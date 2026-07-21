@@ -1,0 +1,33 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Telegram Media Downloader Settings</title>
+  <style>
+    :root{color-scheme:dark}
+    body{margin:0;background:#0b1320;color:#e8eef8;font:14px/1.4 system-ui,sans-serif}
+    main{padding:20px;max-width:700px}
+    h1{margin:0 0 14px}
+    label{display:flex;gap:8px;align-items:center;background:#1b2a41;border:1px solid rgba(255,255,255,.14);border-radius:10px;padding:12px;margin-bottom:10px}
+    .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+    button{background:#1b2a41;color:#fff;border:1px solid rgba(255,255,255,.14);border-radius:10px;padding:10px 12px;cursor:pointer}
+    pre{white-space:pre-wrap;word-break:break-word;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:12px}
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Settings</h1>
+    <label><input id="debugEnabled" type="checkbox"> Enable debug mode</label>
+    <label><input id="showFloatingButtons" type="checkbox"> Show floating media and debug buttons</label>
+    <label><input id="autoCollectLight" type="checkbox"> Auto collect light metadata in page</label>
+    <div class="actions">
+      <button id="save">Save</button>
+      <button id="clearLogs">Clear logs</button>
+      <button id="clearAll">Clear all indexed media</button>
+    </div>
+    <pre id="status">Ready.</pre>
+  </main>
+  <script src="scripts/common.js"></script>
+  <script src="settings.js"></script>
+</body>
+</html>

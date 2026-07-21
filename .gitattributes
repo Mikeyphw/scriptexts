@@ -1,0 +1,9 @@
+
+* text=auto eol=lf
+*.user.js text eol=lf linguist-language=JavaScript
+*.xpi binary
+*.zip binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary

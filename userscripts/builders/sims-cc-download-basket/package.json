@@ -1,0 +1,10 @@
+{
+  "name": "@scriptexts/sims-cc-download-basket",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs",
+    "check": "node --check dist/modthesims-download-basket.user.js && node --check dist/simblrcc-download-basket.user.js && node --check dist/thesimsresource-download-basket.user.js"
+  },
+  "devDependencies": {}
+}

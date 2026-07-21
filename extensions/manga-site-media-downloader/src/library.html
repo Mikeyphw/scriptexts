@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>MRM Library</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="./icons/icon32.png">
+  <link rel="apple-touch-icon" href="./icons/icon128.png">
+  <link rel="stylesheet" href="./library.css">
+
+<style id="mrm-flat-revamp-v11021">
+:root{
+  --mrm-surface:#121212 !important;
+  --mrm-surface-2:#181818 !important;
+  --mrm-surface-3:#202020 !important;
+  --mrm-text:#f5f5f5 !important;
+  --mrm-muted:#a3a3a3 !important;
+  --mrm-border:transparent !important;
+  --mrm-accent:#ff7a33 !important;
+}
+html,body{
+  background:#101010 !important;
+  background-image:none !important;
+}
+body,
+.popup-app,
+.settings-page,
+.library-page,
+.bulk-page,
+.app-shell,
+.view-shell,
+.page-shell,
+.page-panel,
+.settings-panel,
+.content-panel,
+.content-area,
+.tab-view{
+  background:#101010 !important;
+  backdrop-filter:none !important;
+  box-shadow:none !important;
+  border:none !important;
+}
+.main-card,.glass-card,.page-panel,.settings-panel,.history-item,.queue-item,.queue-card,.history-card,.debug-card,.sites-card,
+.panel-card,.mrm-panel,.home-card,.site-link-card,.library-card,.sync-panel,.summary,.settings-section,.mrm-setting-block,.mrm-setting-row,
+.status-chip,.top-nav button,.top-nav a,button,input,select,textarea,.mrm-inline-chip,.queue-chip,.filter-chip,.queue-toolbar button,.queue-card button,
+.collapsible-action-panel,.collapsible-action-panel summary,.pane-card,.site-chip,.dashboard-stat,.mrm-collapsible,.site-link-card,.history-row,
+.download-button,.action-btn,.ghost-button,.action-button,.primary-action,.secondary-action,.card,.list-card,.row-card,.queue-actions-themed button{
+  background:#1a1a1a !important;
+  background-image:none !important;
+  color:#f5f5f5 !important;
+  border:none !important;
+  outline:none !important;
+  box-shadow:none !important;
+  backdrop-filter:none !important;
+}
+button,.top-nav button,.top-nav a,.action-btn,.tab-btn,.action-button,.ghost-button,.download-button,.primary-action,.secondary-action{
+  min-height:42px;
+  border-radius:14px !important;
+}
+button:hover,.top-nav button:hover,.top-nav a:hover,.action-btn:hover,.download-button:hover,.action-button:hover,.ghost-button:hover,.site-link-card:hover{
+  transform:none !important;
+  background:#232323 !important;
+  border:none !important;
+  box-shadow:none !important;
+}
+button.is-active,.top-nav button.is-active,.top-nav a.is-active,.filter-chip.is-active,.queue-chip.is-active,.status-chip.is-active{
+  background:var(--mrm-accent) !important;
+  color:#fff !important;
+}
+button.is-quiet,.top-nav button.is-quiet,.top-nav a.is-quiet{
+  background:#1d1d1d !important;
+  color:#d4d4d4 !important;
+}
+input,select,textarea{
+  background:#171717 !important;
+  color:#f5f5f5 !important;
+  border:none !important;
+  box-shadow:none !important;
+}
+.queue-card,.history-row,.history-item,.library-card,.settings-section,.mrm-setting-block,.mrm-setting-row,.pane-card,.footer-card,.site-link-card,.dashboard-stat{
+  border-radius:16px !important;
+}
+.brand-subtitle,.section-subtitle,.muted,.muted-footer,.muted-text,.hint,.site-link-card small,.status-copy,.caption{
+  color:#9a9a9a !important;
+}
+hr,.divider,.section-divider{
+  border:none !important;
+  background:#1f1f1f !important;
+  height:1px !important;
+}
+.status-chip,.queue-chip,.filter-chip,.pill,.badge{
+  border-radius:999px !important;
+}
+.top-nav{
+  gap:8px !important;
+}
+.top-nav button,.top-nav a{
+  background:#1a1a1a !important;
+}
+.scroll-view::-webkit-scrollbar{width:10px;height:10px}
+.scroll-view::-webkit-scrollbar-thumb{background:#2a2a2a;border-radius:999px}
+#siteChip,.site-chip,.status-chip{
+  background:#161616 !important;
+}
+
+/* v1.10.30 library inline tighten */
+:root{
+  --mrm-surface:#181818 !important;
+  --mrm-surface-2:#1c1c1c !important;
+  --mrm-surface-3:#202020 !important;
+}
+.toolbar,.summary,.item-card,.item-row,.collection-card,.modal-card,.empty{
+  border-radius:18px !important;
+}
+button,.header-actions button,.bulk-actions button,.toolbar button{
+  min-height:40px !important;
+  border-radius:12px !important;
+}
+.tag,.chip,.badge,.pill,.count{background:#202020 !important;border:none !important}
+
+</style>
+
+  <link rel="stylesheet" href="./styles/final-polish.css">
+
+<style id="mrm-v11028-surface-cleanup">
+html,body{max-width:100%;overflow-x:hidden!important}
+body{min-width:0!important}
+.mrm-page-shell,.library-app,.mrm-page-stack,.content-wrap,.scroll-view,.mrm-card,.mrm-setting-block,.mrm-setting-row,.library-card{
+  min-width:0!important;max-width:100%!important;box-sizing:border-box!important;
+}
+.mrm-page-shell{width:min(980px,100%)!important}
+.mrm-page-stack{display:flex!important;flex-direction:column!important;gap:12px!important}
+.mrm-settings-tools,.mrm-settings-nav,.mrm-settings-footer-bar{
+  background:#181818!important;border:none!important;box-shadow:none!important;backdrop-filter:none!important
+}
+.mrm-settings-search,.mrm-settings-nav a,.mrm-secondary-btn,.mrm-ghost-btn,.mrm-icon-btn,.mrm-inline-chip,.mrm-field .mrm-input,.mrm-input,input,select,textarea,button{
+  background:#202020!important;border:none!important;box-shadow:none!important;background-image:none!important
+}
+.mrm-primary-btn,#saveBtn,#footerSaveBtn,.button-primary,.btn-primary{
+  background:#ff7a33!important;color:#111!important;background-image:none!important;border:none!important;box-shadow:none!important
+}
+.mrm-toggle-track{background:#2a2a2a!important;border:none!important}
+.mrm-toggle input:checked + .mrm-toggle-track{background:#ff7a33!important}
+.mrm-page-header{background:#181818!important;border:none!important;box-shadow:none!important}
+.mrm-card,.mrm-setting-block,.mrm-setting-row,.library-card,.site-link-card,.queue-card,.history-row{
+  background:#181818!important;border:none!important;box-shadow:none!important
+}
+@media (max-width: 860px){
+  .mrm-settings-tools{position:static!important;grid-template-columns:1fr!important}
+  .mrm-settings-quick-actions{justify-content:flex-start!important}
+}
+
+/* v1.10.30 library inline tighten */
+:root{
+  --mrm-surface:#181818 !important;
+  --mrm-surface-2:#1c1c1c !important;
+  --mrm-surface-3:#202020 !important;
+}
+.toolbar,.summary,.item-card,.item-row,.collection-card,.modal-card,.empty{
+  border-radius:18px !important;
+}
+button,.header-actions button,.bulk-actions button,.toolbar button{
+  min-height:40px !important;
+  border-radius:12px !important;
+}
+.tag,.chip,.badge,.pill,.count{background:#202020 !important;border:none !important}
+
+</style>
+
+</head>
+<body>
+  <div class="library-app">
+    <header class="library-header">
+      <div>
+        <h1>Library</h1>
+        <p>Saved post metadata from supported sites. Covers are cached locally when possible; full post images are not stored.</p>
+      </div>
+      <div class="header-actions">
+        <button id="syncNowBtn" class="ghost">Sync now</button>
+        <button id="exportLibraryBtn">Export JSON</button>
+        <button id="exportSelectedBtn" class="ghost">Export selected</button>
+        <button id="toggleDensityBtn" class="ghost">Compact view</button>
+        <button id="importLibraryBtn">Import JSON</button>
+        <button id="backBtn" class="ghost">Back</button>
+      </div>
+      <input id="importLibraryFileInput" type="file" accept="application/json,.json" hidden>
+    </header>
+
+    <section class="library-summary" id="libraryStats"></section>
+    <section class="library-quick-filters" id="libraryQuickFilters" aria-label="Quick filters"></section>
+    <section class="toolbar">
+      <input id="searchInput" type="search" placeholder="Search title, artist, tag, site, notes…">
+      <select id="siteFilter">
+        <option value="">All sites</option>
+      </select>
+      <select id="languageFilter">
+        <option value="">All languages</option>
+      </select>
+      <select id="statusFilter">
+        <option value="">All statuses</option>
+        <option value="downloaded">Downloaded</option>
+        <option value="not-downloaded">Not downloaded</option>
+        <option value="favorite">Favorites</option>
+        <option value="reading">Reading</option>
+        <option value="finished">Finished</option>
+      </select>
+      <select id="collectionFilter">
+        <option value="">All collections</option>
+      </select>
+      <select id="ratingFilter">
+        <option value="">Any rating</option>
+        <option value="5">★★★★★</option>
+        <option value="4">★★★★+</option>
+        <option value="3">★★★+</option>
+      </select>
+      <select id="sortSelect">
+        <option value="addedAtDesc">Recently added</option>
+        <option value="titleAsc">Title A–Z</option>
+        <option value="siteAsc">Site</option>
+        <option value="downloadedDesc">Downloaded first</option>
+      </select>
+    </section>
+
+    <section class="sync-panel">
+      <div>
+        <strong>Sync-ready storage</strong>
+        <span id="syncStatus">Google Drive manual/auto sync is available after OAuth connection.</span>
+      </div>
+      <div class="sync-actions"><button id="drivePushBtn" class="ghost">Push</button><button id="drivePullBtn" class="ghost">Pull</button><button id="syncNowBtn2" class="ghost">Sync</button><button id="createSnapshotBtn" class="ghost">Export snapshot</button></div>
+    </section>
+
+    <section class="bulk-panel" aria-label="Bulk library actions">
+      <div class="bulk-status">
+        <strong id="selectedSummary">0 selected</strong>
+        <span>Select visible cards, then run a bulk action.</span>
+      </div>
+      <div class="bulk-actions">
+        <button id="selectVisibleBtn" class="ghost">Select visible</button>
+        <button id="selectAllBtn" class="ghost">Select all</button>
+        <button id="clearSelectionBtn" class="ghost">Clear</button>
+        <button id="downloadSelectedBtn">Download selected</button>
+        <button id="queueSelectedBtn" class="ghost">Queue selected</button>
+        <button id="refreshSelectedBtn" class="ghost">Refresh metadata</button>
+        <button id="refreshMissingCoversBtn" class="ghost">Refresh missing covers</button>
+        <button id="generateSelectedCoversBtn" class="ghost">Generate cover only</button>
+        <button id="setCollectionSelectedBtn" class="ghost">Set collection</button>
+        <button id="bulkTagSelectedBtn" class="ghost">Bulk tags</button>
+        <button id="refreshStaleMetadataBtn" class="ghost">Refresh stale</button>
+        <button id="cleanupDuplicatesBtn" class="ghost">Cleanup duplicates</button>
+        <button id="removeSelectedBtn" class="danger">Remove selected</button>
+      </div>
+    </section>
+
+    <main>
+      <div id="librarySummaryText" class="summary">Loading…</div>
+      <div id="libraryGrid" class="library-grid"></div>
+      <div id="emptyLibrary" class="empty" hidden>
+        <div class="empty-icon">📚</div>
+        <h2>No saved posts yet</h2>
+        <p>Use “Save to Library” on post/listing pages, or import a JSON library file.</p>
+      </div>
+    </main>
+
+    <div id="toast" class="toast" hidden></div>
+  </div>
+
+  <script src="./scripts/library-store.js"></script>
+  <script src="./scripts/sync-foundation.js"></script>
+  <script src="./scripts/metadata-extractor.js"></script>
+  <script src="./library.js"></script>
+</body>
+</html>

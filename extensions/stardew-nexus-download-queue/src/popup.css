@@ -1,0 +1,361 @@
+:root {
+  color-scheme: dark;
+  --nxq-shell-width: 460px;
+  --nxq-shell-height: 720px;
+  --nxq-bg: #16120f;
+  --nxq-bg-2: #1b1511;
+  --nxq-panel: #211811;
+  --nxq-panel-2: #281d15;
+  --nxq-panel-3: #30231a;
+  --nxq-text: #e8d5b5;
+  --nxq-muted: #bb9d73;
+  --nxq-btn: #5f452d;
+  --nxq-btn-2: #523b28;
+  --nxq-accent: #c3a779;
+  --nxq-accent-soft: rgba(195, 167, 121, 0.18);
+  --nxq-press: rgba(195, 167, 121, 0.24);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--nxq-bg);
+  background-image: none;
+  color: var(--nxq-text);
+}
+
+body {
+  width: min(var(--nxq-shell-width), 100vw);
+  min-width: 0;
+  max-width: 100vw;
+  height: min(var(--nxq-shell-height), 100dvh);
+  min-height: min(var(--nxq-shell-height), 100dvh);
+  max-height: 100dvh;
+  overflow: hidden;
+  overscroll-behavior: contain;
+  font: 14px/1.45 Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+.nxq-android-ui body {
+  width: 100vw;
+  min-height: 100dvh;
+  height: 100dvh;
+  max-height: 100dvh;
+}
+
+.app {
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow: hidden;
+  padding:
+    max(12px, env(safe-area-inset-top))
+    max(12px, env(safe-area-inset-right))
+    max(12px, calc(env(safe-area-inset-bottom) + 12px))
+    max(12px, env(safe-area-inset-left));
+}
+
+.nxq-android-ui .app {
+  gap: 8px;
+  padding:
+    max(10px, env(safe-area-inset-top))
+    max(10px, env(safe-area-inset-right))
+    max(10px, calc(env(safe-area-inset-bottom) + 10px))
+    max(10px, env(safe-area-inset-left));
+}
+
+.header,
+.panel,
+.queue-item,
+.debug-panel,
+.badge,
+button,
+select,
+input[type="text"],
+input[type="number"] {
+  border: none;
+  box-shadow: none;
+  background-image: none;
+}
+
+.header,
+.panel {
+  background: var(--nxq-panel);
+  padding: 12px;
+  border-radius: 18px;
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.header h1,
+.panel h2 {
+  margin: 0 0 4px;
+  color: var(--nxq-text);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  font-weight: 800;
+}
+
+.header h1 {
+  font-size: 19px;
+}
+
+.panel h2 {
+  font-size: 15px;
+  margin-bottom: 0;
+}
+
+.header p,
+.footer-note,
+.queue-subtitle,
+.queue-message,
+#debugStatus {
+  color: var(--nxq-muted);
+}
+
+.header p,
+.footer-note,
+#debugStatus {
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  gap: 8px;
+}
+
+.panel-head,
+.queue-row,
+.actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.actions {
+  flex-wrap: wrap;
+}
+
+.settings {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.settings label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 8px 10px;
+  border-radius: 12px;
+  background: var(--nxq-panel-2);
+  color: var(--nxq-text);
+  font-weight: 700;
+}
+
+.settings label:has(select) {
+  display: grid;
+  gap: 8px;
+  align-items: stretch;
+}
+
+.queue-list {
+  max-height: 360px;
+  overflow: auto;
+  padding-right: 2px;
+}
+
+.queue-item {
+  margin-bottom: 8px;
+  padding: 10px;
+  border-radius: 12px;
+  background: var(--nxq-panel-2);
+}
+
+.queue-item.dragging {
+  opacity: 0.65;
+}
+
+.queue-title {
+  font-weight: 800;
+  line-height: 1.3;
+}
+
+.queue-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--nxq-muted);
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: var(--nxq-btn-2);
+  color: #f2e1c7;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.progress {
+  margin-top: 8px;
+  height: 6px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: #19130f;
+}
+
+.progress > span {
+  display: block;
+  height: 100%;
+  background: var(--nxq-accent);
+}
+
+button,
+select,
+input[type="text"],
+input[type="number"] {
+  min-height: 40px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: var(--nxq-btn);
+  color: #f7ead4;
+  font-size: 13px;
+  line-height: 1.2;
+  font-weight: 800;
+  transition:
+    background-color 0.16s ease,
+    color 0.16s ease,
+    transform 0.12s ease,
+    opacity 0.16s ease,
+    box-shadow 0.16s ease;
+}
+
+button:hover,
+select:hover,
+input[type="text"]:hover,
+input[type="number"]:hover {
+  background: #705237;
+  box-shadow: inset 0 0 0 1px rgba(255, 240, 217, 0.03);
+}
+
+button:active,
+select:active,
+input[type="text"]:active,
+input[type="number"]:active {
+  background: var(--nxq-press);
+}
+
+button:focus-visible,
+select:focus-visible,
+input[type="text"]:focus-visible,
+input[type="number"]:focus-visible,
+input[type="checkbox"]:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(195, 167, 121, 0.22);
+}
+
+.nxq-android-ui button,
+.nxq-android-ui select,
+.nxq-android-ui input[type="text"],
+.nxq-android-ui input[type="number"] {
+  min-height: 44px;
+}
+
+button.secondary {
+  background: var(--nxq-btn-2);
+}
+
+button.danger {
+  background: #7a3f32;
+  color: #ffe2da;
+}
+
+.icon-btn {
+  width: 40px;
+  min-width: 40px;
+  padding: 0;
+  font-size: 17px;
+  line-height: 1;
+}
+
+select {
+  appearance: none;
+}
+
+input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--nxq-accent);
+}
+
+.debug-panel {
+  max-height: 220px;
+  overflow: auto;
+  margin-top: 0;
+  padding: 10px;
+  border-radius: 12px;
+  background: var(--nxq-panel-2);
+  color: #dcc29a;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+@media (max-width: 520px) {
+  body {
+    width: 100vw;
+    height: 100dvh;
+    min-height: 100dvh;
+  }
+
+  .header,
+  .panel {
+    padding: 10px;
+    border-radius: 16px;
+  }
+
+  .header {
+    gap: 8px;
+  }
+
+  .header h1 {
+    font-size: 18px;
+  }
+
+  .panel-head {
+    align-items: flex-start;
+  }
+
+  .actions {
+    justify-content: flex-end;
+  }
+
+  .queue-list {
+    max-height: none;
+    flex: 1 1 auto;
+  }
+}

@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>Stardew Nexus Queue</title>
+  <script src="popup-platform.js"></script>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <main class="app nxq-shell">
+    <header class="header">
+      <div>
+        <h1>Stardew Nexus Queue</h1>
+        <p>Queue and manage Stardew Valley Nexus downloads.</p>
+      </div>
+      <button id="refreshBtn" class="icon-btn" title="Refresh">↻</button>
+    </header>
+
+    <section class="panel">
+      <div class="panel-head">
+        <h2>Queue</h2>
+        <div class="actions">
+          <button id="pauseBtn" class="secondary">Pause active</button>
+          <button id="clearBtn" class="secondary">Clear finished</button>
+        </div>
+      </div>
+      <div id="queueList" class="queue-list"></div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <h2>Settings</h2>
+      </div>
+      <div class="settings">
+        <label><input id="showListingButtons" type="checkbox"> Show listing buttons</label>
+        <label><input id="interceptPageDownloads" type="checkbox"> Intercept page downloads into queue</label>
+        <label><input id="autoProcessQueue" type="checkbox"> Process queue automatically</label>
+        <label><input id="notifyOnComplete" type="checkbox"> Notify when done</label>
+        <label><input id="highlightUpdateCards" type="checkbox"> Highlight cards with updates</label>
+        <label><input id="debug" type="checkbox"> Debug logging</label>
+
+        <label>
+          Listing button mode
+          <select id="listingButtonMode">
+            <option value="manual">Manual only</option>
+            <option value="manager">Vortex only</option>
+            <option value="both">Manual + Vortex</option>
+          </select>
+        </label>
+
+        <label>
+          Listing button style
+          <select id="listingButtonStyle">
+            <option value="icon">Icon only</option>
+            <option value="button">Text + icon</option>
+          </select>
+        </label>
+      </div>
+      <div class="footer-note">Works only on Stardew Valley pages on Nexus Mods.</div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <h2>Debug</h2>
+        <div class="actions">
+          <button id="copyLogsBtn" class="secondary">Copy logs</button>
+          <button id="clearLogsBtn" class="secondary">Clear logs</button>
+        </div>
+      </div>
+      <div id="debugStatus" class="footer-note">Waiting for logs…</div>
+      <pre id="debugPanel" class="debug-panel"></pre>
+    </section>
+  </main>
+  <script src="popup.js"></script>
+</body>
+</html>

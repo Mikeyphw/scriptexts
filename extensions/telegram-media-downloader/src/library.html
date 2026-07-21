@@ -1,0 +1,42 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Telegram Media Library</title>
+  <style>
+    :root{color-scheme:dark}
+    body{margin:0;background:#0b1320;color:#e8eef8;font:14px/1.4 system-ui,sans-serif}
+    main{display:grid;grid-template-columns:300px 1fr;min-height:100vh}
+    .sidebar{border-right:1px solid rgba(255,255,255,.08);padding:16px}
+    .content{padding:16px;min-width:0}
+    .list{display:grid;gap:8px}
+    .chat,button{background:#1b2a41;color:#fff;border:1px solid rgba(255,255,255,.14);border-radius:10px;padding:10px 12px;cursor:pointer}
+    .header{display:flex;justify-content:space-between;gap:8px;align-items:start;margin-bottom:16px}
+    .actions{display:flex;gap:8px;flex-wrap:wrap}
+    .grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}
+    .entry{border:1px solid rgba(255,255,255,.08);border-radius:14px;overflow:hidden;background:rgba(255,255,255,.03)}
+    .entry img{width:100%;aspect-ratio:1/1;object-fit:cover;display:block}
+    .entry .meta{padding:10px;display:grid;gap:4px}
+  </style>
+</head>
+<body>
+  <main>
+    <section class="sidebar">
+      <h1>Chats</h1>
+      <div id="chats" class="list"></div>
+    </section>
+    <section class="content">
+      <div class="header">
+        <h2 id="title">Select a chat</h2>
+        <div class="actions">
+          <button id="export">Export</button>
+          <button id="clear">Clear chat</button>
+        </div>
+      </div>
+      <div id="entries" class="grid"></div>
+    </section>
+  </main>
+  <script src="scripts/common.js"></script>
+  <script src="library.js"></script>
+</body>
+</html>

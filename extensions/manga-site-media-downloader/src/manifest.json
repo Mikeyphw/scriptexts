@@ -1,0 +1,110 @@
+{
+  "manifest_version": 2,
+  "name": "Manga Site Media Downloader",
+  "version": "1.10.3",
+  "description": "Download galleries from MyReadingManga, MangaLotus, BaraMangaOnline, YaoiMangaOnline, and nhentai.",
+  "author": "nyt92",
+  "permissions": [
+    "storage",
+    "downloads",
+    "cookies",
+    "webRequest",
+    "webRequestBlocking",
+    "tabs",
+    "https://myreadingmanga.info/*",
+    "https://www.myreadingmanga.info/*",
+    "https://i1.myreadingmanga.info/*",
+    "https://i2.myreadingmanga.info/*",
+    "https://i3.myreadingmanga.info/*",
+    "https://i4.myreadingmanga.info/*",
+    "https://i5.myreadingmanga.info/*",
+    "https://i6.myreadingmanga.info/*",
+    "https://mangalotus.com/*",
+    "https://www.mangalotus.com/*",
+    "https://yaoimangaonline.com/*",
+    "https://www.yaoimangaonline.com/*",
+    "https://baramangaonline.com/*",
+    "https://www.baramangaonline.com/*",
+    "https://nhentai.net/*",
+    "https://www.nhentai.net/*",
+    "https://i.nhentai.net/*",
+    "https://t.nhentai.net/*",
+    "https://t1.nhentai.net/*",
+    "https://t2.nhentai.net/*",
+    "https://t3.nhentai.net/*",
+    "https://t4.nhentai.net/*",
+    "identity",
+    "https://www.googleapis.com/*",
+    "http://127.0.0.1/*"
+  ],
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "browser_action": {
+    "default_popup": "popup.html",
+    "default_title": "Manga Site Downloader"
+  },
+  "background": {
+    "scripts": [
+      "scripts/jszip.min.js",
+      "background.js"
+    ],
+    "persistent": true
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://myreadingmanga.info/*",
+        "https://www.myreadingmanga.info/*",
+        "https://mangalotus.com/*",
+        "https://www.mangalotus.com/*",
+        "https://baramangaonline.com/*",
+        "https://www.baramangaonline.com/*",
+        "https://nhentai.net/*",
+        "https://www.nhentai.net/*",
+        "https://yaoimangaonline.com/*",
+        "https://www.yaoimangaonline.com/*"
+      ],
+      "js": [
+        "scripts/mrm-common.js",
+        "scripts/jszip.min.js",
+        "scripts/library-store.js",
+        "scripts/metadata-extractor.js",
+        "content.js"
+      ]
+    }
+  ],
+  "web_accessible_resources": [
+    "scripts/FileSaver.min.js",
+    "scripts/jszip.min.js",
+    "scripts/mrm-common.js",
+    "styles/theme.css",
+    "scripts/library-store.js",
+    "scripts/metadata-extractor.js",
+    "scripts/sync-foundation.js",
+    "library.html",
+    "library.css",
+    "popup.html",
+    "popup.js",
+    "scripts/popup-platform.js",
+    "styles/revamp.css",
+    "styles/mrm-dark.css"
+  ],
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "manga-site-media-downloader@mikeyphw.scriptexts",
+      "strict_min_version": "142.0",
+      "data_collection_permissions": {
+        "required": [
+          "none"
+        ]
+      }
+    },
+    "gecko_android": {
+      "strict_min_version": "142.0"
+    }
+  }
+}

@@ -1,0 +1,67 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Telegram Media Downloader</title>
+  <style>
+    :root{color-scheme:dark}
+    body{margin:0;background:#0b1320;color:#e8eef8;font:14px/1.4 system-ui,sans-serif}
+    main{padding:16px;width:380px;box-sizing:border-box;display:grid;gap:12px}
+    h1{margin:0;font-size:18px}
+    p{margin:0;color:#9fb1c7}
+    .actions,.toggles{display:grid;gap:8px}
+    button,label{background:#1b2a41;color:#fff;border:1px solid rgba(255,255,255,.14);border-radius:10px;padding:10px 12px}
+    label{display:flex;gap:8px;align-items:center}
+    .row{display:flex;gap:8px;flex-wrap:wrap}
+    .row > button{flex:1}
+    pre,.logs{white-space:pre-wrap;word-break:break-word;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:12px}
+    .logs{max-height:260px;overflow:auto;display:grid;gap:8px}
+    .log{border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:8px;background:rgba(255,255,255,.03)}
+    .log.error{border-color:rgba(255,89,89,.32)}
+    .log.warn{border-color:rgba(255,196,89,.24)}
+    .meta{font-size:11px;color:#9fb1c7}
+    .msg{font-size:12px;margin-top:2px}
+  </style>
+</head>
+<body>
+  <main>
+    <div>
+      <h1>Telegram Media Downloader</h1>
+      <p>Popup controls + debug panel. Harvesting tuned for Firefox Android too.</p>
+    </div>
+
+    <div class="actions">
+      <div class="row">
+        <button id="collect">Collect now</button>
+        <button id="harvest">Harvest steps</button>
+      </div>
+      <div class="row">
+        <label style="flex:1;display:flex;align-items:center;gap:8px"><span>Steps</span><input id="harvestSteps" type="number" min="1" max="100" value="8" style="flex:1;background:#0f1a2b;color:#fff;border:1px solid rgba(255,255,255,.14);border-radius:8px;padding:8px"></label>
+      </div>
+      <div class="row">
+        <button id="browser">Open media browser</button>
+        <button id="library">Open library</button>
+      </div>
+      <div class="row">
+        <button id="copyLogs">Copy logs</button>
+        <button id="clearLogs">Clear logs</button>
+      </div>
+      <div class="row">
+        <button id="settings">Settings</button>
+        <button id="refreshLogs">Refresh logs</button>
+      </div>
+    </div>
+
+    <div class="toggles">
+      <label><input id="debugEnabled" type="checkbox"> Debug mode</label>
+      <label><input id="showFloatingButtons" type="checkbox"> Show floating buttons</label>
+      <label><input id="autoCollectLight" type="checkbox"> Light auto collect</label>
+    </div>
+
+    <pre id="status">Ready.</pre>
+    <div id="logs" class="logs"><div class="meta">No logs yet.</div></div>
+  </main>
+  <script src="scripts/common.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

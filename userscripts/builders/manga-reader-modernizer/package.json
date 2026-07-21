@@ -1,0 +1,12 @@
+{
+  "name": "@scriptexts/manga-reader-modernizer",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs",
+    "check": "node --check dist/mrm.user.js && node --check dist/ymo.user.js && node --check dist/bara.user.js"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.5"
+  }
+}

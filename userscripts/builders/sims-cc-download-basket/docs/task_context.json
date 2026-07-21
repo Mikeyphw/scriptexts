@@ -1,0 +1,159 @@
+{
+  "schema_version": 1,
+  "generated_at_utc": "2026-07-08T18:13:29Z",
+  "project": {
+    "name": "Sims CC Download Basket",
+    "current_version": "1.4.1",
+    "sites": [
+      "modthesims.info",
+      "simblr.cc",
+      "thesimsresource.com"
+    ],
+    "source_of_truth": {
+      "path": "project/sims_cc_download_basket_build.zip",
+      "size_bytes": 364078,
+      "line_count": 1463,
+      "sha256": "061cebac44029eabafa39d120fa5a5b5f991811da7b8e8514561ed5780e8cccb"
+    },
+    "build_commands": [
+      "npm run build",
+      "npm run check"
+    ],
+    "stable_archive_name": "sims_cc_download_basket_build.zip",
+    "output_policy": "Three independent site-specific JavaScript userscripts; no TXT mirrors."
+  },
+  "latest_issue": {
+    "site": "Mod The Sims",
+    "page_type": "downloads listing",
+    "symptoms": [
+      "Category chips in replacement cards were clipped/chopped.",
+      "Replacement cards did not show a Basket action."
+    ],
+    "evidence": {
+      "path": "evidence/mts_cards_chips_and_missing_basket.png",
+      "size_bytes": 690132,
+      "line_count": 2809,
+      "sha256": "fdc80e18b58d097d2c941be96307b9eaea48d5e8535c5f70d5278b48f5994263"
+    },
+    "implemented_fix_in_1_4_1": [
+      "Chip containers use automatic height, wrapping, and visible overflow.",
+      "The MTS replacement-card renderer creates the Basket action directly.",
+      "Rendered cards are immediately marked as wired to avoid duplicate later insertion."
+    ],
+    "verification_status": "Static syntax and archive validation passed; live-site browser verification still required."
+  },
+  "hard_constraints": [
+    "Preserve target-aware pruning and previous runtime optimizations.",
+    "Do not include all three heavy site implementations in every output.",
+    "Do not add duplicate top-level functions that override newer behavior.",
+    "Keep the project archive ZIP-only with the stable unversioned filename.",
+    "Generate one userscript per site and no TXT mirrors.",
+    "Avoid eval.",
+    "Keep dark, flat, modern, borderless, responsive styling.",
+    "Keep advanced basket controls behind menus or overlays.",
+    "Save full mod descriptions but show only a compact preview in the basket.",
+    "Do not restore Add visible mods; use per-card Basket actions."
+  ],
+  "architecture": {
+    "entries": "src/entry/*.user.js",
+    "shared_runtime": "src/core/app.js",
+    "design_system": "src/core/design-system.js",
+    "site_adapters": [
+      "src/sites/mts.js",
+      "src/sites/simblr.js",
+      "src/sites/tsr.js"
+    ],
+    "builder": "build.mjs",
+    "targets": "scripts.config.mjs"
+  },
+  "implemented_capabilities": {
+    "basket": [
+      "Cross-site storage",
+      "Grouped mods and multi-file selection",
+      "Search/filter/sort/session baskets",
+      "Duplicate scoring and review",
+      "Download plan and queue state",
+      "Stale-link refresh and health checks",
+      "Exports, backup/undo, notes/tags, keyboard shortcuts",
+      "Saved full mod info/description with click-to-open overlay"
+    ],
+    "stability": [
+      "Page-type routing",
+      "Throttled keyed cleanup",
+      "Processed-node caching",
+      "Deferred idle work",
+      "Cleanup budgets",
+      "CSS containment",
+      "Safe mode and per-site toggles",
+      "Visual diagnostics",
+      "Broken-layout recovery",
+      "Build reports and leak checks"
+    ]
+  },
+  "generated_userscripts": [
+    {
+      "path": "userscripts/modthesims-download-basket.user.js",
+      "size_bytes": 481040,
+      "line_count": 4805,
+      "sha256": "8722b3f810bb51af275d4830428f7fe276d36bbcab01dd8c762ab92d535b92c4",
+      "userscript_version": "1.4.1"
+    },
+    {
+      "path": "userscripts/simblrcc-download-basket.user.js",
+      "size_bytes": 484374,
+      "line_count": 4845,
+      "sha256": "3b2f19a4ea593daa485f6351e9fb64e4fdfa8e5a6451e8ed7f6a49df366effc4",
+      "userscript_version": "1.4.1"
+    },
+    {
+      "path": "userscripts/thesimsresource-download-basket.user.js",
+      "size_bytes": 475391,
+      "line_count": 4573,
+      "sha256": "c8ac6a84a633fb6d6e3b9f27903dfbc64216dfe2debd20cb26958962a91ecb95",
+      "userscript_version": "1.4.1"
+    }
+  ],
+  "html_fixtures": [
+    {
+      "path": "html/mts_testpage/index.html",
+      "size_bytes": 69293,
+      "line_count": 1756,
+      "sha256": "da65b5dfaab7b76083e6c3480126065de72f85d1656487dee4c07c933493d00a",
+      "note": "MTS HTML fixture supplied by the user."
+    },
+    {
+      "path": "html/mts_testpage/dump.html",
+      "size_bytes": 0,
+      "line_count": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "note": "Zero-byte file retained exactly as uploaded."
+    },
+    {
+      "path": "html/mts_testpage/test.html",
+      "size_bytes": 549153,
+      "line_count": 6545,
+      "sha256": "b1805744181a1faf0c4ebca90d9162aac64f78a05fa3c4058a261162729c060e",
+      "note": "MTS HTML fixture supplied by the user."
+    },
+    {
+      "path": "html/mts_testpage/test-fixed.html",
+      "size_bytes": 550485,
+      "line_count": 6561,
+      "sha256": "c4fe2d567d79af18bd91dd96894c356edc840f50e1e54cdce9a8c53cec374d1c",
+      "note": "MTS HTML fixture supplied by the user."
+    }
+  ],
+  "recommended_new_chat_sequence": [
+    "Read HANDOFF.md and task_context.json.",
+    "Unpack project/sims_cc_download_basket_build.zip.",
+    "Run npm run build and npm run check before edits.",
+    "Use the supplied MTS fixtures to verify chip wrapping and exactly one Basket action per card.",
+    "Edit source files, not only dist files.",
+    "Bump versions consistently, rebuild, validate, and recreate the stable source archive."
+  ],
+  "known_caveats": [
+    "The standalone userscripts elsewhere in /mnt/data may be stale; use the copies in this handoff or the nested source archive.",
+    "dump.html is empty but was intentionally included exactly as uploaded.",
+    "Current fixes have not been live-browser tested in this environment."
+  ]
+}

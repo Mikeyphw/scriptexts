@@ -1,0 +1,62 @@
+{
+  "manifest_version": 2,
+  "name": "Stardew Nexus Download Queue",
+  "version": "0.4.4",
+  "description": "Queue and launch Stardew Valley Nexus downloads with listing-page buttons and a popup manager.",
+  "author": "OpenAI",
+  "permissions": [
+    "https://next.nexusmods.com/stardewvalley/*",
+    "https://www.nexusmods.com/stardewvalley/*",
+    "https://www.nexusmods.com/games/stardewvalley/*",
+    "notifications",
+    "downloads",
+    "tabs",
+    "https://staticdelivery.nexusmods.com/*",
+    "storage",
+    "https://next.nexusmods.com/games/stardewvalley/*"
+  ],
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "browser_action": {
+    "default_popup": "popup.html",
+    "default_title": "Stardew Nexus Queue"
+  },
+  "background": {
+    "scripts": [
+      "background.js"
+    ],
+    "persistent": true
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.nexusmods.com/games/stardewvalley/*",
+        "https://next.nexusmods.com/stardewvalley/*",
+        "https://www.nexusmods.com/stardewvalley/*",
+        "https://next.nexusmods.com/games/stardewvalley/*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "stardew-nexus-download-queue@mikeyphw.scriptexts",
+      "strict_min_version": "140.0",
+      "data_collection_permissions": {
+        "required": [
+          "none"
+        ]
+      }
+    },
+    "gecko_android": {
+      "strict_min_version": "142.0"
+    }
+  }
+}

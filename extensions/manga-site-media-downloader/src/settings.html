@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>MRM Downloader - Settings</title>
+  <link rel="stylesheet" href="./styles/theme.css">
+  <link rel="stylesheet" href="./styles/mrm-dark.css">
+  <link rel="stylesheet" href="./styles/revamp.css">
+  <link rel="stylesheet" href="./styles/settings-bulk-polish.css">
+  <link rel="stylesheet" href="./styles/final-polish.css">
+<style>
+.mrm-settings-tools{display:flex;gap:10px;align-items:center;justify-content:space-between;margin:0 0 12px;background:#181818;border:none;border-radius:12px;padding:12px}
+.mrm-settings-search{flex:1;min-width:220px;padding:12px 14px;border-radius:10px;border:none;background:#202020;color:#f5f5f5}
+.mrm-settings-search::placeholder{color:#a3a3a3}
+.mrm-settings-quick-actions{display:flex;gap:8px;flex-wrap:wrap}
+.mrm-settings-nav{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px;background:transparent;padding:0}
+.mrm-settings-nav a{padding:9px 12px;border:none;border-radius:10px;background:#202020;color:#d4d4d4;text-decoration:none;font-size:13px;font-weight:700;letter-spacing:.01em}
+.mrm-settings-nav a:hover,.mrm-settings-nav a.is-active{background:#2a2a2a;color:#fff}
+.mrm-card.is-filter-hidden{display:none!important}
+.mrm-settings-tools{position:sticky;top:98px;z-index:9}
+.mrm-settings-quick-actions .mrm-secondary-btn{min-height:42px}
+.mrm-settings-footer-bar{position:sticky;bottom:0;z-index:12;display:flex;justify-content:space-between;gap:12px;align-items:center;padding:14px 16px;border:none;border-radius:12px;background:#181818;backdrop-filter:none;box-shadow:none;margin-top:16px}
+.mrm-settings-footer-copy{color:#a3a3a3;font-size:13px}
+@media (max-width: 860px){.mrm-settings-tools,.mrm-settings-nav{position:static}.mrm-settings-footer-bar{flex-direction:column;align-items:stretch}}
+
+/* v1.10.30 settings tighten */
+.mrm-settings-tools,.mrm-page-header,.mrm-settings-footer-bar{border-radius:18px !important;padding:12px !important}
+.mrm-settings-nav a,button,input,select,textarea,.mrm-icon-btn,.mrm-secondary-btn,.mrm-ghost-btn,.mrm-inline-chip{
+  min-height:40px !important;
+  border-radius:12px !important;
+}
+.mrm-settings-nav a:hover,button:not(.mrm-primary-btn):hover,.mrm-icon-btn:hover,.mrm-secondary-btn:hover,.mrm-ghost-btn:hover{
+  background:#262626 !important;
+}
+.mrm-settings-nav a:active,button:not(.mrm-primary-btn):active,.mrm-icon-btn:active,.mrm-secondary-btn:active,.mrm-ghost-btn:active{
+  background:rgba(255,122,51,.16) !important;
+}
+
+</style>
+<style id="mrm-flat-revamp-v11021">
+:root{
+  --mrm-surface:#121212 !important;
+  --mrm-surface-2:#181818 !important;
+  --mrm-surface-3:#202020 !important;
+  --mrm-text:#f5f5f5 !important;
+  --mrm-muted:#a3a3a3 !important;
+  --mrm-border:transparent !important;
+  --mrm-accent:#ff7a33 !important;
+}
+html,body{
+  background:#101010 !important;
+  background-image:none !important;
+}
+body,
+.popup-app,
+.settings-page,
+.library-page,
+.bulk-page,
+.app-shell,
+.view-shell,
+.page-shell,
+.page-panel,
+.settings-panel,
+.content-panel,
+.content-area,
+.tab-view{
+  background:#101010 !important;
+  backdrop-filter:none !important;
+  box-shadow:none !important;
+  border:none !important;
+}
+.main-card,.glass-card,.page-panel,.settings-panel,.history-item,.queue-item,.queue-card,.history-card,.debug-card,.sites-card,
+.panel-card,.mrm-panel,.home-card,.site-link-card,.library-card,.sync-panel,.summary,.settings-section,.mrm-setting-block,.mrm-setting-row,
+.status-chip,.top-nav button,.top-nav a,button,input,select,textarea,.mrm-inline-chip,.queue-chip,.filter-chip,.queue-toolbar button,.queue-card button,
+.collapsible-action-panel,.collapsible-action-panel summary,.pane-card,.site-chip,.dashboard-stat,.mrm-collapsible,.site-link-card,.history-row,
+.download-button,.action-btn,.ghost-button,.action-button,.primary-action,.secondary-action,.card,.list-card,.row-card,.queue-actions-themed button{
+  background:#1a1a1a !important;
+  background-image:none !important;
+  color:#f5f5f5 !important;
+  border:none !important;
+  outline:none !important;
+  box-shadow:none !important;
+  backdrop-filter:none !important;
+}
+button,.top-nav button,.top-nav a,.action-btn,.tab-btn,.action-button,.ghost-button,.download-button,.primary-action,.secondary-action{
+  min-height:42px;
+  border-radius:14px !important;
+}
+button:hover,.top-nav button:hover,.top-nav a:hover,.action-btn:hover,.download-button:hover,.action-button:hover,.ghost-button:hover,.site-link-card:hover{
+  transform:none !important;
+  background:#232323 !important;
+  border:none !important;
+  box-shadow:none !important;
+}
+button.is-active,.top-nav button.is-active,.top-nav a.is-active,.filter-chip.is-active,.queue-chip.is-active,.status-chip.is-active{
+  background:var(--mrm-accent) !important;
+  color:#fff !important;
+}
+button.is-quiet,.top-nav button.is-quiet,.top-nav a.is-quiet{
+  background:#1d1d1d !important;
+  color:#d4d4d4 !important;
+}
+input,select,textarea{
+  background:#171717 !important;
+  color:#f5f5f5 !important;
+  border:none !important;
+  box-shadow:none !important;
+}
+.queue-card,.history-row,.history-item,.library-card,.settings-section,.mrm-setting-block,.mrm-setting-row,.pane-card,.footer-card,.site-link-card,.dashboard-stat{
+  border-radius:16px !important;
+}
+.brand-subtitle,.section-subtitle,.muted,.muted-footer,.muted-text,.hint,.site-link-card small,.status-copy,.caption{
+  color:#9a9a9a !important;
+}
+hr,.divider,.section-divider{
+  border:none !important;
+  background:#1f1f1f !important;
+  height:1px !important;
+}
+.status-chip,.queue-chip,.filter-chip,.pill,.badge{
+  border-radius:999px !important;
+}
+.top-nav{
+  gap:8px !important;
+}
+.top-nav button,.top-nav a{
+  background:#1a1a1a !important;
+}
+.scroll-view::-webkit-scrollbar{width:10px;height:10px}
+.scroll-view::-webkit-scrollbar-thumb{background:#2a2a2a;border-radius:999px}
+#siteChip,.site-chip,.status-chip{
+  background:#161616 !important;
+}
+
+/* v1.10.30 settings tighten */
+.mrm-settings-tools,.mrm-page-header,.mrm-settings-footer-bar{border-radius:18px !important;padding:12px !important}
+.mrm-settings-nav a,button,input,select,textarea,.mrm-icon-btn,.mrm-secondary-btn,.mrm-ghost-btn,.mrm-inline-chip{
+  min-height:40px !important;
+  border-radius:12px !important;
+}
+.mrm-settings-nav a:hover,button:not(.mrm-primary-btn):hover,.mrm-icon-btn:hover,.mrm-secondary-btn:hover,.mrm-ghost-btn:hover{
+  background:#262626 !important;
+}
+.mrm-settings-nav a:active,button:not(.mrm-primary-btn):active,.mrm-icon-btn:active,.mrm-secondary-btn:active,.mrm-ghost-btn:active{
+  background:rgba(255,122,51,.16) !important;
+}
+
+</style>
+
+  <link rel="stylesheet" href="./styles/final-polish.css">
+
+<style id="mrm-v11028-surface-cleanup">
+html,body{max-width:100%;overflow-x:hidden!important}
+body{min-width:0!important}
+.mrm-page-shell,.library-app,.mrm-page-stack,.content-wrap,.scroll-view,.mrm-card,.mrm-setting-block,.mrm-setting-row,.library-card{
+  min-width:0!important;max-width:100%!important;box-sizing:border-box!important;
+}
+.mrm-page-shell{width:min(980px,100%)!important}
+.mrm-page-stack{display:flex!important;flex-direction:column!important;gap:12px!important}
+.mrm-settings-tools,.mrm-settings-nav,.mrm-settings-footer-bar{
+  background:#181818!important;border:none!important;box-shadow:none!important;backdrop-filter:none!important
+}
+.mrm-settings-search,.mrm-settings-nav a,.mrm-secondary-btn,.mrm-ghost-btn,.mrm-icon-btn,.mrm-inline-chip,.mrm-field .mrm-input,.mrm-input,input,select,textarea,button{
+  background:#202020!important;border:none!important;box-shadow:none!important;background-image:none!important
+}
+.mrm-primary-btn,#saveBtn,#footerSaveBtn,.button-primary,.btn-primary{
+  background:#ff7a33!important;color:#111!important;background-image:none!important;border:none!important;box-shadow:none!important
+}
+.mrm-toggle-track{background:#2a2a2a!important;border:none!important}
+.mrm-toggle input:checked + .mrm-toggle-track{background:#ff7a33!important}
+.mrm-page-header{background:#181818!important;border:none!important;box-shadow:none!important}
+.mrm-card,.mrm-setting-block,.mrm-setting-row,.library-card,.site-link-card,.queue-card,.history-row{
+  background:#181818!important;border:none!important;box-shadow:none!important
+}
+@media (max-width: 860px){
+  .mrm-settings-tools{position:static!important;grid-template-columns:1fr!important}
+  .mrm-settings-quick-actions{justify-content:flex-start!important}
+}
+
+/* v1.10.30 settings tighten */
+.mrm-settings-tools,.mrm-page-header,.mrm-settings-footer-bar{border-radius:18px !important;padding:12px !important}
+.mrm-settings-nav a,button,input,select,textarea,.mrm-icon-btn,.mrm-secondary-btn,.mrm-ghost-btn,.mrm-inline-chip{
+  min-height:40px !important;
+  border-radius:12px !important;
+}
+.mrm-settings-nav a:hover,button:not(.mrm-primary-btn):hover,.mrm-icon-btn:hover,.mrm-secondary-btn:hover,.mrm-ghost-btn:hover{
+  background:#262626 !important;
+}
+.mrm-settings-nav a:active,button:not(.mrm-primary-btn):active,.mrm-icon-btn:active,.mrm-secondary-btn:active,.mrm-ghost-btn:active{
+  background:rgba(255,122,51,.16) !important;
+}
+
+</style>
+
+
+<style id="mrm-settings-form-v11029">
+input,select,textarea,option,.mrm-settings-search{
+  background:#202020!important;
+  color:#f3f3f3!important;
+  border:none!important;
+  box-shadow:none!important;
+  outline:none!important;
+  accent-color:#ff7a33!important;
+  caret-color:#ff7a33!important;
+}
+input:focus,select:focus,textarea:focus,.mrm-settings-search:focus{
+  box-shadow:0 0 0 1px rgba(255,122,51,.5) inset!important;
+  background:#242424!important;
+}
+input:-webkit-autofill,textarea:-webkit-autofill,select:-webkit-autofill{
+  -webkit-text-fill-color:#f3f3f3!important;
+  transition:background-color 99999s ease-in-out 0s!important;
+  box-shadow:0 0 0 1000px #202020 inset!important;
+}
+
+/* v1.10.30 settings tighten */
+.mrm-settings-tools,.mrm-page-header,.mrm-settings-footer-bar{border-radius:18px !important;padding:12px !important}
+.mrm-settings-nav a,button,input,select,textarea,.mrm-icon-btn,.mrm-secondary-btn,.mrm-ghost-btn,.mrm-inline-chip{
+  min-height:40px !important;
+  border-radius:12px !important;
+}
+.mrm-settings-nav a:hover,button:not(.mrm-primary-btn):hover,.mrm-icon-btn:hover,.mrm-secondary-btn:hover,.mrm-ghost-btn:hover{
+  background:#262626 !important;
+}
+.mrm-settings-nav a:active,button:not(.mrm-primary-btn):active,.mrm-icon-btn:active,.mrm-secondary-btn:active,.mrm-ghost-btn:active{
+  background:rgba(255,122,51,.16) !important;
+}
+
+</style>
+
+</head>
+<body class="mrm-page mrm-page--settings">
+  <div class="mrm-page-shell mrm-shell">
+    <header class="mrm-page-header">
+      <div class="mrm-header-main">
+        <button id="backBtn" class="mrm-icon-btn" aria-label="Back">←</button>
+        <div>
+          <h1 class="mrm-page-title">Settings</h1>
+          <p class="mrm-page-subtitle">Cookies, downloads, behavior, and debugging.</p>
+        </div>
+      </div>
+      <div class="mrm-header-actions">
+        <button id="saveBtn" class="mrm-primary-btn">Save settings</button>
+      </div>
+    </header>
+
+    <div class="mrm-settings-tools">
+        <input id="settingsSearchInput" class="mrm-settings-search" type="search" placeholder="Search settings…">
+        <div class="mrm-settings-quick-actions">
+          <button id="applyAndroidPresetBtn" class="mrm-secondary-btn">Android preset</button>
+          <button id="expandAllSettingsBtn" class="mrm-secondary-btn">Expand all</button>
+        </div>
+      </div>
+      <nav class="mrm-settings-nav" id="settingsSectionNav"></nav>
+      <main class="mrm-page-stack">
+      <section class="mrm-card">
+        <div class="mrm-card-header">
+          <div>
+            <h2 class="mrm-card-title" data-section-title="cookies">Cookie management</h2>
+            <p class="mrm-card-subtitle">Use browser cookies or paste a custom cookie string.</p>
+          </div>
+          <div class="mrm-inline-actions">
+            <button id="autoRetrieveCookiesBtn" class="mrm-secondary-btn">Auto retrieve</button>
+            <button id="addCookieBtn" class="mrm-secondary-btn">Add cookie</button>
+          </div>
+        </div>
+
+        <div class="mrm-segmented" role="radiogroup" aria-label="Cookie source">
+          <label class="mrm-segment">
+            <input type="radio" name="cookieSource" value="auto" id="cookieSourceAuto">
+            <span>From current tab</span>
+          </label>
+          <label class="mrm-segment">
+            <input type="radio" name="cookieSource" value="custom" id="cookieSourceCustom">
+            <span>Custom string</span>
+          </label>
+        </div>
+
+        <p class="mrm-help-text">Auto-retrieve gets cookies from the current page, including clearance cookies when available. Custom mode lets you paste a raw cookie header.</p>
+
+        <div id="simpleCookieInput" class="mrm-card-subsection" style="display:none;">
+          <div class="mrm-subsection-header">
+            <h3>Cookie string</h3>
+            <button id="parseCookieStringBtn" class="mrm-ghost-btn">Parse &amp; save</button>
+          </div>
+          <textarea id="cookieStringTextarea" class="mrm-textarea long-text" rows="4" placeholder="name1=value1; name2=value2; cf_clearance=..."></textarea>
+          <p class="mrm-help-text">Long values wrap now, so this will not blow up the layout.</p>
+        </div>
+
+        <div id="autoRetrievedCookies" class="mrm-card-subsection" style="display:none;">
+          <div class="mrm-subsection-header">
+            <h3>Auto-retrieved cookies</h3>
+            <button id="refreshCookiesBtn" class="mrm-ghost-btn">Refresh</button>
+          </div>
+          <div id="autoRetrievedList" class="mrm-list-stack"></div>
+        </div>
+
+        <div id="cookieList" class="mrm-list-stack"></div>
+
+        <div id="emptyCookies" class="mrm-empty-state">
+          <div class="mrm-empty-icon">🍪</div>
+          <div class="mrm-empty-title">No cookies configured</div>
+          <div class="mrm-empty-copy">Choose auto-retrieve or add cookies manually.</div>
+        </div>
+      </section>
+
+      <section class="mrm-card">
+        <div class="mrm-card-header">
+          <div>
+            <h2 class="mrm-card-title">Download behavior</h2>
+            <p class="mrm-card-subtitle">Tune reliability and request behavior.</p>
+          </div>
+        </div>
+
+        <div class="mrm-setting-grid">
+          <div class="mrm-setting-row">
+            <div>
+              <div class="mrm-setting-title">Use cookies for downloads</div>
+              <div class="mrm-setting-copy">Send configured cookies with image requests.</div>
+            </div>
+            <label class="mrm-toggle">
+              <input type="checkbox" id="useCookiesToggle">
+              <span class="mrm-toggle-track"></span>
+            </label>
+          </div>
+
+          <div class="mrm-setting-block">
+            <div class="mrm-setting-head">
+              <div>
+                <div class="mrm-setting-title">Retry attempts</div>
+                <div class="mrm-setting-copy">How many times failed image requests should retry.</div>
+              </div>
+              <span id="retryCountDisplay" class="mrm-inline-chip">3</span>
+            </div>
+            <input type="range" id="retryCountSlider" min="1" max="10" value="3" class="mrm-range">
+          </div>
+
+          <div class="mrm-setting-block">
+            <div class="mrm-setting-head">
+              <div>
+                <div class="mrm-setting-title">Timeout</div>
+                <div class="mrm-setting-copy">Maximum time per image request in seconds.</div>
+              </div>
+              <span id="timeoutDisplay" class="mrm-inline-chip">30</span>
+            </div>
+            <input type="range" id="timeoutSlider" min="10" max="120" value="30" class="mrm-range">
+          </div>
+        </div>
+      </section>
+
+
+      <section class="mrm-card">
+        <div class="mrm-card-header">
+          <div>
+            <h2 class="mrm-card-title">Google Drive sync</h2>
+            <p class="mrm-card-subtitle">Google Drive AppData sync, manual actions, automatic sync, and OAuth connection.</p>
+          </div>
+        </div>
+
+        <div class="mrm-setting-grid">
+          <div class="mrm-setting-block mrm-accent-block">
+            <div class="mrm-subsection-header">
+              <div>
+                <h3>OAuth redirect URL</h3>
+                <p class="mrm-help-text">Copy this exact URL into Google Cloud → OAuth client → Authorized redirect URIs.</p>
+              </div>
+              <div class="mrm-inline-actions">
+                <button id="showOAuthRedirectBtn" type="button" class="mrm-secondary-btn">Show / copy redirect URL</button>
+              </div>
+            </div>
+            <textarea id="googleOAuthRedirectUrl" class="mrm-textarea long-text" rows="2" readonly placeholder="Click Show / copy redirect URL"></textarea>
+          </div>
+
+          <div class="mrm-setting-block">
+            <div class="mrm-subsection-header">
+              <div>
+                <h3>Connection test</h3>
+                <p class="mrm-help-text">Desktop app PKCE is the only Google Drive OAuth mode. The Desktop Client ID is bundled; paste your client secret locally if Google requires it.</p>
+              </div>
+            </div>
+            <label class="mrm-field">
+              <span>Google OAuth Desktop client ID <small>(optional override)</small></span>
+              <input id="googleDriveClientIdInput" type="text" class="mrm-input" autocomplete="off" spellcheck="false" readonly placeholder="1045970260428-l071ieen89j7cqbpq86def3cdkr3pptf.apps.googleusercontent.com">
+              <small class="mrm-help-text">Desktop PKCE uses the bundled Desktop Client ID.</small>
+            </label>
+
+            <label class="mrm-field">
+              <span>Google OAuth client secret <small>(Desktop PKCE only, optional)</small></span>
+              <input id="googleDriveClientSecretInput" type="password" class="mrm-input" autocomplete="off" spellcheck="false" placeholder="Paste Desktop app client secret only if Google says it is required">
+              <small class="mrm-help-text">Some Google Desktop OAuth clients still require this at the token endpoint. It is stored locally, never bundled, and redacted from diagnostic reports.</small>
+            </label>
+
+            <div class="mrm-google-credentials-actions" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:-2px;margin-bottom:8px;">
+              <button id="saveGoogleDriveCredentialsBtn" type="button" class="mrm-secondary-btn">Save Google Drive credentials</button>
+              <span id="googleDriveCredentialsSavedState" class="mrm-help-text" data-state="saved">Saved locally</span>
+            </div>
+
+            <div id="googleDriveConnectionBanner" class="mrm-google-connection-banner mrm-google-connection-banner--disconnected">
+              <div class="mrm-google-connection-main">
+                <span id="googleDriveConnectionDot" class="mrm-google-connection-dot" aria-hidden="true"></span>
+                <div>
+                  <div id="googleDriveConnectionTitle" class="mrm-google-connection-title">Google Drive disconnected</div>
+                  <div id="googleDriveConnectionDetails" class="mrm-google-connection-details">Sign in to enable Drive AppData sync.</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="mrm-google-signin-panel">
+              <button id="googleDriveSignInBtn" type="button" class="mrm-primary-btn mrm-google-signin-btn">
+                <span class="mrm-google-signin-icon" aria-hidden="true">G</span>
+                <span id="googleDriveSignInLabel">Sign in with Google Drive</span>
+              </button>
+              <div id="googleDriveConnectedActions" class="mrm-inline-actions" style="display:none;">
+                <button id="googleDriveReconnectBtn" type="button" class="mrm-secondary-btn">Reconnect Google Drive</button>
+                <button id="googleDriveDisconnectPrimaryBtn" type="button" class="mrm-ghost-btn">Disconnect Google Drive</button>
+              </div>
+              <p id="googleDriveConnectionHelp" class="mrm-help-text">Uses Desktop app PKCE and Drive AppData access. The client secret is entered locally by the user, not bundled.</p>
+            </div>
+
+            <div class="mrm-inline-actions">
+              <button id="googleDriveConnectTestBtn" type="button" class="mrm-secondary-btn">Test connection</button>
+              <button id="copyGoogleDriveSignInUrlBtn" type="button" class="mrm-secondary-btn">Copy sign-in URL</button>
+              <button id="googleDriveStatusBtn" type="button" class="mrm-ghost-btn">Refresh status</button>
+              <button id="googleDriveDisconnectBtn" type="button" class="mrm-ghost-btn">Disconnect</button>
+            </div>
+
+            <textarea id="googleDriveSignInUrl" class="mrm-textarea long-text" rows="3" readonly placeholder="Click Copy sign-in URL if Android does not open the Google tab"></textarea>
+
+            <div class="mrm-card-subsection">
+              <div class="mrm-subsection-header">
+                <div>
+                  <h3>Android manual fallback</h3>
+                  <p class="mrm-help-text">If Firefox Android does not return to the extension automatically, paste the final redirected URL here. Desktop PKCE uses the 127.0.0.1/mozoauth2 redirect.</p>
+                </div>
+              </div>
+              <textarea id="googleDriveManualRedirectUrl" class="mrm-textarea long-text" rows="3" placeholder="Paste final redirected URL here after Google sign-in"></textarea>
+              <div class="mrm-inline-actions">
+                <button id="googleDriveCompleteManualRedirectBtn" type="button" class="mrm-secondary-btn">Use pasted redirect URL</button>
+              </div>
+            </div>
+
+            <div class="mrm-card-subsection">
+              <div class="mrm-subsection-header">
+                <div>
+                  <h3>Manual sync</h3>
+                  <p class="mrm-help-text">Use Push first on your main device. Pull merges remote data into local storage and creates a local backup first.</p>
+                </div>
+              </div>
+              <div class="mrm-inline-actions">
+                <button id="googleDrivePushBtn" type="button" class="mrm-secondary-btn">Push Local to Drive</button>
+                <button id="googleDrivePullBtn" type="button" class="mrm-ghost-btn">Pull Remote to Local</button>
+                <button id="googleDriveSyncNowBtn" type="button" class="mrm-secondary-btn">Sync Now</button>
+              </div>
+            </div>
+
+            <div class="mrm-card-subsection">
+              <div class="mrm-subsection-header">
+                <div>
+                  <h3>Automatic sync</h3>
+                  <p class="mrm-help-text">Experimental. Runs after Library/Queue changes and optionally when the extension starts.</p>
+                </div>
+              </div>
+
+              <div class="mrm-setting-row">
+                <div>
+                  <div class="mrm-setting-title">Enable Google Drive sync</div>
+                  <div class="mrm-setting-copy">Allows manual and automatic sync using your stored OAuth token.</div>
+                </div>
+                <label class="mrm-toggle">
+                  <input type="checkbox" id="googleDriveSyncEnabledToggle">
+                  <span class="mrm-toggle-track"></span>
+                </label>
+              </div>
+
+              <div class="mrm-setting-row">
+                <div>
+                  <div class="mrm-setting-title">Auto-sync on Library/Queue change</div>
+                  <div class="mrm-setting-copy">Debounced to avoid syncing every single click.</div>
+                </div>
+                <label class="mrm-toggle">
+                  <input type="checkbox" id="googleDriveAutoSyncChangeToggle">
+                  <span class="mrm-toggle-track"></span>
+                </label>
+              </div>
+
+              <div class="mrm-setting-row">
+                <div>
+                  <div class="mrm-setting-title">Auto-sync on startup</div>
+                  <div class="mrm-setting-copy">Runs once after the background script starts.</div>
+                </div>
+                <label class="mrm-toggle">
+                  <input type="checkbox" id="googleDriveAutoSyncStartupToggle">
+                  <span class="mrm-toggle-track"></span>
+                </label>
+              </div>
+
+              <label class="mrm-field">
+                <span>Auto-sync delay seconds</span>
+                <input id="googleDriveAutoSyncDelayInput" type="number" min="10" max="900" step="5" class="mrm-input" value="60">
+              </label>
+            </div>
+
+            <div id="googleDriveStatus" class="mrm-code-block" style="display:none;"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="mrm-card">
+        <div class="mrm-card-header">
+          <div>
+            <h2 class="mrm-card-title">Advanced</h2>
+            <p class="mrm-card-subtitle">Quality-of-life toggles and troubleshooting tools.</p>
+          </div>
+        </div>
+
+        <div class="mrm-setting-grid">
+          <div class="mrm-setting-row">
+            <div>
+              <div class="mrm-setting-title">Hide AI-generated listings</div>
+              <div class="mrm-setting-copy">Blur and suppress AI-tagged entries by default.</div>
+            </div>
+            <label class="mrm-toggle">
+              <input type="checkbox" id="hideAIListingToggle">
+              <span class="mrm-toggle-track"></span>
+            </label>
+          </div>
+
+          <div class="mrm-setting-row">
+            <div>
+              <div class="mrm-setting-title">Hide already-downloaded posts</div>
+              <div class="mrm-setting-copy">Hide listing cards when their URL appears in Library as downloaded or in completed download history.</div>
+            </div>
+            <label class="mrm-toggle">
+              <input type="checkbox" id="hideDownloadedListingToggle">
+              <span class="mrm-toggle-track"></span>
+            </label>
+          </div>
+
+
+
+          <div class="mrm-setting-row">
+            <div>
+              <div class="mrm-setting-title">Hide queued posts</div>
+              <div class="mrm-setting-copy">Hide listing cards that are already saved in the download queue.</div>
+            </div>
+            <label class="mrm-toggle">
+              <input type="checkbox" id="hideQueuedListingToggle">
+              <span class="mrm-toggle-track"></span>
+            </label>
+          </div>
+          <div class="mrm-setting-row">
+            <div>
+              <div class="mrm-setting-title">Hide saved posts</div>
+              <div class="mrm-setting-copy">Hide listing cards already saved in your Library.</div>
+            </div>
+            <label class="mrm-toggle">
+              <input type="checkbox" id="hideSavedListingToggle">
+              <span class="mrm-toggle-track"></span>
+            </label>
+          </div>
+
+          <div class="mrm-setting-row">
+            <div>
+              <div class="mrm-setting-title">Compact Android UI</div>
+              <div class="mrm-setting-copy">Use denser Library/Queue cards and sticky mobile actions.</div>
+            </div>
+            <label class="mrm-toggle">
+              <input type="checkbox" id="compactMobileUiToggle">
+              <span class="mrm-toggle-track"></span>
+            </label>
+          </div>
+
+          
+          <div class="mrm-setting-row">
+            <div>
+              <div class="mrm-setting-title">Page toasts</div>
+              <div class="mrm-setting-copy">Show queue and download feedback directly on supported pages.</div>
+            </div>
+            <label class="mrm-toggle">
+              <input type="checkbox" id="pageToastEnabledToggle">
+              <span class="mrm-toggle-track"></span>
+            </label>
+          </div>
+
+          <div class="mrm-setting-row">
+            <div>
+              <div class="mrm-setting-title">Minimal queue overlay</div>
+              <div class="mrm-setting-copy">Show a small on-page queue widget with progress and filename.</div>
+            </div>
+            <label class="mrm-toggle">
+              <input type="checkbox" id="minimalQueueOverlayToggle">
+              <span class="mrm-toggle-track"></span>
+            </label>
+          </div>
+
+          <div class="mrm-setting-row">
+            <div>
+              <div class="mrm-setting-title">Overlay only during active downloads</div>
+              <div class="mrm-setting-copy">Hide the queue overlay when downloads are not currently active.</div>
+            </div>
+            <label class="mrm-toggle">
+              <input type="checkbox" id="minimalQueueOverlayActiveOnlyToggle">
+              <span class="mrm-toggle-track"></span>
+            </label>
+          </div>
+<div class="mrm-setting-block">
+            <div class="mrm-setting-head">
+              <div>
+                <div class="mrm-setting-title">Queue concurrency</div>
+                <div class="mrm-setting-copy">How many queue items to start in parallel.</div>
+              </div>
+              <span id="queueConcurrencyDisplay" class="mrm-inline-chip">1</span>
+            </div>
+            <input type="range" id="queueConcurrencySlider" min="1" max="3" value="1" class="mrm-range">
+          </div>
+
+          <div class="mrm-setting-row">
+            <div>
+              <div class="mrm-setting-title">Auto-start queue only on Wi‑Fi</div>
+              <div class="mrm-setting-copy">Uses the browser Network Information API when available.</div>
+            </div>
+            <label class="mrm-toggle">
+              <input type="checkbox" id="queueWifiOnlyToggle">
+              <span class="mrm-toggle-track"></span>
+            </label>
+          </div>
+
+
+          <div class="mrm-setting-row">
+            <div>
+              <div class="mrm-setting-title">Android compatibility mode</div>
+              <div class="mrm-setting-copy">Re-focus the original tab after opening worker/download tabs on Android.</div>
+            </div>
+            <label class="mrm-toggle">
+              <input type="checkbox" id="androidBackgroundTabFixToggle">
+              <span class="mrm-toggle-track"></span>
+            </label>
+          </div>
+
+          <div class="mrm-setting-row">
+            <div>
+              <div class="mrm-setting-title">Debug mode</div>
+              <div class="mrm-setting-copy">Enable detailed logging and testing tools.</div>
+            </div>
+            <label class="mrm-toggle">
+              <input type="checkbox" id="debugModeToggle">
+              <span class="mrm-toggle-track"></span>
+            </label>
+          </div>
+
+          <div class="mrm-setting-row">
+            <div>
+              <div class="mrm-setting-title">Verbose debugging</div>
+              <div class="mrm-setting-copy">Log every extension action, including button injection scans, clicks, queue changes, messages, and filename sanitization.</div>
+            </div>
+            <label class="mrm-toggle">
+              <input type="checkbox" id="verboseDebugModeToggle">
+              <span class="mrm-toggle-track"></span>
+            </label>
+          </div>
+
+          <div class="mrm-setting-block mrm-accent-block">
+            <div class="mrm-subsection-header">
+              <div>
+                <h3>Cookie test tools</h3>
+                <p class="mrm-help-text">Verify that the current cookie setup works before downloading.</p>
+              </div>
+              <div class="mrm-inline-actions">
+                <button id="testCookiesBtn" class="mrm-secondary-btn">Test cookies</button>
+                <button id="clearTestCookiesBtn" class="mrm-ghost-btn">Clear</button>
+              </div>
+            </div>
+            <div id="cookieTestResult" class="mrm-code-block" style="display:none;"></div>
+          </div>
+
+          <div class="mrm-setting-block mrm-danger-block">
+            <div class="mrm-subsection-header">
+              <div>
+                <h3>Reset everything</h3>
+                <p class="mrm-help-text">Restore default settings and clear saved configuration.</p>
+              </div>
+              <button id="resetBtn" class="mrm-danger-btn">Reset</button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+    <div class="mrm-settings-footer-bar">
+      <div class="mrm-settings-footer-copy">Cleaner layout, quick navigation, and Android-friendly controls.</div>
+      <div class="mrm-header-actions">
+        <button id="footerBackBtn" class="mrm-secondary-btn">Back</button>
+        <button id="footerSaveBtn" class="mrm-primary-btn">Save settings</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="cookieModal" class="mrm-modal-backdrop" style="display:none;">
+    <div class="mrm-modal-card">
+      <div class="mrm-subsection-header">
+        <h3 id="modalTitle">Add cookie</h3>
+        <button id="closeModalBtn" class="mrm-icon-btn" aria-label="Close">×</button>
+      </div>
+      <div class="mrm-form-grid">
+        <label class="mrm-field">
+          <span>Name</span>
+          <input id="cookieName" type="text" class="mrm-input">
+        </label>
+        <label class="mrm-field">
+          <span>Value</span>
+          <input id="cookieValue" type="text" class="mrm-input">
+        </label>
+        <label class="mrm-field">
+          <span>Domain</span>
+          <input id="cookieDomain" type="text" class="mrm-input" placeholder="myreadingmanga.info or baramangaonline.com">
+        </label>
+        <label class="mrm-field">
+          <span>Path</span>
+          <input id="cookiePath" type="text" class="mrm-input" placeholder="/">
+        </label>
+        <label class="mrm-check">
+          <input id="cookieSecure" type="checkbox">
+          <span>Secure</span>
+        </label>
+        <label class="mrm-check">
+          <input id="cookieHttpOnly" type="checkbox">
+          <span>HTTP only</span>
+        </label>
+      </div>
+      <div class="mrm-modal-actions">
+        <button id="cancelCookieBtn" class="mrm-ghost-btn">Cancel</button>
+        <button id="saveCookieBtn" class="mrm-primary-btn">Save cookie</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="./scripts/mrm-common.js"></script>
+  <script src="settings.js"></script>
+</body>
+</html>
+
+<style id="mrm-settings-flat-v11024">
+html,body,body.mrm-page,.mrm-page-shell{background:#101010 !important;background-image:none !important;color:#f5f5f5 !important;}
+.mrm-page-header,.mrm-settings-tools,.mrm-settings-nav,.mrm-settings-footer-bar,.mrm-card,.mrm-setting-block,.mrm-panel,.settings-section,.page-panel,.mrm-setting-row,.mrm-setting-group,.mrm-modal-card{
+  background:#181818 !important;border:none !important;box-shadow:none !important;backdrop-filter:none !important;
+}
+.mrm-settings-search,.mrm-settings-nav a,input,select,textarea,button,.mrm-icon-btn,.mrm-secondary-btn,.mrm-ghost-btn,.mrm-segment,.mrm-segmented,.mrm-inline-chip{
+  background:#202020 !important;border:none !important;box-shadow:none !important;color:#f5f5f5 !important;background-image:none !important;
+}
+.mrm-primary-btn,.btn-primary,.button-primary,#saveBtn,#footerSaveBtn{
+  background:#ff7a33 !important;color:#111 !important;border:none !important;box-shadow:none !important;background-image:none !important;
+}
+.mrm-segment input:checked + span,.mrm-segment.is-active span,.mrm-segmented .active,.mrm-tab-button.is-active{
+  background:#2a2a2a !important;color:#fff !important;border:none !important;box-shadow:none !important;
+}
+.mrm-progress-fill{background:#ff7a33 !important;}
+
+/* v1.10.30 settings tighten */
+.mrm-settings-tools,.mrm-page-header,.mrm-settings-footer-bar{border-radius:18px !important;padding:12px !important}
+.mrm-settings-nav a,button,input,select,textarea,.mrm-icon-btn,.mrm-secondary-btn,.mrm-ghost-btn,.mrm-inline-chip{
+  min-height:40px !important;
+  border-radius:12px !important;
+}
+.mrm-settings-nav a:hover,button:not(.mrm-primary-btn):hover,.mrm-icon-btn:hover,.mrm-secondary-btn:hover,.mrm-ghost-btn:hover{
+  background:#262626 !important;
+}
+.mrm-settings-nav a:active,button:not(.mrm-primary-btn):active,.mrm-icon-btn:active,.mrm-secondary-btn:active,.mrm-ghost-btn:active{
+  background:rgba(255,122,51,.16) !important;
+}
+
+</style>

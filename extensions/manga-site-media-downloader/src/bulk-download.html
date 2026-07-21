@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>MRM Downloader - Bulk Downloader</title>
+  <link rel="stylesheet" href="./styles/theme.css">
+  <link rel="stylesheet" href="./styles/mrm-dark.css">
+  <link rel="stylesheet" href="./styles/revamp.css">
+  <link rel="stylesheet" href="./styles/settings-bulk-polish.css">
+
+<style id="mrm-flat-revamp-v11021">
+:root{
+  --mrm-surface:#121212 !important;
+  --mrm-surface-2:#181818 !important;
+  --mrm-surface-3:#202020 !important;
+  --mrm-text:#f5f5f5 !important;
+  --mrm-muted:#a3a3a3 !important;
+  --mrm-border:transparent !important;
+  --mrm-accent:#ff7a33 !important;
+}
+html,body{
+  background:#101010 !important;
+  background-image:none !important;
+}
+body,
+.popup-app,
+.settings-page,
+.library-page,
+.bulk-page,
+.app-shell,
+.view-shell,
+.page-shell,
+.page-panel,
+.settings-panel,
+.content-panel,
+.content-area,
+.tab-view{
+  background:#101010 !important;
+  backdrop-filter:none !important;
+  box-shadow:none !important;
+  border:none !important;
+}
+.main-card,.glass-card,.page-panel,.settings-panel,.history-item,.queue-item,.queue-card,.history-card,.debug-card,.sites-card,
+.panel-card,.mrm-panel,.home-card,.site-link-card,.library-card,.sync-panel,.summary,.settings-section,.mrm-setting-block,.mrm-setting-row,
+.status-chip,.top-nav button,.top-nav a,button,input,select,textarea,.mrm-inline-chip,.queue-chip,.filter-chip,.queue-toolbar button,.queue-card button,
+.collapsible-action-panel,.collapsible-action-panel summary,.pane-card,.site-chip,.dashboard-stat,.mrm-collapsible,.site-link-card,.history-row,
+.download-button,.action-btn,.ghost-button,.action-button,.primary-action,.secondary-action,.card,.list-card,.row-card,.queue-actions-themed button{
+  background:#1a1a1a !important;
+  background-image:none !important;
+  color:#f5f5f5 !important;
+  border:none !important;
+  outline:none !important;
+  box-shadow:none !important;
+  backdrop-filter:none !important;
+}
+button,.top-nav button,.top-nav a,.action-btn,.tab-btn,.action-button,.ghost-button,.download-button,.primary-action,.secondary-action{
+  min-height:42px;
+  border-radius:14px !important;
+}
+button:hover,.top-nav button:hover,.top-nav a:hover,.action-btn:hover,.download-button:hover,.action-button:hover,.ghost-button:hover,.site-link-card:hover{
+  transform:none !important;
+  background:#232323 !important;
+  border:none !important;
+  box-shadow:none !important;
+}
+button.is-active,.top-nav button.is-active,.top-nav a.is-active,.filter-chip.is-active,.queue-chip.is-active,.status-chip.is-active{
+  background:var(--mrm-accent) !important;
+  color:#fff !important;
+}
+button.is-quiet,.top-nav button.is-quiet,.top-nav a.is-quiet{
+  background:#1d1d1d !important;
+  color:#d4d4d4 !important;
+}
+input,select,textarea{
+  background:#171717 !important;
+  color:#f5f5f5 !important;
+  border:none !important;
+  box-shadow:none !important;
+}
+.queue-card,.history-row,.history-item,.library-card,.settings-section,.mrm-setting-block,.mrm-setting-row,.pane-card,.footer-card,.site-link-card,.dashboard-stat{
+  border-radius:16px !important;
+}
+.brand-subtitle,.section-subtitle,.muted,.muted-footer,.muted-text,.hint,.site-link-card small,.status-copy,.caption{
+  color:#9a9a9a !important;
+}
+hr,.divider,.section-divider{
+  border:none !important;
+  background:#1f1f1f !important;
+  height:1px !important;
+}
+.status-chip,.queue-chip,.filter-chip,.pill,.badge{
+  border-radius:999px !important;
+}
+.top-nav{
+  gap:8px !important;
+}
+.top-nav button,.top-nav a{
+  background:#1a1a1a !important;
+}
+.scroll-view::-webkit-scrollbar{width:10px;height:10px}
+.scroll-view::-webkit-scrollbar-thumb{background:#2a2a2a;border-radius:999px}
+#siteChip,.site-chip,.status-chip{
+  background:#161616 !important;
+}
+</style>
+
+  <link rel="stylesheet" href="./styles/final-polish.css">
+
+<style id="mrm-v11028-surface-cleanup">
+html,body{max-width:100%;overflow-x:hidden!important}
+body{min-width:0!important}
+.mrm-page-shell,.library-app,.mrm-page-stack,.content-wrap,.scroll-view,.mrm-card,.mrm-setting-block,.mrm-setting-row,.library-card{
+  min-width:0!important;max-width:100%!important;box-sizing:border-box!important;
+}
+.mrm-page-shell{width:min(980px,100%)!important}
+.mrm-page-stack{display:flex!important;flex-direction:column!important;gap:12px!important}
+.mrm-settings-tools,.mrm-settings-nav,.mrm-settings-footer-bar{
+  background:#181818!important;border:none!important;box-shadow:none!important;backdrop-filter:none!important
+}
+.mrm-settings-search,.mrm-settings-nav a,.mrm-secondary-btn,.mrm-ghost-btn,.mrm-icon-btn,.mrm-inline-chip,.mrm-field .mrm-input,.mrm-input,input,select,textarea,button{
+  background:#202020!important;border:none!important;box-shadow:none!important;background-image:none!important
+}
+.mrm-primary-btn,#saveBtn,#footerSaveBtn,.button-primary,.btn-primary{
+  background:#ff7a33!important;color:#111!important;background-image:none!important;border:none!important;box-shadow:none!important
+}
+.mrm-toggle-track{background:#2a2a2a!important;border:none!important}
+.mrm-toggle input:checked + .mrm-toggle-track{background:#ff7a33!important}
+.mrm-page-header{background:#181818!important;border:none!important;box-shadow:none!important}
+.mrm-card,.mrm-setting-block,.mrm-setting-row,.library-card,.site-link-card,.queue-card,.history-row{
+  background:#181818!important;border:none!important;box-shadow:none!important
+}
+@media (max-width: 860px){
+  .mrm-settings-tools{position:static!important;grid-template-columns:1fr!important}
+  .mrm-settings-quick-actions{justify-content:flex-start!important}
+}
+</style>
+
+</head>
+<body class="mrm-page mrm-page--bulk">
+  <div class="mrm-page-shell">
+    <header class="mrm-page-header">
+      <div class="mrm-header-main">
+        <div>
+          <h1 class="mrm-page-title">Bulk downloader</h1>
+          <p class="mrm-page-subtitle">Queue multiple archive pages with a cleaner, compact workflow.</p>
+        </div>
+      </div>
+      <div class="mrm-header-actions">
+        <button id="backBtn" class="mrm-secondary-btn">Back</button>
+      </div>
+    </header>
+
+    <main class="mrm-page-stack">
+      <section id="configCard" class="mrm-card">
+        <div class="mrm-card-header">
+          <div>
+            <h2 class="mrm-card-title">Download configuration</h2>
+            <p class="mrm-card-subtitle">Choose a page range and output mode.</p>
+          </div>
+          <div class="mrm-inline-chip">Same engine, cleaner shell</div>
+        </div>
+
+        <div class="mrm-info-grid">
+          <div class="mrm-info-item">
+            <span class="mrm-info-label">Current page</span>
+            <strong id="currentPageInfo">Loading…</strong>
+          </div>
+          <div class="mrm-info-item">
+            <span class="mrm-info-label">Title</span>
+            <strong id="currentTitleInfo">Loading…</strong>
+          </div>
+          <div class="mrm-info-item">
+            <span class="mrm-info-label">Latest page</span>
+            <strong id="latestPageInfo">Detecting…</strong>
+          </div>
+        </div>
+
+        <div class="mrm-form-grid mrm-form-grid--two">
+          <label class="mrm-field">
+            <span>Start page</span>
+            <input type="number" id="startPage" min="1" value="1" class="mrm-input">
+          </label>
+          <label class="mrm-field">
+            <span>End page</span>
+            <input type="number" id="endPage" min="1" value="1" class="mrm-input">
+          </label>
+          <label class="mrm-field mrm-field--full">
+            <span>Download type</span>
+            <select id="downloadType" class="mrm-input">
+              <option value="images">Images only (CBZ per page)</option>
+              <option value="all">All media (when video exists)</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="mrm-inline-actions">
+          <button id="startDownloadBtn" class="mrm-primary-btn">Start bulk download</button>
+          <button id="detectPagesBtn" class="mrm-secondary-btn">Auto-detect pages</button>
+        </div>
+
+        <div id="resumeSection" class="mrm-setting-block mrm-warning-block" style="display:none;">
+          <div class="mrm-subsection-header">
+            <div>
+              <h3>Resume previous session</h3>
+              <p id="resumeInfo" class="mrm-help-text"></p>
+            </div>
+            <div class="mrm-inline-actions">
+              <button id="resumeBtn" class="mrm-primary-btn">Resume</button>
+              <button id="clearResumeBtn" class="mrm-danger-btn">Clear</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="progressCard" class="mrm-card" style="display:none;">
+        <div class="mrm-card-header">
+          <div>
+            <h2 class="mrm-card-title">Progress</h2>
+            <p id="overallStatus" class="mrm-card-subtitle">Preparing…</p>
+          </div>
+          <div class="mrm-inline-actions">
+            <button id="pauseBtn" class="mrm-secondary-btn">Pause</button>
+            <button id="cancelBtn" class="mrm-danger-btn">Cancel</button>
+          </div>
+        </div>
+
+        <div class="mrm-progress-panel">
+          <div class="mrm-progress-meta">
+            <span id="overallProgressText">0%</span>
+            <span id="overallProgressStatus">0 / 0 pages</span>
+          </div>
+          <div class="mrm-progress-track mrm-progress-track--lg">
+            <div id="overallProgressBar" class="mrm-progress-fill" style="width:0%"></div>
+          </div>
+        </div>
+
+        <div id="pageList" class="mrm-list-stack mrm-list-stack--scroll"></div>
+      </section>
+
+      <section class="mrm-card mrm-warning-block">
+        <div class="mrm-card-header">
+          <div>
+            <h2 class="mrm-card-title">Keep this page open</h2>
+            <p class="mrm-card-subtitle">Bulk jobs still need this window while pages are processed and packed.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="./scripts/jszip.min.js"></script>
+  <script src="./scripts/FileSaver.min.js"></script>
+  <script src="./scripts/mrm-common.js"></script>
+  <script src="bulk-download.js"></script>
+</body>
+</html>

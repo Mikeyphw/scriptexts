@@ -1,0 +1,25 @@
+{
+  "name": "scriptexts",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "userscripts/builders/manga-reader-modernizer",
+    "userscripts/builders/sims-cc-download-basket"
+  ],
+  "scripts": {
+    "build": "npm run build:userscripts && npm run build:extensions && npm run userscripts:metadata",
+    "build:userscripts": "npm run build:manga && npm run build:sims",
+    "build:manga": "npm --prefix userscripts/builders/manga-reader-modernizer run build",
+    "build:sims": "npm --prefix userscripts/builders/sims-cc-download-basket run build",
+    "build:extensions": "npm run build:extension:manga && npm run build:extension:stardew && npm run build:extension:telegram",
+    "build:extension:manga": "python3 extensions/manga-site-media-downloader/build.py",
+    "build:extension:stardew": "python3 extensions/stardew-nexus-download-queue/build.py",
+    "build:extension:telegram": "python3 extensions/telegram-media-downloader/build.py",
+    "userscripts:metadata": "node tools/generate-userscript-meta.mjs",
+    "check": "node tools/check-repo.mjs",
+    "inventory": "node tools/inventory.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

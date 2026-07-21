@@ -1,0 +1,144 @@
+{
+  "schema_version": 3,
+  "repository": "scriptexts",
+  "origin": "git@github.com:Mikeyphw/scriptexts.git",
+  "organized_on": "2026-07-21",
+  "identifier_policy": {
+    "firefox_extension_id": "<project-slug>@mikeyphw.scriptexts",
+    "userscript_namespace": "https://github.com/Mikeyphw/scriptexts/userscripts/<script-slug>",
+    "userscript_update_url": "https://raw.githubusercontent.com/Mikeyphw/scriptexts/main/<script-path>.meta.js",
+    "userscript_download_url": "https://raw.githubusercontent.com/Mikeyphw/scriptexts/main/<script-path>.user.js"
+  },
+  "projects": [
+    {
+      "path": "userscripts/standalone/menofporn-modern-ui",
+      "type": "standalone-userscript",
+      "version": "1.4.0",
+      "source_model": "direct-single-file",
+      "canonical_source": "menofporn-modern-ui.user.js",
+      "install_artifacts": [
+        "menofporn-modern-ui.user.js",
+        "menofporn-modern-ui.meta.js"
+      ]
+    },
+    {
+      "path": "userscripts/standalone/lpsg-media-gallery-unlocker",
+      "type": "standalone-userscript",
+      "version": "6.7.3-optimized",
+      "source_model": "direct-single-file",
+      "canonical_source": "lpsg-media-gallery-unlocker.user.js",
+      "install_artifacts": [
+        "lpsg-media-gallery-unlocker.user.js",
+        "lpsg-media-gallery-unlocker.meta.js"
+      ]
+    },
+    {
+      "path": "userscripts/standalone/telegram-media-downloader",
+      "type": "standalone-userscript",
+      "version": "1.212",
+      "source_model": "direct-single-file",
+      "canonical_source": "telegram-media-downloader.user.js",
+      "install_artifacts": [
+        "telegram-media-downloader.user.js",
+        "telegram-media-downloader.meta.js"
+      ]
+    },
+    {
+      "path": "userscripts/standalone/search-engines-clean-dark-ui",
+      "type": "standalone-userscript",
+      "version": "3.4",
+      "source_model": "direct-single-file",
+      "canonical_source": "search-engines-clean-dark-ui.user.js",
+      "install_artifacts": [
+        "search-engines-clean-dark-ui.user.js",
+        "search-engines-clean-dark-ui.meta.js"
+      ]
+    },
+    {
+      "path": "userscripts/standalone/poast-timeline-metadata-reset",
+      "type": "standalone-userscript",
+      "version": "1.0.0",
+      "source_model": "direct-single-file",
+      "canonical_source": "poast-timeline-metadata-reset.user.js",
+      "install_artifacts": [
+        "poast-timeline-metadata-reset.user.js",
+        "poast-timeline-metadata-reset.meta.js"
+      ]
+    },
+    {
+      "path": "userscripts/builders/manga-reader-modernizer",
+      "type": "userscript-builder",
+      "source_model": "independent-builder",
+      "builder": "build.mjs",
+      "source": "src/original/",
+      "install_artifacts": [
+        "dist/myreadingmanga-modern-reader.user.js",
+        "dist/myreadingmanga-modern-reader.meta.js",
+        "dist/yaoimangaonline-modern-reader.user.js",
+        "dist/yaoimangaonline-modern-reader.meta.js",
+        "dist/baramangaonline-modern-reader.user.js",
+        "dist/baramangaonline-modern-reader.meta.js"
+      ],
+      "versions": {
+        "myreadingmanga": "5.2.43",
+        "yaoimangaonline": "5.2.47",
+        "baramangaonline": "1.5.5"
+      }
+    },
+    {
+      "path": "userscripts/builders/sims-cc-download-basket",
+      "type": "userscript-builder",
+      "version": "1.4.1",
+      "source_model": "independent-builder",
+      "builder": "build.mjs",
+      "source": "src/",
+      "install_artifacts": [
+        "dist/sims-basket-modthesims.user.js",
+        "dist/sims-basket-modthesims.meta.js",
+        "dist/sims-basket-simblrcc.user.js",
+        "dist/sims-basket-simblrcc.meta.js",
+        "dist/sims-basket-thesimsresource.user.js",
+        "dist/sims-basket-thesimsresource.meta.js"
+      ]
+    },
+    {
+      "path": "extensions/manga-site-media-downloader",
+      "type": "firefox-extension",
+      "version": "1.10.3",
+      "source_model": "editable-source-with-reproducible-package",
+      "canonical_source": "src/",
+      "builder": "build.py",
+      "firefox_extension_id": "manga-site-media-downloader@mikeyphw.scriptexts",
+      "install_artifacts": [
+        "dist/manga-site-media-downloader-1.10.3.xpi",
+        "dist/SHA256SUMS"
+      ]
+    },
+    {
+      "path": "extensions/stardew-nexus-download-queue",
+      "type": "firefox-extension",
+      "version": "0.4.4",
+      "source_model": "editable-source-with-reproducible-package",
+      "canonical_source": "src/",
+      "builder": "build.py",
+      "firefox_extension_id": "stardew-nexus-download-queue@mikeyphw.scriptexts",
+      "install_artifacts": [
+        "dist/stardew-nexus-download-queue-0.4.4.xpi",
+        "dist/SHA256SUMS"
+      ]
+    },
+    {
+      "path": "extensions/telegram-media-downloader",
+      "type": "firefox-extension",
+      "version": "3.4.9",
+      "source_model": "editable-source-with-reproducible-package",
+      "canonical_source": "src/",
+      "builder": "build.py",
+      "firefox_extension_id": "telegram-media-downloader@mikeyphw.scriptexts",
+      "install_artifacts": [
+        "dist/telegram-media-downloader-3.4.9.xpi",
+        "dist/SHA256SUMS"
+      ]
+    }
+  ]
+}
