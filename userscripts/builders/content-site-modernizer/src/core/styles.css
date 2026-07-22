@@ -198,17 +198,57 @@ html.csm-modernized.csm-site-bleeding-cool-modern-reader .csm-feed-grid {
   position: relative;
   z-index: 2;
 }
+
+.csm-card-media {
+  display: grid !important;
+  place-items: center !important;
+  inline-size: 100% !important;
+  aspect-ratio: var(--csm-card-ratio, 16 / 9) !important;
+  overflow: hidden !important;
+  background: #0d1118 !important;
+}
+.csm-card-body {
+  position: relative !important;
+  z-index: 2 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: .45rem !important;
+  padding: .72rem .82rem .82rem !important;
+  min-block-size: 0 !important;
+}
+.csm-card-title {
+  margin: 0 !important;
+  color: var(--csm-text) !important;
+  font-size: clamp(.98rem, 1.6vw, 1.24rem) !important;
+  line-height: 1.12 !important;
+  letter-spacing: -.025em !important;
+  display: -webkit-box !important;
+  -webkit-line-clamp: 3 !important;
+  -webkit-box-orient: vertical !important;
+  overflow: hidden !important;
+}
+.csm-card-body .csm-meta {
+  margin: 0 !important;
+  font-size: .78rem !important;
+  line-height: 1.2 !important;
+}
 .csm-card img {
   inline-size: 100% !important;
   width: 100% !important;
   aspect-ratio: var(--csm-card-ratio, 16 / 9);
   block-size: auto !important;
-  object-fit: cover !important;
+  object-fit: var(--csm-card-fit, cover) !important;
+  object-position: center center !important;
   display: block !important;
   border-radius: 0 !important;
   margin: 0 !important;
+  background: #0d1118 !important;
 }
-.csm-card :is(h1,h2,h3,.entry-title,.post-title,.title) {
+.csm-card-media img {
+  block-size: 100% !important;
+  height: 100% !important;
+}
+.csm-card :is(h1,h2,h3,.entry-title,.post-title,.title):not(.csm-card-title) {
   font-size: clamp(1.05rem, 2.4vw, 1.36rem) !important;
   line-height: 1.12 !important;
   letter-spacing: -.025em !important;
@@ -362,7 +402,6 @@ html.csm-site-bleeding-cool-modern-reader {
   --csm-max: 1320px;
   --csm-article-width: 820px;
 }
-html.csm-site-bleeding-cool-modern-reader 
 @supports (content-visibility: auto) {
   html.csm-modernized.csm-low-resource .csm-card {
     content-visibility: auto;
@@ -393,6 +432,85 @@ html.csm-site-bleeding-cool-modern-reader .csm-article {
   background: #171c24 !important;
 }
 html.csm-site-bleeding-cool-modern-reader :is(.popular-now,.popular,.trending,.widget,.widget-area,aside,[class*="sidebar"],[id*="sidebar"],[class*="popular"]):not(.csm-drawer) {
+  display: none !important;
+}
+
+
+/* Bleeding Cool profile: strip native white wrappers and heavyweight article extras. */
+html.csm-modernized.csm-site-bleeding-cool-modern-reader,
+html.csm-modernized.csm-site-bleeding-cool-modern-reader body,
+html.csm-modernized.csm-site-bleeding-cool-modern-reader :is(#td-outer-wrap,#td-container,.td-container,.td-main-content-wrap,.td-main-page-wrap,.td-pb-row,.td-ss-main-content,.td-pb-span8,.td-pb-span4,.td-main-sidebar,.td-content-wrap,.tdc-content-wrap,.td-page-content,.td-post-content,.td-article-content,.td_block_wrap,.td_module_wrap,.td_block_inner,.td_quote_box) {
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+}
+html.csm-modernized.csm-site-bleeding-cool-modern-reader body {
+  background: var(--csm-bg) !important;
+}
+html.csm-feed-mode.csm-site-bleeding-cool-modern-reader .csm-layout {
+  background: transparent !important;
+}
+html.csm-feed-mode.csm-site-bleeding-cool-modern-reader .csm-feed-grid {
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)) !important;
+  gap: .72rem !important;
+}
+html.csm-feed-mode.csm-site-bleeding-cool-modern-reader .csm-card {
+  border-radius: 16px !important;
+  min-block-size: 0 !important;
+  background: #141922 !important;
+}
+html.csm-feed-mode.csm-site-bleeding-cool-modern-reader .csm-card-media {
+  border-radius: 0 !important;
+}
+html.csm-feed-mode.csm-site-bleeding-cool-modern-reader .csm-card img {
+  object-fit: contain !important;
+}
+html.csm-feed-mode.csm-site-bleeding-cool-modern-reader .csm-card:first-child {
+  grid-column: span 2;
+}
+html.csm-feed-mode.csm-site-bleeding-cool-modern-reader .csm-card:first-child .csm-card-title {
+  font-size: clamp(1.12rem, 2.2vw, 1.58rem) !important;
+}
+html.csm-feed-mode.csm-site-bleeding-cool-modern-reader .csm-card[data-csm-no-image="true"] {
+  display: none !important;
+}
+html.csm-article-mode.csm-site-bleeding-cool-modern-reader .csm-article-shell {
+  background: transparent !important;
+}
+html.csm-article-mode.csm-site-bleeding-cool-modern-reader .csm-article {
+  background: #161b23 !important;
+  color: var(--csm-text) !important;
+}
+html.csm-article-mode.csm-site-bleeding-cool-modern-reader .csm-article :is(.td-post-sharing,.td-post-sharing-top,.td-post-sharing-bottom,.td-social-sharing,.td-social-style,.addtoany_share_save_container,[class*="addthis"],.sharedaddy,.sd-sharing-enabled,.td-a-rec,.td-g-rec,.td_block_related_posts,.td-related-title,.td-related-row,.td-post-next-prev,.td-author-box-wrap,.td-author-name,.td-author-description,.td-more-articles-box,.td-post-source-tags) {
+  display: none !important;
+  visibility: hidden !important;
+  block-size: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+html.csm-article-mode.csm-site-bleeding-cool-modern-reader .csm-article img {
+  display: block !important;
+  max-inline-size: 100% !important;
+  width: auto !important;
+  height: auto !important;
+  max-height: 78vh !important;
+  object-fit: contain !important;
+  margin-inline: auto !important;
+  background: #0d1118 !important;
+}
+html.csm-article-mode.csm-site-bleeding-cool-modern-reader .csm-article iframe,
+html.csm-article-mode.csm-site-bleeding-cool-modern-reader .csm-article video {
+  width: 100% !important;
+  aspect-ratio: 16 / 9 !important;
+  height: auto !important;
+  background: #0d1118 !important;
+}
+html.csm-article-mode.csm-site-bleeding-cool-modern-reader .csm-article :is(p,li,figcaption) {
+  color: #e6ebf3 !important;
+}
+html.csm-article-mode.csm-site-bleeding-cool-modern-reader :is(.td-main-sidebar,.td-pb-span4,aside,.sidebar,.widget-area,.td-footer-wrapper,.td-sub-footer-container) {
   display: none !important;
 }
 

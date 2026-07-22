@@ -36,12 +36,17 @@ export default {
       "hideSidebars": true,
       "hideOriginalChrome": true,
       "rebuildFeedGrid": true,
+      "normalizeCards": true,
+      "requireCardImage": true,
+      "hideFeedRemainder": true,
+      "hideArticleRemainder": true,
+      "imageFit": "contain",
       "minCardTextLength": 24
     },
     "performance": {
       "lowResource": true,
       "disableMutationObserver": true,
-      "maxFeedCards": 42,
+      "maxFeedCards": 24,
       "feedRootSelector": ".td-ss-main-content,.td-pb-span8,.main-content,.content-area,.site-main,main,#main"
     },
     "articleHints": [

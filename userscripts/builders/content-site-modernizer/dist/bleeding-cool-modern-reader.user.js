@@ -36,12 +36,17 @@
     "hideSidebars": true,
     "hideOriginalChrome": true,
     "rebuildFeedGrid": true,
+    "normalizeCards": true,
+    "requireCardImage": true,
+    "hideFeedRemainder": true,
+    "hideArticleRemainder": true,
+    "imageFit": "contain",
     "minCardTextLength": 24
   },
   "performance": {
     "lowResource": true,
     "disableMutationObserver": true,
-    "maxFeedCards": 42,
+    "maxFeedCards": 24,
     "feedRootSelector": ".td-ss-main-content,.td-pb-span8,.main-content,.content-area,.site-main,main,#main"
   },
   "articleHints": [
@@ -190,7 +195,7 @@
     ]
   }
 };
-  const CSS_TEXT = ":root {\n  --csm-bg: #090b0f;\n  --csm-surface: #12161d;\n  --csm-raised: #191f28;\n  --csm-text: #f0f3f7;\n  --csm-muted: #aab3c1;\n  --csm-faint: #8792a2;\n  --csm-accent: #d65cff;\n  --csm-accent-2: #5ad7ff;\n  --csm-radius: 24px;\n  color-scheme: dark;\n}\nhtml.csm-modernized {\n  background: var(--csm-bg) !important;\n  min-inline-size: 0 !important;\n}\nhtml.csm-modernized body {\n  background: radial-gradient(circle at 20% -10%, rgba(214,92,255,.14), transparent 36rem), var(--csm-bg) !important;\n  color: var(--csm-text) !important;\n  font: 16px/1.62 Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif !important;\n  overflow-x: hidden !important;\n  min-inline-size: 0 !important;\n}\nhtml.csm-modernized body :is(#page,#content,.site,.site-content,.site-main,.content,.content-area,.main-content,.wrap,.wrapper,.container,.page-wrap,.page-wrapper,.row,.col,.column,.entry-content,.post-content,.single-post,.post,.article,.main,.primary) {\n  background-color: transparent !important;\n  background-image: none !important;\n  box-shadow: none !important;\n}\n\nhtml.csm-modernized.csm-low-resource body {\n  background: var(--csm-bg) !important;\n}\nhtml.csm-modernized.csm-low-resource .csm-topbar {\n  backdrop-filter: none !important;\n}\nhtml.csm-modernized.csm-low-resource .csm-card,\nhtml.csm-modernized.csm-low-resource .csm-article {\n  background: var(--csm-surface) !important;\n}\nhtml.csm-modernized.csm-low-resource .csm-drawer {\n  backdrop-filter: none !important;\n}\n\nhtml.csm-modernized img,\nhtml.csm-modernized video,\nhtml.csm-modernized iframe {\n  max-inline-size: 100% !important;\n}\n.csm-hidden,\n.csm-ad-hidden,\n.csm-source-hidden {\n  display: none !important;\n  visibility: hidden !important;\n  inline-size: 0 !important;\n  block-size: 0 !important;\n  max-inline-size: 0 !important;\n  max-block-size: 0 !important;\n  margin: 0 !important;\n  padding: 0 !important;\n  overflow: hidden !important;\n}\n.csm-topbar {\n  position: sticky;\n  top: 0;\n  z-index: 2147481000;\n  display: flex;\n  align-items: center;\n  gap: .8rem;\n  min-height: 58px;\n  padding: max(.7rem, env(safe-area-inset-top)) clamp(.85rem, 3vw, 1.4rem) .7rem;\n  background: rgba(9, 11, 15, .9);\n  backdrop-filter: blur(18px);\n  box-shadow: 0 1px 0 rgba(255,255,255,.06);\n}\n.csm-brand {\n  display: flex;\n  align-items: center;\n  min-width: 0;\n  gap: .65rem;\n  color: var(--csm-text) !important;\n  text-decoration: none !important;\n  font-weight: 800 !important;\n  letter-spacing: -.02em;\n}\n.csm-brand-mark {\n  display: grid;\n  place-items: center;\n  inline-size: 34px;\n  block-size: 34px;\n  border-radius: 13px;\n  background: linear-gradient(135deg, var(--csm-accent), var(--csm-accent-2));\n  color: #07080a;\n  font-weight: 900;\n  font-size: .86rem;\n}\n.csm-brand-text {\n  overflow: hidden;\n  text-overflow: ellipsis;\n  white-space: nowrap;\n}\n.csm-actions {\n  margin-inline-start: auto;\n  display: flex;\n  gap: .45rem;\n}\n.csm-btn,\n.csm-chip {\n  border: 0 !important;\n  min-height: 44px;\n  border-radius: 999px;\n  padding: .68rem .92rem;\n  background: rgba(255,255,255,.08);\n  color: var(--csm-text) !important;\n  text-decoration: none !important;\n  font: inherit;\n  font-weight: 750;\n  cursor: pointer;\n  touch-action: manipulation;\n}\n.csm-btn:hover,\n.csm-chip:hover,\n.csm-btn[aria-pressed=\"true\"],\n.csm-chip[aria-pressed=\"true\"] {\n  background: rgba(214,92,255,.2);\n}\n.csm-progress {\n  position: fixed;\n  inset: 0 0 auto 0;\n  height: 3px;\n  z-index: 2147481002;\n  transform-origin: 0 50%;\n  transform: scaleX(0);\n  background: linear-gradient(90deg, var(--csm-accent), var(--csm-accent-2));\n}\n.csm-layout {\n  width: min(100% - 1.5rem, var(--csm-max, 1360px)) !important;\n  max-inline-size: var(--csm-max, 1360px) !important;\n  margin: 1rem auto 5rem !important;\n  padding: 0 !important;\n  float: none !important;\n  clear: both !important;\n  min-inline-size: 0 !important;\n}\n\n@supports (content-visibility: auto) {\n  html.csm-modernized.csm-low-resource .csm-card {\n    content-visibility: auto;\n    contain-intrinsic-size: 360px 260px;\n  }\n  html.csm-modernized.csm-low-resource .csm-article > * {\n    content-visibility: auto;\n    contain-intrinsic-size: 1px 720px;\n  }\n}\nhtml.csm-modernized.csm-site-bleeding-cool-modern-reader .csm-layout {\n  contain: layout paint style;\n}\nhtml.csm-modernized.csm-site-bleeding-cool-modern-reader .csm-feed-grid {\n  grid-template-columns: repeat(auto-fit, minmax(min(100%, 310px), 1fr));\n}\n\n.csm-feed-grid {\n  display: grid !important;\n  grid-template-columns: repeat(auto-fit, minmax(min(100%, 285px), 1fr));\n  gap: clamp(.8rem, 2vw, 1.2rem);\n  align-items: stretch;\n  width: 100% !important;\n  min-inline-size: 0 !important;\n}\n.csm-card {\n  position: relative !important;\n  display: flex !important;\n  flex-direction: column !important;\n  overflow: hidden !important;\n  min-width: 0 !important;\n  border: 0 !important;\n  border-radius: var(--csm-radius) !important;\n  background: linear-gradient(180deg, rgba(255,255,255,.055), rgba(255,255,255,.025)), var(--csm-surface) !important;\n  box-shadow: none !important;\n  padding: 0 !important;\n  margin: 0 !important;\n  color: var(--csm-text) !important;\n  float: none !important;\n  width: auto !important;\n  max-width: none !important;\n  min-height: 100% !important;\n}\n.csm-card-cover {\n  position: absolute !important;\n  inset: 0 !important;\n  z-index: 3 !important;\n  color: transparent !important;\n  text-decoration: none !important;\n}\n.csm-card a:not(.csm-card-cover) {\n  color: inherit !important;\n  text-decoration: none !important;\n  position: relative;\n  z-index: 2;\n}\n.csm-card img {\n  inline-size: 100% !important;\n  width: 100% !important;\n  aspect-ratio: var(--csm-card-ratio, 16 / 9);\n  block-size: auto !important;\n  object-fit: cover !important;\n  display: block !important;\n  border-radius: 0 !important;\n  margin: 0 !important;\n}\n.csm-card :is(h1,h2,h3,.entry-title,.post-title,.title) {\n  font-size: clamp(1.05rem, 2.4vw, 1.36rem) !important;\n  line-height: 1.12 !important;\n  letter-spacing: -.025em !important;\n  margin: .85rem .95rem .35rem !important;\n  color: var(--csm-text) !important;\n  display: -webkit-box !important;\n  -webkit-line-clamp: 3;\n  -webkit-box-orient: vertical;\n  overflow: hidden !important;\n}\n.csm-card :is(p,.excerpt,.summary,.dek) {\n  color: var(--csm-muted) !important;\n  margin: 0 .95rem .9rem !important;\n  display: -webkit-box !important;\n  -webkit-line-clamp: 3;\n  -webkit-box-orient: vertical;\n  overflow: hidden !important;\n}\n.csm-card .csm-meta {\n  display: flex;\n  flex-wrap: wrap;\n  gap: .4rem;\n  margin: auto .95rem .95rem;\n  color: var(--csm-faint);\n  font-size: .84rem;\n  position: relative;\n  z-index: 2;\n}\n.csm-card.csm-viewed img {\n  opacity: .56;\n  filter: saturate(.7);\n}\n.csm-section-title {\n  grid-column: 1 / -1;\n  margin: 1.4rem 0 .8rem;\n  font-size: clamp(1.4rem, 4vw, 2.35rem);\n  line-height: 1.05;\n  letter-spacing: -.04em;\n  color: var(--csm-text) !important;\n}\n.csm-article-shell {\n  width: min(100% - 1.5rem, calc(var(--csm-article-width, 790px) + 4rem)) !important;\n  margin: 1rem auto 6rem !important;\n  padding: 0 !important;\n  float: none !important;\n  background: transparent !important;\n}\n.csm-article {\n  width: min(100%, var(--csm-article-width, 790px)) !important;\n  max-inline-size: var(--csm-article-width, 790px) !important;\n  margin: 1.1rem auto 6rem !important;\n  padding: clamp(1rem, 3vw, 1.35rem) !important;\n  border-radius: 28px !important;\n  background: linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,.02)), var(--csm-surface) !important;\n  color: var(--csm-text) !important;\n  float: none !important;\n  box-sizing: border-box !important;\n}\n.csm-article :is(h1,.entry-title,.post-title) {\n  font-size: clamp(1.85rem, 8vw, 3.4rem) !important;\n  line-height: 1.08 !important;\n  letter-spacing: -.045em !important;\n  color: var(--csm-text) !important;\n  overflow: visible !important;\n  display: block !important;\n  -webkit-line-clamp: unset !important;\n}\n.csm-article :is(h2,h3,h4) {\n  color: var(--csm-text) !important;\n  line-height: 1.18 !important;\n}\n.csm-article :is(p,li) {\n  color: #e7ebf2 !important;\n  font-size: clamp(1rem, 1.4vw, 1.12rem) !important;\n  line-height: 1.72 !important;\n}\n.csm-article :is(a) { color: var(--csm-accent-2) !important; }\n.csm-article img,\n.csm-article video,\n.csm-article iframe {\n  max-inline-size: 100% !important;\n  block-size: auto !important;\n  border-radius: 18px !important;\n}\n.csm-drawer {\n  position: fixed;\n  inset: auto .65rem calc(.65rem + env(safe-area-inset-bottom)) .65rem;\n  z-index: 2147481001;\n  max-height: min(72vh, 620px);\n  overflow: auto;\n  border-radius: 28px;\n  padding: 1rem;\n  background: #10141b;\n  color: var(--csm-text);\n  box-shadow: 0 24px 80px rgba(0,0,0,.52);\n  transform: translateY(120%);\n  transition: transform .2s ease;\n}\n.csm-drawer[aria-hidden=\"false\"] { transform: translateY(0); }\n.csm-drawer-backdrop {\n  position: fixed;\n  inset: 0;\n  z-index: 2147481000;\n  background: rgba(0,0,0,.48);\n  opacity: 0;\n  pointer-events: none;\n  transition: opacity .2s ease;\n}\n.csm-drawer-backdrop[data-open=\"true\"] { opacity: 1; pointer-events: auto; }\n.csm-drawer h2 { margin: .2rem 0 1rem; font-size: 1.25rem; color: var(--csm-text) !important; }\n.csm-drawer-grid { display: grid; gap: .55rem; }\n.csm-drawer input {\n  min-height: 46px;\n  border: 0;\n  border-radius: 16px;\n  padding: .75rem .9rem;\n  background: rgba(255,255,255,.08);\n  color: var(--csm-text);\n}\n.csm-bottomnav {\n  position: fixed;\n  inset: auto .55rem calc(.55rem + env(safe-area-inset-bottom)) .55rem;\n  z-index: 2147480999;\n  display: grid;\n  grid-template-columns: repeat(5, 1fr);\n  gap: .25rem;\n  padding: .35rem;\n  border-radius: 24px;\n  background: rgba(15,18,24,.9);\n  backdrop-filter: blur(18px);\n}\n.csm-bottomnav button {\n  min-height: 48px;\n  border: 0;\n  border-radius: 18px;\n  background: transparent;\n  color: var(--csm-muted);\n  font: inherit;\n  font-size: .76rem;\n  font-weight: 760;\n}\n.csm-bottomnav button[aria-current=\"page\"],\n.csm-bottomnav button:hover {\n  color: var(--csm-text);\n  background: rgba(255,255,255,.08);\n}\n\nhtml.csm-site-bleeding-cool-modern-reader {\n  --csm-accent: #b68cff;\n  --csm-accent-2: #6fd2ff;\n  --csm-max: 1320px;\n  --csm-article-width: 820px;\n}\nhtml.csm-site-bleeding-cool-modern-reader \n@supports (content-visibility: auto) {\n  html.csm-modernized.csm-low-resource .csm-card {\n    content-visibility: auto;\n    contain-intrinsic-size: 360px 260px;\n  }\n  html.csm-modernized.csm-low-resource .csm-article > * {\n    content-visibility: auto;\n    contain-intrinsic-size: 1px 720px;\n  }\n}\nhtml.csm-modernized.csm-site-bleeding-cool-modern-reader .csm-layout {\n  contain: layout paint style;\n}\nhtml.csm-modernized.csm-site-bleeding-cool-modern-reader .csm-feed-grid {\n  grid-template-columns: repeat(auto-fit, minmax(min(100%, 310px), 1fr));\n}\n\n.csm-feed-grid {\n  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));\n}\nhtml.csm-site-bleeding-cool-modern-reader .csm-feed-grid .csm-card:first-child {\n  grid-column: span 2;\n}\nhtml.csm-site-bleeding-cool-modern-reader .csm-card:first-child :is(h1,h2,h3,.entry-title,.post-title,.title) {\n  font-size: clamp(1.25rem, 2.7vw, 2rem) !important;\n}\nhtml.csm-site-bleeding-cool-modern-reader .csm-article {\n  background: #171c24 !important;\n}\nhtml.csm-site-bleeding-cool-modern-reader :is(.popular-now,.popular,.trending,.widget,.widget-area,aside,[class*=\"sidebar\"],[id*=\"sidebar\"],[class*=\"popular\"]):not(.csm-drawer) {\n  display: none !important;\n}\n\n@media (min-width: 760px) {\n  .csm-bottomnav { display: none; }\n  .csm-layout { margin-bottom: 3rem !important; }\n}\n@media (max-width: 760px) {\n  .csm-layout { width: min(100% - .9rem, var(--csm-max, 1360px)) !important; }\n  html.csm-site-bleeding-cool-modern-reader .csm-feed-grid .csm-card:first-child { grid-column: auto; }\n}\n@media (max-width: 520px) {\n  .csm-actions .csm-btn[data-desktop] { display:none; }\n  .csm-topbar { min-height: 54px; }\n  .csm-card { border-radius: 20px !important; }\n  .csm-article { border-radius: 22px !important; padding: .95rem !important; }\n}\n";
+  const CSS_TEXT = ":root {\n  --csm-bg: #090b0f;\n  --csm-surface: #12161d;\n  --csm-raised: #191f28;\n  --csm-text: #f0f3f7;\n  --csm-muted: #aab3c1;\n  --csm-faint: #8792a2;\n  --csm-accent: #d65cff;\n  --csm-accent-2: #5ad7ff;\n  --csm-radius: 24px;\n  color-scheme: dark;\n}\nhtml.csm-modernized {\n  background: var(--csm-bg) !important;\n  min-inline-size: 0 !important;\n}\nhtml.csm-modernized body {\n  background: radial-gradient(circle at 20% -10%, rgba(214,92,255,.14), transparent 36rem), var(--csm-bg) !important;\n  color: var(--csm-text) !important;\n  font: 16px/1.62 Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif !important;\n  overflow-x: hidden !important;\n  min-inline-size: 0 !important;\n}\nhtml.csm-modernized body :is(#page,#content,.site,.site-content,.site-main,.content,.content-area,.main-content,.wrap,.wrapper,.container,.page-wrap,.page-wrapper,.row,.col,.column,.entry-content,.post-content,.single-post,.post,.article,.main,.primary) {\n  background-color: transparent !important;\n  background-image: none !important;\n  box-shadow: none !important;\n}\n\nhtml.csm-modernized.csm-low-resource body {\n  background: var(--csm-bg) !important;\n}\nhtml.csm-modernized.csm-low-resource .csm-topbar {\n  backdrop-filter: none !important;\n}\nhtml.csm-modernized.csm-low-resource .csm-card,\nhtml.csm-modernized.csm-low-resource .csm-article {\n  background: var(--csm-surface) !important;\n}\nhtml.csm-modernized.csm-low-resource .csm-drawer {\n  backdrop-filter: none !important;\n}\n\nhtml.csm-modernized img,\nhtml.csm-modernized video,\nhtml.csm-modernized iframe {\n  max-inline-size: 100% !important;\n}\n.csm-hidden,\n.csm-ad-hidden,\n.csm-source-hidden {\n  display: none !important;\n  visibility: hidden !important;\n  inline-size: 0 !important;\n  block-size: 0 !important;\n  max-inline-size: 0 !important;\n  max-block-size: 0 !important;\n  margin: 0 !important;\n  padding: 0 !important;\n  overflow: hidden !important;\n}\n.csm-topbar {\n  position: sticky;\n  top: 0;\n  z-index: 2147481000;\n  display: flex;\n  align-items: center;\n  gap: .8rem;\n  min-height: 58px;\n  padding: max(.7rem, env(safe-area-inset-top)) clamp(.85rem, 3vw, 1.4rem) .7rem;\n  background: rgba(9, 11, 15, .9);\n  backdrop-filter: blur(18px);\n  box-shadow: 0 1px 0 rgba(255,255,255,.06);\n}\n.csm-brand {\n  display: flex;\n  align-items: center;\n  min-width: 0;\n  gap: .65rem;\n  color: var(--csm-text) !important;\n  text-decoration: none !important;\n  font-weight: 800 !important;\n  letter-spacing: -.02em;\n}\n.csm-brand-mark {\n  display: grid;\n  place-items: center;\n  inline-size: 34px;\n  block-size: 34px;\n  border-radius: 13px;\n  background: linear-gradient(135deg, var(--csm-accent), var(--csm-accent-2));\n  color: #07080a;\n  font-weight: 900;\n  font-size: .86rem;\n}\n.csm-brand-text {\n  overflow: hidden;\n  text-overflow: ellipsis;\n  white-space: nowrap;\n}\n.csm-actions {\n  margin-inline-start: auto;\n  display: flex;\n  gap: .45rem;\n}\n.csm-btn,\n.csm-chip {\n  border: 0 !important;\n  min-height: 44px;\n  border-radius: 999px;\n  padding: .68rem .92rem;\n  background: rgba(255,255,255,.08);\n  color: var(--csm-text) !important;\n  text-decoration: none !important;\n  font: inherit;\n  font-weight: 750;\n  cursor: pointer;\n  touch-action: manipulation;\n}\n.csm-btn:hover,\n.csm-chip:hover,\n.csm-btn[aria-pressed=\"true\"],\n.csm-chip[aria-pressed=\"true\"] {\n  background: rgba(214,92,255,.2);\n}\n.csm-progress {\n  position: fixed;\n  inset: 0 0 auto 0;\n  height: 3px;\n  z-index: 2147481002;\n  transform-origin: 0 50%;\n  transform: scaleX(0);\n  background: linear-gradient(90deg, var(--csm-accent), var(--csm-accent-2));\n}\n.csm-layout {\n  width: min(100% - 1.5rem, var(--csm-max, 1360px)) !important;\n  max-inline-size: var(--csm-max, 1360px) !important;\n  margin: 1rem auto 5rem !important;\n  padding: 0 !important;\n  float: none !important;\n  clear: both !important;\n  min-inline-size: 0 !important;\n}\n\n@supports (content-visibility: auto) {\n  html.csm-modernized.csm-low-resource .csm-card {\n    content-visibility: auto;\n    contain-intrinsic-size: 360px 260px;\n  }\n  html.csm-modernized.csm-low-resource .csm-article > * {\n    content-visibility: auto;\n    contain-intrinsic-size: 1px 720px;\n  }\n}\nhtml.csm-modernized.csm-site-bleeding-cool-modern-reader .csm-layout {\n  contain: layout paint style;\n}\nhtml.csm-modernized.csm-site-bleeding-cool-modern-reader .csm-feed-grid {\n  grid-template-columns: repeat(auto-fit, minmax(min(100%, 310px), 1fr));\n}\n\n.csm-feed-grid {\n  display: grid !important;\n  grid-template-columns: repeat(auto-fit, minmax(min(100%, 285px), 1fr));\n  gap: clamp(.8rem, 2vw, 1.2rem);\n  align-items: stretch;\n  width: 100% !important;\n  min-inline-size: 0 !important;\n}\n.csm-card {\n  position: relative !important;\n  display: flex !important;\n  flex-direction: column !important;\n  overflow: hidden !important;\n  min-width: 0 !important;\n  border: 0 !important;\n  border-radius: var(--csm-radius) !important;\n  background: linear-gradient(180deg, rgba(255,255,255,.055), rgba(255,255,255,.025)), var(--csm-surface) !important;\n  box-shadow: none !important;\n  padding: 0 !important;\n  margin: 0 !important;\n  color: var(--csm-text) !important;\n  float: none !important;\n  width: auto !important;\n  max-width: none !important;\n  min-height: 100% !important;\n}\n.csm-card-cover {\n  position: absolute !important;\n  inset: 0 !important;\n  z-index: 3 !important;\n  color: transparent !important;\n  text-decoration: none !important;\n}\n.csm-card a:not(.csm-card-cover) {\n  color: inherit !important;\n  text-decoration: none !important;\n  position: relative;\n  z-index: 2;\n}\n\n.csm-card-media {\n  display: grid !important;\n  place-items: center !important;\n  inline-size: 100% !important;\n  aspect-ratio: var(--csm-card-ratio, 16 / 9) !important;\n  overflow: hidden !important;\n  background: #0d1118 !important;\n}\n.csm-card-body {\n  position: relative !important;\n  z-index: 2 !important;\n  display: flex !important;\n  flex-direction: column !important;\n  gap: .45rem !important;\n  padding: .72rem .82rem .82rem !important;\n  min-block-size: 0 !important;\n}\n.csm-card-title {\n  margin: 0 !important;\n  color: var(--csm-text) !important;\n  font-size: clamp(.98rem, 1.6vw, 1.24rem) !important;\n  line-height: 1.12 !important;\n  letter-spacing: -.025em !important;\n  display: -webkit-box !important;\n  -webkit-line-clamp: 3 !important;\n  -webkit-box-orient: vertical !important;\n  overflow: hidden !important;\n}\n.csm-card-body .csm-meta {\n  margin: 0 !important;\n  font-size: .78rem !important;\n  line-height: 1.2 !important;\n}\n.csm-card img {\n  inline-size: 100% !important;\n  width: 100% !important;\n  aspect-ratio: var(--csm-card-ratio, 16 / 9);\n  block-size: auto !important;\n  object-fit: var(--csm-card-fit, cover) !important;\n  object-position: center center !important;\n  display: block !important;\n  border-radius: 0 !important;\n  margin: 0 !important;\n  background: #0d1118 !important;\n}\n.csm-card-media img {\n  block-size: 100% !important;\n  height: 100% !important;\n}\n.csm-card :is(h1,h2,h3,.entry-title,.post-title,.title):not(.csm-card-title) {\n  font-size: clamp(1.05rem, 2.4vw, 1.36rem) !important;\n  line-height: 1.12 !important;\n  letter-spacing: -.025em !important;\n  margin: .85rem .95rem .35rem !important;\n  color: var(--csm-text) !important;\n  display: -webkit-box !important;\n  -webkit-line-clamp: 3;\n  -webkit-box-orient: vertical;\n  overflow: hidden !important;\n}\n.csm-card :is(p,.excerpt,.summary,.dek) {\n  color: var(--csm-muted) !important;\n  margin: 0 .95rem .9rem !important;\n  display: -webkit-box !important;\n  -webkit-line-clamp: 3;\n  -webkit-box-orient: vertical;\n  overflow: hidden !important;\n}\n.csm-card .csm-meta {\n  display: flex;\n  flex-wrap: wrap;\n  gap: .4rem;\n  margin: auto .95rem .95rem;\n  color: var(--csm-faint);\n  font-size: .84rem;\n  position: relative;\n  z-index: 2;\n}\n.csm-card.csm-viewed img {\n  opacity: .56;\n  filter: saturate(.7);\n}\n.csm-section-title {\n  grid-column: 1 / -1;\n  margin: 1.4rem 0 .8rem;\n  font-size: clamp(1.4rem, 4vw, 2.35rem);\n  line-height: 1.05;\n  letter-spacing: -.04em;\n  color: var(--csm-text) !important;\n}\n.csm-article-shell {\n  width: min(100% - 1.5rem, calc(var(--csm-article-width, 790px) + 4rem)) !important;\n  margin: 1rem auto 6rem !important;\n  padding: 0 !important;\n  float: none !important;\n  background: transparent !important;\n}\n.csm-article {\n  width: min(100%, var(--csm-article-width, 790px)) !important;\n  max-inline-size: var(--csm-article-width, 790px) !important;\n  margin: 1.1rem auto 6rem !important;\n  padding: clamp(1rem, 3vw, 1.35rem) !important;\n  border-radius: 28px !important;\n  background: linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,.02)), var(--csm-surface) !important;\n  color: var(--csm-text) !important;\n  float: none !important;\n  box-sizing: border-box !important;\n}\n.csm-article :is(h1,.entry-title,.post-title) {\n  font-size: clamp(1.85rem, 8vw, 3.4rem) !important;\n  line-height: 1.08 !important;\n  letter-spacing: -.045em !important;\n  color: var(--csm-text) !important;\n  overflow: visible !important;\n  display: block !important;\n  -webkit-line-clamp: unset !important;\n}\n.csm-article :is(h2,h3,h4) {\n  color: var(--csm-text) !important;\n  line-height: 1.18 !important;\n}\n.csm-article :is(p,li) {\n  color: #e7ebf2 !important;\n  font-size: clamp(1rem, 1.4vw, 1.12rem) !important;\n  line-height: 1.72 !important;\n}\n.csm-article :is(a) { color: var(--csm-accent-2) !important; }\n.csm-article img,\n.csm-article video,\n.csm-article iframe {\n  max-inline-size: 100% !important;\n  block-size: auto !important;\n  border-radius: 18px !important;\n}\n.csm-drawer {\n  position: fixed;\n  inset: auto .65rem calc(.65rem + env(safe-area-inset-bottom)) .65rem;\n  z-index: 2147481001;\n  max-height: min(72vh, 620px);\n  overflow: auto;\n  border-radius: 28px;\n  padding: 1rem;\n  background: #10141b;\n  color: var(--csm-text);\n  box-shadow: 0 24px 80px rgba(0,0,0,.52);\n  transform: translateY(120%);\n  transition: transform .2s ease;\n}\n.csm-drawer[aria-hidden=\"false\"] { transform: translateY(0); }\n.csm-drawer-backdrop {\n  position: fixed;\n  inset: 0;\n  z-index: 2147481000;\n  background: rgba(0,0,0,.48);\n  opacity: 0;\n  pointer-events: none;\n  transition: opacity .2s ease;\n}\n.csm-drawer-backdrop[data-open=\"true\"] { opacity: 1; pointer-events: auto; }\n.csm-drawer h2 { margin: .2rem 0 1rem; font-size: 1.25rem; color: var(--csm-text) !important; }\n.csm-drawer-grid { display: grid; gap: .55rem; }\n.csm-drawer input {\n  min-height: 46px;\n  border: 0;\n  border-radius: 16px;\n  padding: .75rem .9rem;\n  background: rgba(255,255,255,.08);\n  color: var(--csm-text);\n}\n.csm-bottomnav {\n  position: fixed;\n  inset: auto .55rem calc(.55rem + env(safe-area-inset-bottom)) .55rem;\n  z-index: 2147480999;\n  display: grid;\n  grid-template-columns: repeat(5, 1fr);\n  gap: .25rem;\n  padding: .35rem;\n  border-radius: 24px;\n  background: rgba(15,18,24,.9);\n  backdrop-filter: blur(18px);\n}\n.csm-bottomnav button {\n  min-height: 48px;\n  border: 0;\n  border-radius: 18px;\n  background: transparent;\n  color: var(--csm-muted);\n  font: inherit;\n  font-size: .76rem;\n  font-weight: 760;\n}\n.csm-bottomnav button[aria-current=\"page\"],\n.csm-bottomnav button:hover {\n  color: var(--csm-text);\n  background: rgba(255,255,255,.08);\n}\n\nhtml.csm-site-bleeding-cool-modern-reader {\n  --csm-accent: #b68cff;\n  --csm-accent-2: #6fd2ff;\n  --csm-max: 1320px;\n  --csm-article-width: 820px;\n}\n@supports (content-visibility: auto) {\n  html.csm-modernized.csm-low-resource .csm-card {\n    content-visibility: auto;\n    contain-intrinsic-size: 360px 260px;\n  }\n  html.csm-modernized.csm-low-resource .csm-article > * {\n    content-visibility: auto;\n    contain-intrinsic-size: 1px 720px;\n  }\n}\nhtml.csm-modernized.csm-site-bleeding-cool-modern-reader .csm-layout {\n  contain: layout paint style;\n}\nhtml.csm-modernized.csm-site-bleeding-cool-modern-reader .csm-feed-grid {\n  grid-template-columns: repeat(auto-fit, minmax(min(100%, 310px), 1fr));\n}\n\n.csm-feed-grid {\n  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));\n}\nhtml.csm-site-bleeding-cool-modern-reader .csm-feed-grid .csm-card:first-child {\n  grid-column: span 2;\n}\nhtml.csm-site-bleeding-cool-modern-reader .csm-card:first-child :is(h1,h2,h3,.entry-title,.post-title,.title) {\n  font-size: clamp(1.25rem, 2.7vw, 2rem) !important;\n}\nhtml.csm-site-bleeding-cool-modern-reader .csm-article {\n  background: #171c24 !important;\n}\nhtml.csm-site-bleeding-cool-modern-reader :is(.popular-now,.popular,.trending,.widget,.widget-area,aside,[class*=\"sidebar\"],[id*=\"sidebar\"],[class*=\"popular\"]):not(.csm-drawer) {\n  display: none !important;\n}\n\n\n/* Bleeding Cool profile: strip native white wrappers and heavyweight article extras. */\nhtml.csm-modernized.csm-site-bleeding-cool-modern-reader,\nhtml.csm-modernized.csm-site-bleeding-cool-modern-reader body,\nhtml.csm-modernized.csm-site-bleeding-cool-modern-reader :is(#td-outer-wrap,#td-container,.td-container,.td-main-content-wrap,.td-main-page-wrap,.td-pb-row,.td-ss-main-content,.td-pb-span8,.td-pb-span4,.td-main-sidebar,.td-content-wrap,.tdc-content-wrap,.td-page-content,.td-post-content,.td-article-content,.td_block_wrap,.td_module_wrap,.td_block_inner,.td_quote_box) {\n  background: transparent !important;\n  background-color: transparent !important;\n  background-image: none !important;\n  box-shadow: none !important;\n}\nhtml.csm-modernized.csm-site-bleeding-cool-modern-reader body {\n  background: var(--csm-bg) !important;\n}\nhtml.csm-feed-mode.csm-site-bleeding-cool-modern-reader .csm-layout {\n  background: transparent !important;\n}\nhtml.csm-feed-mode.csm-site-bleeding-cool-modern-reader .csm-feed-grid {\n  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)) !important;\n  gap: .72rem !important;\n}\nhtml.csm-feed-mode.csm-site-bleeding-cool-modern-reader .csm-card {\n  border-radius: 16px !important;\n  min-block-size: 0 !important;\n  background: #141922 !important;\n}\nhtml.csm-feed-mode.csm-site-bleeding-cool-modern-reader .csm-card-media {\n  border-radius: 0 !important;\n}\nhtml.csm-feed-mode.csm-site-bleeding-cool-modern-reader .csm-card img {\n  object-fit: contain !important;\n}\nhtml.csm-feed-mode.csm-site-bleeding-cool-modern-reader .csm-card:first-child {\n  grid-column: span 2;\n}\nhtml.csm-feed-mode.csm-site-bleeding-cool-modern-reader .csm-card:first-child .csm-card-title {\n  font-size: clamp(1.12rem, 2.2vw, 1.58rem) !important;\n}\nhtml.csm-feed-mode.csm-site-bleeding-cool-modern-reader .csm-card[data-csm-no-image=\"true\"] {\n  display: none !important;\n}\nhtml.csm-article-mode.csm-site-bleeding-cool-modern-reader .csm-article-shell {\n  background: transparent !important;\n}\nhtml.csm-article-mode.csm-site-bleeding-cool-modern-reader .csm-article {\n  background: #161b23 !important;\n  color: var(--csm-text) !important;\n}\nhtml.csm-article-mode.csm-site-bleeding-cool-modern-reader .csm-article :is(.td-post-sharing,.td-post-sharing-top,.td-post-sharing-bottom,.td-social-sharing,.td-social-style,.addtoany_share_save_container,[class*=\"addthis\"],.sharedaddy,.sd-sharing-enabled,.td-a-rec,.td-g-rec,.td_block_related_posts,.td-related-title,.td-related-row,.td-post-next-prev,.td-author-box-wrap,.td-author-name,.td-author-description,.td-more-articles-box,.td-post-source-tags) {\n  display: none !important;\n  visibility: hidden !important;\n  block-size: 0 !important;\n  margin: 0 !important;\n  padding: 0 !important;\n  overflow: hidden !important;\n}\nhtml.csm-article-mode.csm-site-bleeding-cool-modern-reader .csm-article img {\n  display: block !important;\n  max-inline-size: 100% !important;\n  width: auto !important;\n  height: auto !important;\n  max-height: 78vh !important;\n  object-fit: contain !important;\n  margin-inline: auto !important;\n  background: #0d1118 !important;\n}\nhtml.csm-article-mode.csm-site-bleeding-cool-modern-reader .csm-article iframe,\nhtml.csm-article-mode.csm-site-bleeding-cool-modern-reader .csm-article video {\n  width: 100% !important;\n  aspect-ratio: 16 / 9 !important;\n  height: auto !important;\n  background: #0d1118 !important;\n}\nhtml.csm-article-mode.csm-site-bleeding-cool-modern-reader .csm-article :is(p,li,figcaption) {\n  color: #e6ebf3 !important;\n}\nhtml.csm-article-mode.csm-site-bleeding-cool-modern-reader :is(.td-main-sidebar,.td-pb-span4,aside,.sidebar,.widget-area,.td-footer-wrapper,.td-sub-footer-container) {\n  display: none !important;\n}\n\n@media (min-width: 760px) {\n  .csm-bottomnav { display: none; }\n  .csm-layout { margin-bottom: 3rem !important; }\n}\n@media (max-width: 760px) {\n  .csm-layout { width: min(100% - .9rem, var(--csm-max, 1360px)) !important; }\n  html.csm-site-bleeding-cool-modern-reader .csm-feed-grid .csm-card:first-child { grid-column: auto; }\n}\n@media (max-width: 520px) {\n  .csm-actions .csm-btn[data-desktop] { display:none; }\n  .csm-topbar { min-height: 54px; }\n  .csm-card { border-radius: 20px !important; }\n  .csm-article { border-radius: 22px !important; padding: .95rem !important; }\n}\n";
   const install = function installContentSiteModernizer(profile, cssText) {
   if (!profile || document.documentElement.classList.contains('csm-modernized')) return;
 
@@ -240,6 +245,7 @@
     d.documentElement.style.setProperty('--csm-max', `${profile.layout?.desktopMaxWidth || 1360}px`);
     d.documentElement.style.setProperty('--csm-article-width', `${profile.layout?.articleMaxWidth || 790}px`);
     d.documentElement.style.setProperty('--csm-card-ratio', profile.layout?.cardImageRatio || '16 / 9');
+    d.documentElement.style.setProperty('--csm-card-fit', profile.layout?.cardImageFit || profile.layout?.imageFit || 'cover');
   }
 
   function hideNodes(selectors, root = d) {
@@ -421,6 +427,21 @@
     return excludes.some((sel) => node.matches?.(sel) || node.closest?.(sel));
   }
 
+  function findCardImage(node) {
+    const images = Array.from(node.querySelectorAll('img'));
+    return images.find((img) => {
+      if (!(img instanceof HTMLImageElement)) return false;
+      const src = img.currentSrc || img.src || img.getAttribute('data-src') || img.getAttribute('data-lazy-src') || img.getAttribute('data-original') || img.getAttribute('srcset') || img.getAttribute('data-srcset');
+      const alt = (img.getAttribute('alt') || '').trim();
+      return !!src && !/spacer|blank|placeholder|pixel|avatar|logo/i.test(src + ' ' + alt);
+    }) || null;
+  }
+
+  function titleTextFor(node, link) {
+    const titleNode = first(profile.selectors?.feed?.title || 'h1,h2,h3,.entry-title,.post-title,.title', node) || link;
+    return (titleNode?.textContent || link?.textContent || '').replace(/\s+/g, ' ').trim();
+  }
+
   function cardCandidates() {
     const selectors = selectorList(profile.selectors?.feed?.items || 'article');
     const nodes = [];
@@ -428,17 +449,22 @@
       for (const sel of selectors) nodes.push(...$$(sel, root));
     }
     const seen = new Set();
+    const seenLinks = new Set();
     const limit = Number(perf.maxFeedCards || profile.layout?.maxFeedCards || 0);
     const selected = [];
+    const requireImage = profile.layout?.requireCardImage === true;
     for (const node of nodes) {
       if (!(node instanceof HTMLElement) || seen.has(node)) continue;
       seen.add(node);
       if (node.closest('.csm-topbar,.csm-drawer,.csm-bottomnav') || isExcluded(node)) continue;
       const link = node.querySelector('a[href]');
       if (!link) continue;
-      const titleNode = first(profile.selectors?.feed?.title || 'h1,h2,h3,.entry-title,.post-title,.title', node) || link;
-      const text = (titleNode.textContent || link.textContent || '').replace(/\s+/g, ' ').trim();
+      const hrefKey = absolutePath(link.href);
+      if (seenLinks.has(hrefKey)) continue;
+      const text = titleTextFor(node, link);
       if (text.length < (profile.layout?.minCardTextLength || 18)) continue;
+      if (requireImage && !findCardImage(node)) continue;
+      seenLinks.add(hrefKey);
       selected.push(node);
       if (limit > 0 && selected.length >= limit) break;
     }
@@ -467,9 +493,10 @@
       main.prepend(grid);
     }
     for (const item of items) grid.append(item);
+    const hideRemainder = profile.layout?.hideFeedRemainder === true;
     for (const child of Array.from(main.children)) {
       if (child === grid || child.classList.contains('csm-section-title')) continue;
-      if (!child.querySelector?.('a[href],img,video,iframe') && !child.textContent.trim()) child.classList.add('csm-source-hidden');
+      if (hideRemainder || (!child.querySelector?.('a[href],img,video,iframe') && !child.textContent.trim())) child.classList.add('csm-source-hidden');
     }
   }
 
@@ -488,6 +515,52 @@
     for (const item of items) enhanceCard(item);
   }
 
+  function normalizeCard(item, link, id) {
+    const title = titleTextFor(item, link);
+    const image = findCardImage(item);
+    const cat = first(profile.selectors?.feed?.category || '', item);
+    const time = first(profile.selectors?.feed?.date || 'time', item);
+    const metaParts = [];
+    if (cat) metaParts.push(cat.textContent.trim().split(/\s+/).slice(0, 4).join(' '));
+    if (time) metaParts.push(time.textContent.trim());
+
+    const cover = d.createElement('a');
+    cover.className = 'csm-card-cover';
+    cover.href = link.href;
+    cover.setAttribute('aria-label', title || link.textContent.trim() || 'Open story');
+
+    const body = d.createElement('div');
+    body.className = 'csm-card-body';
+    const heading = d.createElement('h3');
+    heading.className = 'csm-card-title';
+    heading.textContent = title;
+    body.append(heading);
+    if (metaParts.length) {
+      const meta = d.createElement('div');
+      meta.className = 'csm-meta';
+      meta.textContent = metaParts.filter(Boolean).join(' · ');
+      body.append(meta);
+    }
+
+    item.textContent = '';
+    if (image) {
+      const media = d.createElement('div');
+      media.className = 'csm-card-media';
+      const clone = image.cloneNode(false);
+      const lazySrc = clone.getAttribute('data-src') || clone.getAttribute('data-lazy-src') || clone.getAttribute('data-original');
+      const lazySrcset = clone.getAttribute('data-srcset');
+      if ((!clone.getAttribute('src') || /^data:/i.test(clone.getAttribute('src') || '')) && lazySrc) clone.setAttribute('src', lazySrc);
+      if (!clone.getAttribute('srcset') && lazySrcset) clone.setAttribute('srcset', lazySrcset);
+      clone.loading = 'lazy';
+      clone.decoding = 'async';
+      media.append(clone);
+      item.append(media);
+    } else {
+      item.dataset.csmNoImage = 'true';
+    }
+    item.append(body, cover);
+  }
+
   function enhanceCard(item) {
     if (item.dataset.csmCard) return;
     item.dataset.csmCard = '1';
@@ -495,25 +568,29 @@
     const id = idFor(item);
     if (viewed.has(id)) item.classList.add('csm-viewed');
     const link = item.querySelector('a[href]');
-    if (link && !item.querySelector('.csm-card-cover')) {
-      const cover = d.createElement('a');
-      cover.className = 'csm-card-cover';
-      cover.href = link.href;
-      cover.setAttribute('aria-label', link.textContent.trim() || 'Open story');
-      item.prepend(cover);
+    if (profile.layout?.normalizeCards && link) {
+      normalizeCard(item, link, id);
+    } else {
+      if (link && !item.querySelector('.csm-card-cover')) {
+        const cover = d.createElement('a');
+        cover.className = 'csm-card-cover';
+        cover.href = link.href;
+        cover.setAttribute('aria-label', link.textContent.trim() || 'Open story');
+        item.prepend(cover);
+      }
+      if (!item.querySelector('.csm-meta')) {
+        const meta = d.createElement('div');
+        meta.className = 'csm-meta';
+        const parts = [];
+        const cat = first(profile.selectors?.feed?.category || '', item);
+        const time = first(profile.selectors?.feed?.date || 'time', item);
+        if (cat) parts.push(cat.textContent.trim().split(/\s+/).slice(0, 4).join(' '));
+        if (time) parts.push(time.textContent.trim());
+        meta.textContent = parts.filter(Boolean).join(' · ');
+        if (meta.textContent) item.append(meta);
+      }
     }
-    if (!item.querySelector('.csm-meta')) {
-      const meta = d.createElement('div');
-      meta.className = 'csm-meta';
-      const parts = [];
-      const cat = first(profile.selectors?.feed?.category || '', item);
-      const time = first(profile.selectors?.feed?.date || 'time', item);
-      if (cat) parts.push(cat.textContent.trim().split(/\s+/).slice(0, 4).join(' '));
-      if (time) parts.push(time.textContent.trim());
-      meta.textContent = parts.filter(Boolean).join(' · ');
-      if (meta.textContent) item.append(meta);
-    }
-    link?.addEventListener('click', () => { viewed.add(id); storage.set('viewed', [...viewed]); });
+    item.querySelector('a[href]')?.addEventListener('click', () => { viewed.add(id); storage.set('viewed', [...viewed]); });
   }
 
   function filterCards(query) {
@@ -547,7 +624,15 @@
     if (!root) return;
     root.classList.add('csm-article');
     const wrapper = root.closest(profile.selectors?.page?.main || 'main,#main,.site-main,.content,.main-content,.site-content');
-    if (wrapper instanceof HTMLElement) wrapper.classList.add('csm-article-shell');
+    if (wrapper instanceof HTMLElement) {
+      wrapper.classList.add('csm-article-shell');
+      if (profile.layout?.hideArticleRemainder === true) {
+        for (const child of Array.from(wrapper.children)) {
+          if (child === root || child.contains(root) || root.contains(child)) continue;
+          child.classList.add('csm-source-hidden');
+        }
+      }
+    }
     const id = absolutePath(location.href);
     let dwell = 0;
     const timer = setInterval(() => {
