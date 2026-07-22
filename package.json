@@ -19,7 +19,8 @@
     "build:extension:telegram": "python3 extensions/telegram-media-downloader/build.py",
     "userscripts:metadata": "node tools/generate-userscript-meta.mjs",
     "check": "node tools/check-repo.mjs",
-    "inventory": "node tools/inventory.mjs"
+    "inventory": "node tools/inventory.mjs",
+    "builder": "bash tools/run-builder.sh"
   },
   "engines": {
     "node": ">=20"

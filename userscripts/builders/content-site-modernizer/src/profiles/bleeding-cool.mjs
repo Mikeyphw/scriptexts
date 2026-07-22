@@ -30,9 +30,13 @@ export default {
     "home": "/",
     "searchPath": "/?s=",
     "layout": {
-      "desktopMaxWidth": 1360,
-      "articleMaxWidth": 790,
-      "cardImageRatio": "16 / 9"
+      "desktopMaxWidth": 1320,
+      "articleMaxWidth": 820,
+      "cardImageRatio": "16 / 9",
+      "hideSidebars": true,
+      "hideOriginalChrome": true,
+      "rebuildFeedGrid": true,
+      "minCardTextLength": 24
     },
     "articleHints": [
       "body.single-post",
@@ -41,17 +45,28 @@ export default {
     ],
     "selectors": {
       "page": {
-        "main": "main,#main,.site-main,.content,.main-content,.site-content"
+        "header": "header,#masthead,.site-header,.top-bar,.topbar,.site-branding,.bc-header,[class*='header'],[class*='breaking']",
+        "nav": "nav,.main-navigation,.site-navigation,.menu,.navbar,.nav-links,.breadcrumb",
+        "main": "main,#main,.site-main,.content-area,.main-content,.primary,.site-content",
+        "sidebar": "aside,#secondary,.sidebar,.widget-area,.popular-now,.popular,.trending,[class*='sidebar'],[class*='popular'],[id*='sidebar'],[id*='popular']"
       },
       "feed": {
+        "containers": [
+          "main",
+          "#main",
+          ".site-main",
+          ".content-area",
+          ".main-content",
+          ".primary"
+        ],
+        "exclude": "aside,#secondary,.sidebar,.widget,.widget-area,.popular-now,.popular,.trending,[class*='sidebar'],[class*='popular'],[id*='sidebar'],[id*='popular'],.csm-source-hidden",
         "items": [
           "article",
-          ".post",
-          ".entry",
+          ".post:not(.widget):not(.popular)",
+          ".entry:not(.widget):not(.popular)",
           ".river-item",
           ".story",
-          ".card",
-          "li:has(a[href*='bleedingcool.com/'])"
+          ".card:not(.widget):not(.popular)"
         ],
         "title": "h1,h2,h3,.entry-title,.post-title,.title",
         "category": ".cat-links,.category,[rel='category tag']",

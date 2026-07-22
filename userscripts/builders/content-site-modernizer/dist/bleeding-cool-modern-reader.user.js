@@ -30,9 +30,13 @@
   "home": "/",
   "searchPath": "/?s=",
   "layout": {
-    "desktopMaxWidth": 1360,
-    "articleMaxWidth": 790,
-    "cardImageRatio": "16 / 9"
+    "desktopMaxWidth": 1320,
+    "articleMaxWidth": 820,
+    "cardImageRatio": "16 / 9",
+    "hideSidebars": true,
+    "hideOriginalChrome": true,
+    "rebuildFeedGrid": true,
+    "minCardTextLength": 24
   },
   "articleHints": [
     "body.single-post",
@@ -41,17 +45,28 @@
   ],
   "selectors": {
     "page": {
-      "main": "main,#main,.site-main,.content,.main-content,.site-content"
+      "header": "header,#masthead,.site-header,.top-bar,.topbar,.site-branding,.bc-header,[class*='header'],[class*='breaking']",
+      "nav": "nav,.main-navigation,.site-navigation,.menu,.navbar,.nav-links,.breadcrumb",
+      "main": "main,#main,.site-main,.content-area,.main-content,.primary,.site-content",
+      "sidebar": "aside,#secondary,.sidebar,.widget-area,.popular-now,.popular,.trending,[class*='sidebar'],[class*='popular'],[id*='sidebar'],[id*='popular']"
     },
     "feed": {
+      "containers": [
+        "main",
+        "#main",
+        ".site-main",
+        ".content-area",
+        ".main-content",
+        ".primary"
+      ],
+      "exclude": "aside,#secondary,.sidebar,.widget,.widget-area,.popular-now,.popular,.trending,[class*='sidebar'],[class*='popular'],[id*='sidebar'],[id*='popular'],.csm-source-hidden",
       "items": [
         "article",
-        ".post",
-        ".entry",
+        ".post:not(.widget):not(.popular)",
+        ".entry:not(.widget):not(.popular)",
         ".river-item",
         ".story",
-        ".card",
-        "li:has(a[href*='bleedingcool.com/'])"
+        ".card:not(.widget):not(.popular)"
       ],
       "title": "h1,h2,h3,.entry-title,.post-title,.title",
       "category": ".cat-links,.category,[rel='category tag']",
@@ -167,20 +182,33 @@
     ]
   }
 };
-  const CSS_TEXT = ":root {\n  --csm-bg: #090b0f;\n  --csm-surface: #12161d;\n  --csm-raised: #191f28;\n  --csm-text: #f0f3f7;\n  --csm-muted: #aab3c1;\n  --csm-faint: #8792a2;\n  --csm-accent: #d65cff;\n  --csm-accent-2: #5ad7ff;\n  --csm-radius: 24px;\n  color-scheme: dark;\n}\nhtml.csm-modernized { background: var(--csm-bg) !important; }\nhtml.csm-modernized body {\n  background: radial-gradient(circle at 20% -10%, rgba(214,92,255,.14), transparent 36rem), var(--csm-bg) !important;\n  color: var(--csm-text) !important;\n  font: 16px/1.62 Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif !important;\n  overflow-x: hidden !important;\n}\n.csm-hidden, .csm-ad-hidden { display: none !important; visibility: hidden !important; inline-size: 0 !important; block-size: 0 !important; margin: 0 !important; padding: 0 !important; }\n.csm-topbar {\n  position: sticky; top: 0; z-index: 2147481000; display: flex; align-items: center; gap: .8rem;\n  min-height: 58px; padding: max(.7rem, env(safe-area-inset-top)) clamp(.85rem, 3vw, 1.4rem) .7rem;\n  background: rgba(9, 11, 15, .86); backdrop-filter: blur(18px); box-shadow: 0 1px 0 rgba(255,255,255,.06);\n}\n.csm-brand { display: flex; align-items: center; min-width: 0; gap: .65rem; color: var(--csm-text) !important; text-decoration: none !important; font-weight: 800 !important; letter-spacing: -.02em; }\n.csm-brand-mark { display: grid; place-items: center; inline-size: 34px; block-size: 34px; border-radius: 13px; background: linear-gradient(135deg, var(--csm-accent), var(--csm-accent-2)); color: #07080a; font-weight: 900; }\n.csm-brand-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }\n.csm-actions { margin-inline-start: auto; display: flex; gap: .45rem; }\n.csm-btn, .csm-chip {\n  border: 0 !important; min-height: 44px; border-radius: 999px; padding: .68rem .92rem;\n  background: rgba(255,255,255,.08); color: var(--csm-text) !important; text-decoration: none !important;\n  font: inherit; font-weight: 750; cursor: pointer; touch-action: manipulation;\n}\n.csm-btn:hover, .csm-chip:hover, .csm-btn[aria-pressed=\"true\"], .csm-chip[aria-pressed=\"true\"] { background: rgba(214,92,255,.2); }\n.csm-progress { position: fixed; inset: 0 0 auto 0; height: 3px; z-index: 2147481002; transform-origin: 0 50%; transform: scaleX(0); background: linear-gradient(90deg, var(--csm-accent), var(--csm-accent-2)); }\n.csm-layout { width: min(100% - 1.2rem, var(--csm-max, 1360px)); margin: 1rem auto 5rem; }\n.csm-feed-grid { display: grid !important; grid-template-columns: repeat(auto-fit, minmax(min(100%, 285px), 1fr)); gap: clamp(.8rem, 2vw, 1.2rem); align-items: stretch; }\n.csm-card {\n  display: flex !important; flex-direction: column; overflow: hidden; min-width: 0; border: 0 !important; border-radius: var(--csm-radius) !important;\n  background: linear-gradient(180deg, rgba(255,255,255,.055), rgba(255,255,255,.025)), var(--csm-surface) !important;\n  box-shadow: none !important; padding: 0 !important; color: var(--csm-text) !important;\n}\n.csm-card a { color: inherit !important; text-decoration: none !important; }\n.csm-card img { inline-size: 100% !important; aspect-ratio: var(--csm-card-ratio, 16 / 9); block-size: auto !important; object-fit: cover !important; display: block !important; border-radius: 0 !important; }\n.csm-card :is(h1,h2,h3,.entry-title,.post-title,.title) { font-size: clamp(1.05rem, 2.4vw, 1.36rem) !important; line-height: 1.12 !important; letter-spacing: -.025em !important; margin: .85rem .95rem .35rem !important; color: var(--csm-text) !important; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }\n.csm-card :is(p,.excerpt,.summary,.dek) { color: var(--csm-muted) !important; margin: 0 .95rem .9rem !important; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }\n.csm-card .csm-meta { display: flex; flex-wrap: wrap; gap: .4rem; margin: auto .95rem .95rem; color: var(--csm-faint); font-size: .84rem; }\n.csm-card.csm-viewed img { opacity: .56; filter: saturate(.7); }\n.csm-section-title { margin: 1.4rem 0 .8rem; font-size: clamp(1.4rem, 4vw, 2.35rem); line-height: 1.05; letter-spacing: -.04em; }\n.csm-article { width: min(100% - 1.1rem, var(--csm-article-width, 790px)); margin: 1.1rem auto 6rem; }\n.csm-article :is(h1,.entry-title,.post-title) { font-size: clamp(1.85rem, 8vw, 3.4rem) !important; line-height: 1.08 !important; letter-spacing: -.045em !important; color: var(--csm-text) !important; overflow: visible !important; display: block !important; -webkit-line-clamp: unset !important; }\n.csm-article :is(p,li) { color: #e7ebf2 !important; font-size: clamp(1rem, 1.4vw, 1.12rem) !important; line-height: 1.72 !important; }\n.csm-article img, .csm-article video, .csm-article iframe { max-inline-size: 100% !important; block-size: auto !important; border-radius: 18px !important; }\n.csm-drawer { position: fixed; inset: auto .65rem calc(.65rem + env(safe-area-inset-bottom)) .65rem; z-index: 2147481001; max-height: min(72vh, 620px); overflow: auto; border-radius: 28px; padding: 1rem; background: #10141b; color: var(--csm-text); box-shadow: 0 24px 80px rgba(0,0,0,.52); transform: translateY(120%); transition: transform .2s ease; }\n.csm-drawer[aria-hidden=\"false\"] { transform: translateY(0); }\n.csm-drawer-backdrop { position: fixed; inset: 0; z-index: 2147481000; background: rgba(0,0,0,.48); opacity: 0; pointer-events: none; transition: opacity .2s ease; }\n.csm-drawer-backdrop[data-open=\"true\"] { opacity: 1; pointer-events: auto; }\n.csm-drawer h2 { margin: .2rem 0 1rem; font-size: 1.25rem; }\n.csm-drawer-grid { display: grid; gap: .55rem; }\n.csm-drawer input { min-height: 46px; border: 0; border-radius: 16px; padding: .75rem .9rem; background: rgba(255,255,255,.08); color: var(--csm-text); }\n.csm-bottomnav { position: fixed; inset: auto .55rem calc(.55rem + env(safe-area-inset-bottom)) .55rem; z-index: 2147480999; display: grid; grid-template-columns: repeat(5, 1fr); gap: .25rem; padding: .35rem; border-radius: 24px; background: rgba(15,18,24,.9); backdrop-filter: blur(18px); }\n.csm-bottomnav button { min-height: 48px; border: 0; border-radius: 18px; background: transparent; color: var(--csm-muted); font: inherit; font-size: .76rem; font-weight: 760; }\n.csm-bottomnav button[aria-current=\"page\"], .csm-bottomnav button:hover { color: var(--csm-text); background: rgba(255,255,255,.08); }\n@media (min-width: 760px) { .csm-bottomnav { display: none; } .csm-layout { margin-bottom: 3rem; } }\n@media (max-width: 520px) { .csm-actions .csm-btn[data-desktop] { display:none; } .csm-topbar { min-height: 54px; } .csm-card { border-radius: 20px !important; } }\n";
+  const CSS_TEXT = ":root {\n  --csm-bg: #090b0f;\n  --csm-surface: #12161d;\n  --csm-raised: #191f28;\n  --csm-text: #f0f3f7;\n  --csm-muted: #aab3c1;\n  --csm-faint: #8792a2;\n  --csm-accent: #d65cff;\n  --csm-accent-2: #5ad7ff;\n  --csm-radius: 24px;\n  color-scheme: dark;\n}\nhtml.csm-modernized {\n  background: var(--csm-bg) !important;\n  min-inline-size: 0 !important;\n}\nhtml.csm-modernized body {\n  background: radial-gradient(circle at 20% -10%, rgba(214,92,255,.14), transparent 36rem), var(--csm-bg) !important;\n  color: var(--csm-text) !important;\n  font: 16px/1.62 Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif !important;\n  overflow-x: hidden !important;\n  min-inline-size: 0 !important;\n}\nhtml.csm-modernized body :is(#page,#content,.site,.site-content,.site-main,.content,.content-area,.main-content,.wrap,.wrapper,.container,.page-wrap,.page-wrapper,.row,.col,.column,.entry-content,.post-content,.single-post,.post,.article,.main,.primary) {\n  background-color: transparent !important;\n  background-image: none !important;\n  box-shadow: none !important;\n}\nhtml.csm-modernized img,\nhtml.csm-modernized video,\nhtml.csm-modernized iframe {\n  max-inline-size: 100% !important;\n}\n.csm-hidden,\n.csm-ad-hidden,\n.csm-source-hidden {\n  display: none !important;\n  visibility: hidden !important;\n  inline-size: 0 !important;\n  block-size: 0 !important;\n  max-inline-size: 0 !important;\n  max-block-size: 0 !important;\n  margin: 0 !important;\n  padding: 0 !important;\n  overflow: hidden !important;\n}\n.csm-topbar {\n  position: sticky;\n  top: 0;\n  z-index: 2147481000;\n  display: flex;\n  align-items: center;\n  gap: .8rem;\n  min-height: 58px;\n  padding: max(.7rem, env(safe-area-inset-top)) clamp(.85rem, 3vw, 1.4rem) .7rem;\n  background: rgba(9, 11, 15, .9);\n  backdrop-filter: blur(18px);\n  box-shadow: 0 1px 0 rgba(255,255,255,.06);\n}\n.csm-brand {\n  display: flex;\n  align-items: center;\n  min-width: 0;\n  gap: .65rem;\n  color: var(--csm-text) !important;\n  text-decoration: none !important;\n  font-weight: 800 !important;\n  letter-spacing: -.02em;\n}\n.csm-brand-mark {\n  display: grid;\n  place-items: center;\n  inline-size: 34px;\n  block-size: 34px;\n  border-radius: 13px;\n  background: linear-gradient(135deg, var(--csm-accent), var(--csm-accent-2));\n  color: #07080a;\n  font-weight: 900;\n  font-size: .86rem;\n}\n.csm-brand-text {\n  overflow: hidden;\n  text-overflow: ellipsis;\n  white-space: nowrap;\n}\n.csm-actions {\n  margin-inline-start: auto;\n  display: flex;\n  gap: .45rem;\n}\n.csm-btn,\n.csm-chip {\n  border: 0 !important;\n  min-height: 44px;\n  border-radius: 999px;\n  padding: .68rem .92rem;\n  background: rgba(255,255,255,.08);\n  color: var(--csm-text) !important;\n  text-decoration: none !important;\n  font: inherit;\n  font-weight: 750;\n  cursor: pointer;\n  touch-action: manipulation;\n}\n.csm-btn:hover,\n.csm-chip:hover,\n.csm-btn[aria-pressed=\"true\"],\n.csm-chip[aria-pressed=\"true\"] {\n  background: rgba(214,92,255,.2);\n}\n.csm-progress {\n  position: fixed;\n  inset: 0 0 auto 0;\n  height: 3px;\n  z-index: 2147481002;\n  transform-origin: 0 50%;\n  transform: scaleX(0);\n  background: linear-gradient(90deg, var(--csm-accent), var(--csm-accent-2));\n}\n.csm-layout {\n  width: min(100% - 1.5rem, var(--csm-max, 1360px)) !important;\n  max-inline-size: var(--csm-max, 1360px) !important;\n  margin: 1rem auto 5rem !important;\n  padding: 0 !important;\n  float: none !important;\n  clear: both !important;\n  min-inline-size: 0 !important;\n}\n.csm-feed-grid {\n  display: grid !important;\n  grid-template-columns: repeat(auto-fit, minmax(min(100%, 285px), 1fr));\n  gap: clamp(.8rem, 2vw, 1.2rem);\n  align-items: stretch;\n  width: 100% !important;\n  min-inline-size: 0 !important;\n}\n.csm-card {\n  position: relative !important;\n  display: flex !important;\n  flex-direction: column !important;\n  overflow: hidden !important;\n  min-width: 0 !important;\n  border: 0 !important;\n  border-radius: var(--csm-radius) !important;\n  background: linear-gradient(180deg, rgba(255,255,255,.055), rgba(255,255,255,.025)), var(--csm-surface) !important;\n  box-shadow: none !important;\n  padding: 0 !important;\n  margin: 0 !important;\n  color: var(--csm-text) !important;\n  float: none !important;\n  width: auto !important;\n  max-width: none !important;\n  min-height: 100% !important;\n}\n.csm-card-cover {\n  position: absolute !important;\n  inset: 0 !important;\n  z-index: 3 !important;\n  color: transparent !important;\n  text-decoration: none !important;\n}\n.csm-card a:not(.csm-card-cover) {\n  color: inherit !important;\n  text-decoration: none !important;\n  position: relative;\n  z-index: 2;\n}\n.csm-card img {\n  inline-size: 100% !important;\n  width: 100% !important;\n  aspect-ratio: var(--csm-card-ratio, 16 / 9);\n  block-size: auto !important;\n  object-fit: cover !important;\n  display: block !important;\n  border-radius: 0 !important;\n  margin: 0 !important;\n}\n.csm-card :is(h1,h2,h3,.entry-title,.post-title,.title) {\n  font-size: clamp(1.05rem, 2.4vw, 1.36rem) !important;\n  line-height: 1.12 !important;\n  letter-spacing: -.025em !important;\n  margin: .85rem .95rem .35rem !important;\n  color: var(--csm-text) !important;\n  display: -webkit-box !important;\n  -webkit-line-clamp: 3;\n  -webkit-box-orient: vertical;\n  overflow: hidden !important;\n}\n.csm-card :is(p,.excerpt,.summary,.dek) {\n  color: var(--csm-muted) !important;\n  margin: 0 .95rem .9rem !important;\n  display: -webkit-box !important;\n  -webkit-line-clamp: 3;\n  -webkit-box-orient: vertical;\n  overflow: hidden !important;\n}\n.csm-card .csm-meta {\n  display: flex;\n  flex-wrap: wrap;\n  gap: .4rem;\n  margin: auto .95rem .95rem;\n  color: var(--csm-faint);\n  font-size: .84rem;\n  position: relative;\n  z-index: 2;\n}\n.csm-card.csm-viewed img {\n  opacity: .56;\n  filter: saturate(.7);\n}\n.csm-section-title {\n  grid-column: 1 / -1;\n  margin: 1.4rem 0 .8rem;\n  font-size: clamp(1.4rem, 4vw, 2.35rem);\n  line-height: 1.05;\n  letter-spacing: -.04em;\n  color: var(--csm-text) !important;\n}\n.csm-article-shell {\n  width: min(100% - 1.5rem, calc(var(--csm-article-width, 790px) + 4rem)) !important;\n  margin: 1rem auto 6rem !important;\n  padding: 0 !important;\n  float: none !important;\n  background: transparent !important;\n}\n.csm-article {\n  width: min(100%, var(--csm-article-width, 790px)) !important;\n  max-inline-size: var(--csm-article-width, 790px) !important;\n  margin: 1.1rem auto 6rem !important;\n  padding: clamp(1rem, 3vw, 1.35rem) !important;\n  border-radius: 28px !important;\n  background: linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,.02)), var(--csm-surface) !important;\n  color: var(--csm-text) !important;\n  float: none !important;\n  box-sizing: border-box !important;\n}\n.csm-article :is(h1,.entry-title,.post-title) {\n  font-size: clamp(1.85rem, 8vw, 3.4rem) !important;\n  line-height: 1.08 !important;\n  letter-spacing: -.045em !important;\n  color: var(--csm-text) !important;\n  overflow: visible !important;\n  display: block !important;\n  -webkit-line-clamp: unset !important;\n}\n.csm-article :is(h2,h3,h4) {\n  color: var(--csm-text) !important;\n  line-height: 1.18 !important;\n}\n.csm-article :is(p,li) {\n  color: #e7ebf2 !important;\n  font-size: clamp(1rem, 1.4vw, 1.12rem) !important;\n  line-height: 1.72 !important;\n}\n.csm-article :is(a) { color: var(--csm-accent-2) !important; }\n.csm-article img,\n.csm-article video,\n.csm-article iframe {\n  max-inline-size: 100% !important;\n  block-size: auto !important;\n  border-radius: 18px !important;\n}\n.csm-drawer {\n  position: fixed;\n  inset: auto .65rem calc(.65rem + env(safe-area-inset-bottom)) .65rem;\n  z-index: 2147481001;\n  max-height: min(72vh, 620px);\n  overflow: auto;\n  border-radius: 28px;\n  padding: 1rem;\n  background: #10141b;\n  color: var(--csm-text);\n  box-shadow: 0 24px 80px rgba(0,0,0,.52);\n  transform: translateY(120%);\n  transition: transform .2s ease;\n}\n.csm-drawer[aria-hidden=\"false\"] { transform: translateY(0); }\n.csm-drawer-backdrop {\n  position: fixed;\n  inset: 0;\n  z-index: 2147481000;\n  background: rgba(0,0,0,.48);\n  opacity: 0;\n  pointer-events: none;\n  transition: opacity .2s ease;\n}\n.csm-drawer-backdrop[data-open=\"true\"] { opacity: 1; pointer-events: auto; }\n.csm-drawer h2 { margin: .2rem 0 1rem; font-size: 1.25rem; color: var(--csm-text) !important; }\n.csm-drawer-grid { display: grid; gap: .55rem; }\n.csm-drawer input {\n  min-height: 46px;\n  border: 0;\n  border-radius: 16px;\n  padding: .75rem .9rem;\n  background: rgba(255,255,255,.08);\n  color: var(--csm-text);\n}\n.csm-bottomnav {\n  position: fixed;\n  inset: auto .55rem calc(.55rem + env(safe-area-inset-bottom)) .55rem;\n  z-index: 2147480999;\n  display: grid;\n  grid-template-columns: repeat(5, 1fr);\n  gap: .25rem;\n  padding: .35rem;\n  border-radius: 24px;\n  background: rgba(15,18,24,.9);\n  backdrop-filter: blur(18px);\n}\n.csm-bottomnav button {\n  min-height: 48px;\n  border: 0;\n  border-radius: 18px;\n  background: transparent;\n  color: var(--csm-muted);\n  font: inherit;\n  font-size: .76rem;\n  font-weight: 760;\n}\n.csm-bottomnav button[aria-current=\"page\"],\n.csm-bottomnav button:hover {\n  color: var(--csm-text);\n  background: rgba(255,255,255,.08);\n}\n\nhtml.csm-site-bleeding-cool-modern-reader {\n  --csm-accent: #b68cff;\n  --csm-accent-2: #6fd2ff;\n  --csm-max: 1320px;\n  --csm-article-width: 820px;\n}\nhtml.csm-site-bleeding-cool-modern-reader .csm-feed-grid {\n  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));\n}\nhtml.csm-site-bleeding-cool-modern-reader .csm-feed-grid .csm-card:first-child {\n  grid-column: span 2;\n}\nhtml.csm-site-bleeding-cool-modern-reader .csm-card:first-child :is(h1,h2,h3,.entry-title,.post-title,.title) {\n  font-size: clamp(1.25rem, 2.7vw, 2rem) !important;\n}\nhtml.csm-site-bleeding-cool-modern-reader .csm-article {\n  background: #171c24 !important;\n}\nhtml.csm-site-bleeding-cool-modern-reader :is(.popular-now,.popular,.trending,.widget,.widget-area,aside,[class*=\"sidebar\"],[id*=\"sidebar\"],[class*=\"popular\"]):not(.csm-drawer) {\n  display: none !important;\n}\n\n@media (min-width: 760px) {\n  .csm-bottomnav { display: none; }\n  .csm-layout { margin-bottom: 3rem !important; }\n}\n@media (max-width: 760px) {\n  .csm-layout { width: min(100% - .9rem, var(--csm-max, 1360px)) !important; }\n  html.csm-site-bleeding-cool-modern-reader .csm-feed-grid .csm-card:first-child { grid-column: auto; }\n}\n@media (max-width: 520px) {\n  .csm-actions .csm-btn[data-desktop] { display:none; }\n  .csm-topbar { min-height: 54px; }\n  .csm-card { border-radius: 20px !important; }\n  .csm-article { border-radius: 22px !important; padding: .95rem !important; }\n}\n";
   const install = function installContentSiteModernizer(profile, cssText) {
   if (!profile || document.documentElement.classList.contains('csm-modernized')) return;
+
   const d = document;
-  const w = window;
   const storage = {
-    get(key, fallback) { try { return JSON.parse(localStorage.getItem(`${profile.storagePrefix}:${key}`)) ?? fallback; } catch { return fallback; } },
-    set(key, value) { try { localStorage.setItem(`${profile.storagePrefix}:${key}`, JSON.stringify(value)); } catch {} }
+    get(key, fallback) {
+      try {
+        const value = localStorage.getItem(`${profile.storagePrefix}:${key}`);
+        return value == null ? fallback : JSON.parse(value);
+      } catch {
+        return fallback;
+      }
+    },
+    set(key, value) {
+      try { localStorage.setItem(`${profile.storagePrefix}:${key}`, JSON.stringify(value)); } catch {}
+    }
   };
+
   const saved = new Set(storage.get('saved', []));
   const viewed = new Set(storage.get('viewed', []));
-  const $$ = (sel, root = d) => Array.from(root.querySelectorAll(sel));
-  const first = (selectors, root = d) => selectors.flatMap((sel) => $$(sel, root)).find(Boolean);
+  const $$ = (sel, root = d) => {
+    try { return Array.from(root.querySelectorAll(sel)); } catch { return []; }
+  };
   const selectorList = (value) => Array.isArray(value) ? value : String(value || '').split(',').map((x) => x.trim()).filter(Boolean);
+  const first = (selectors, root = d) => selectorList(selectors).flatMap((sel) => $$(sel, root)).find(Boolean);
+  const slugClass = `csm-site-${String(profile.id || 'content-site').replace(/[^a-z0-9_-]+/gi, '-').toLowerCase()}`;
   const absolutePath = (href) => { try { return new URL(href, location.href).pathname; } catch { return href || location.href; } };
   const idFor = (node) => absolutePath(node.querySelector('a[href]')?.href || location.href);
   const isArticlePage = () => profile.articleHints?.some((hint) => {
@@ -189,20 +217,39 @@
     return !!d.querySelector(hint);
   }) || false;
 
-  function injectCss() {
+  function injectCss(articleMode) {
     const style = d.createElement('style');
     style.id = 'csm-style';
     style.textContent = cssText;
     d.head.append(style);
-    d.documentElement.classList.add('csm-modernized');
+    d.documentElement.classList.add('csm-modernized', slugClass, articleMode ? 'csm-article-mode' : 'csm-feed-mode');
+    d.body.classList.add('csm-modernized-body', slugClass, articleMode ? 'csm-article-mode' : 'csm-feed-mode');
     d.documentElement.style.setProperty('--csm-max', `${profile.layout?.desktopMaxWidth || 1360}px`);
     d.documentElement.style.setProperty('--csm-article-width', `${profile.layout?.articleMaxWidth || 790}px`);
     d.documentElement.style.setProperty('--csm-card-ratio', profile.layout?.cardImageRatio || '16 / 9');
   }
 
+  function hideNodes(selectors, root = d) {
+    for (const sel of selectorList(selectors)) {
+      for (const node of $$(sel, root)) {
+        if (node.closest?.('.csm-topbar,.csm-drawer,.csm-bottomnav')) continue;
+        node.classList.add('csm-source-hidden');
+      }
+    }
+  }
+
   function hideAds(root = d) {
-    for (const sel of profile.selectors?.ads || []) {
-      for (const node of $$(sel, root)) node.classList.add('csm-ad-hidden');
+    hideNodes(profile.selectors?.ads || [], root);
+  }
+
+  function installSourceCleanup(articleMode) {
+    if (profile.layout?.hideSidebars) hideNodes(profile.selectors?.page?.sidebar || 'aside,.sidebar,#secondary,.widget-area,[class*="sidebar"]');
+    if (profile.layout?.hideOriginalChrome) {
+      hideNodes(profile.selectors?.page?.header || 'header,#masthead,.site-header,.header,.top-bar,.topbar,.ticker,[class*="breaking"]');
+      hideNodes(profile.selectors?.page?.nav || 'nav,.main-navigation,.site-navigation,.menu,.navbar');
+    }
+    if (articleMode && profile.layout?.hideArticleSidebars !== false) {
+      hideNodes(profile.selectors?.page?.sidebar || 'aside,.sidebar,#secondary,.widget-area,[class*="sidebar"]');
     }
   }
 
@@ -337,23 +384,80 @@
     else if (action === 'filter-saved') filterSaved();
     else if (action === 'history-back') history.length > 1 ? history.back() : location.assign(profile.home || '/');
     else if (action === 'toggle-save') toggleSave(location.href, true);
-    else if (action === 'jump-comments') (first(selectorList(profile.selectors?.article?.comments)) || d.querySelector('#comments'))?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    else if (action === 'jump-comments') (first(profile.selectors?.article?.comments || '#comments,.comments-area') || d.querySelector('#comments'))?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     else if (action === 'scroll-top') scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function feedRoots() {
+    const roots = selectorList(profile.selectors?.feed?.containers || profile.selectors?.page?.main || 'main,#main,.site-main')
+      .flatMap((sel) => $$(sel))
+      .filter((node) => node instanceof HTMLElement && !isExcluded(node));
+    return roots.length ? [...new Set(roots)] : [d.body];
+  }
+
+  function isExcluded(node) {
+    const excludes = selectorList(profile.selectors?.feed?.exclude || '');
+    return excludes.some((sel) => node.matches?.(sel) || node.closest?.(sel));
   }
 
   function cardCandidates() {
     const selectors = selectorList(profile.selectors?.feed?.items || 'article');
-    const nodes = selectors.flatMap((sel) => { try { return $$(sel); } catch { return []; } });
-    return [...new Set(nodes)].filter((node) => node instanceof HTMLElement && node.querySelector('a[href]') && !node.closest('.csm-topbar,.csm-drawer,.csm-bottomnav'));
+    const nodes = [];
+    for (const root of feedRoots()) {
+      for (const sel of selectors) nodes.push(...$$(sel, root));
+    }
+    const seen = new Set();
+    return nodes.filter((node) => {
+      if (!(node instanceof HTMLElement) || seen.has(node)) return false;
+      seen.add(node);
+      if (node.closest('.csm-topbar,.csm-drawer,.csm-bottomnav') || isExcluded(node)) return false;
+      if (!node.querySelector('a[href]')) return false;
+      const text = node.textContent.replace(/\s+/g, ' ').trim();
+      if (text.length < (profile.layout?.minCardTextLength || 18)) return false;
+      return true;
+    });
+  }
+
+  function primaryMain(items) {
+    const roots = feedRoots();
+    const best = roots.find((root) => items.some((item) => root.contains(item)));
+    return best || first(profile.selectors?.page?.main || 'main,#main,.site-main') || items[0]?.parentElement || d.body;
+  }
+
+  function ensureFeedGrid(items, main) {
+    main.classList.add('csm-layout');
+    const rebuild = profile.layout?.rebuildFeedGrid !== false;
+    if (!rebuild) {
+      const parent = items[0]?.parentElement;
+      if (parent && items.every((item) => item.parentElement === parent)) parent.classList.add('csm-feed-grid');
+      return;
+    }
+    let grid = main.querySelector(':scope > .csm-feed-grid');
+    if (!grid) {
+      grid = d.createElement('section');
+      grid.className = 'csm-feed-grid';
+      grid.setAttribute('aria-label', 'Stories');
+      main.prepend(grid);
+    }
+    for (const item of items) grid.append(item);
+    for (const child of Array.from(main.children)) {
+      if (child === grid || child.classList.contains('csm-section-title')) continue;
+      if (!child.querySelector?.('a[href],img,video,iframe') && !child.textContent.trim()) child.classList.add('csm-source-hidden');
+    }
   }
 
   function enhanceFeed() {
     const items = cardCandidates();
     if (!items.length) return;
-    const main = first(selectorList(profile.selectors?.page?.main || 'main,#main,.site-main')) || items[0].parentElement;
-    main.classList.add('csm-layout');
-    const parent = items[0].parentElement;
-    if (parent && items.every((item) => item.parentElement === parent)) parent.classList.add('csm-feed-grid');
+    const main = primaryMain(items);
+    const titleText = profile.feedTitle || first('h1,h2,.section-title,.archive-title', main)?.textContent?.trim();
+    if (titleText && !main.querySelector(':scope > .csm-section-title')) {
+      const title = d.createElement('h1');
+      title.className = 'csm-section-title';
+      title.textContent = titleText;
+      main.prepend(title);
+    }
+    ensureFeedGrid(items, main);
     for (const item of items) enhanceCard(item);
   }
 
@@ -363,26 +467,31 @@
     item.classList.add('csm-card');
     const id = idFor(item);
     if (viewed.has(id)) item.classList.add('csm-viewed');
+    const link = item.querySelector('a[href]');
+    if (link && !item.querySelector('.csm-card-cover')) {
+      const cover = d.createElement('a');
+      cover.className = 'csm-card-cover';
+      cover.href = link.href;
+      cover.setAttribute('aria-label', link.textContent.trim() || 'Open story');
+      item.prepend(cover);
+    }
     if (!item.querySelector('.csm-meta')) {
       const meta = d.createElement('div');
       meta.className = 'csm-meta';
       const parts = [];
-      const cat = first(selectorList(profile.selectors?.feed?.category || ''), item);
-      const time = first(selectorList(profile.selectors?.feed?.date || 'time'), item);
+      const cat = first(profile.selectors?.feed?.category || '', item);
+      const time = first(profile.selectors?.feed?.date || 'time', item);
       if (cat) parts.push(cat.textContent.trim().split(/\s+/).slice(0, 4).join(' '));
       if (time) parts.push(time.textContent.trim());
       meta.textContent = parts.filter(Boolean).join(' · ');
-      item.append(meta);
+      if (meta.textContent) item.append(meta);
     }
-    const link = item.querySelector('a[href]');
     link?.addEventListener('click', () => { viewed.add(id); storage.set('viewed', [...viewed]); });
   }
 
   function filterCards(query) {
     const needle = query.trim().toLowerCase();
-    for (const card of $$('.csm-card')) {
-      card.hidden = needle && !card.textContent.toLowerCase().includes(needle);
-    }
+    for (const card of $$('.csm-card')) card.hidden = needle && !card.textContent.toLowerCase().includes(needle);
   }
 
   function filterSaved() {
@@ -391,10 +500,7 @@
   }
 
   function refreshStates() {
-    for (const card of $$('.csm-card')) {
-      const id = idFor(card);
-      card.classList.toggle('csm-viewed', viewed.has(id));
-    }
+    for (const card of $$('.csm-card')) card.classList.toggle('csm-viewed', viewed.has(idFor(card)));
   }
 
   function toggleSave(href, articleMode = false) {
@@ -410,9 +516,11 @@
   }
 
   function enhanceArticle() {
-    const root = first(selectorList(profile.selectors?.article?.root || 'article,main'));
+    const root = first(profile.selectors?.article?.root || 'article,main');
     if (!root) return;
     root.classList.add('csm-article');
+    const wrapper = root.closest(profile.selectors?.page?.main || 'main,#main,.site-main,.content,.main-content,.site-content');
+    if (wrapper instanceof HTMLElement) wrapper.classList.add('csm-article-shell');
     const id = absolutePath(location.href);
     let dwell = 0;
     const timer = setInterval(() => {
@@ -433,9 +541,10 @@
     mo.observe(d.body, { childList: true, subtree: true });
   }
 
-  injectCss();
-  hideAds();
   const articleMode = isArticlePage();
+  injectCss(articleMode);
+  installSourceCleanup(articleMode);
+  hideAds();
   installTopbar(articleMode);
   installProgress(articleMode);
   installDrawer();
