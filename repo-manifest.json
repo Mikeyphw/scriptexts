@@ -11,15 +11,24 @@
   },
   "projects": [
     {
-      "path": "userscripts/standalone/menofporn-modern-ui",
-      "type": "standalone-userscript",
-      "version": "1.4.0",
-      "source_model": "direct-single-file",
-      "canonical_source": "menofporn-modern-ui.user.js",
+      "path": "userscripts/builders/content-site-modernizer",
+      "type": "userscript-builder",
+      "source_model": "shared-builder",
+      "builder": "build.mjs",
+      "source": "src/",
       "install_artifacts": [
-        "menofporn-modern-ui.user.js",
-        "menofporn-modern-ui.meta.js"
-      ]
+        "dist/aipt-comics-modern-reader.user.js",
+        "dist/aipt-comics-modern-reader.meta.js",
+        "dist/menofporn-modern-ui.user.js",
+        "dist/menofporn-modern-ui.meta.js",
+        "dist/bleeding-cool-modern-reader.user.js",
+        "dist/bleeding-cool-modern-reader.meta.js"
+      ],
+      "versions": {
+        "aipt-comics-modern-reader": "0.1.0",
+        "bleeding-cool-modern-reader": "0.1.0",
+        "menofporn-modern-ui": "1.4.0"
+      }
     },
     {
       "path": "userscripts/standalone/lpsg-media-gallery-unlocker",

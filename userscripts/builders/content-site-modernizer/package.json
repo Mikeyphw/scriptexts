@@ -1,0 +1,12 @@
+{
+  "name": "@scriptexts/content-site-modernizer",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs",
+    "check": "node build.mjs --check"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

@@ -3,12 +3,14 @@
   "private": true,
   "type": "module",
   "workspaces": [
+    "userscripts/builders/content-site-modernizer",
     "userscripts/builders/manga-reader-modernizer",
     "userscripts/builders/sims-cc-download-basket"
   ],
   "scripts": {
     "build": "npm run build:userscripts && npm run build:extensions && npm run userscripts:metadata",
-    "build:userscripts": "npm run build:manga && npm run build:sims",
+    "build:userscripts": "npm run build:content-sites && npm run build:manga && npm run build:sims",
+    "build:content-sites": "npm --prefix userscripts/builders/content-site-modernizer run build",
     "build:manga": "npm --prefix userscripts/builders/manga-reader-modernizer run build",
     "build:sims": "npm --prefix userscripts/builders/sims-cc-download-basket run build",
     "build:extensions": "npm run build:extension:manga && npm run build:extension:stardew && npm run build:extension:telegram",

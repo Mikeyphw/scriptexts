@@ -3,11 +3,11 @@
 1. Edit source in `userscripts/standalone`, `userscripts/builders`, or `extensions`.
 2. Run `npm run build`.
 3. Run `npm run check`.
-4. Commit source plus generated install artifacts.
+4. Commit source and generated install artifacts together.
 
-Userscript updates work through raw GitHub URLs:
+Userscripts are installed from `.user.js` files. `.meta.js` files are generated update beacons and should be committed beside their matching `.user.js` files.
 
-- `@updateURL` points to the generated `.meta.js` file.
-- `@downloadURL` points to the installable `.user.js` file.
+The content-site builder emits both MenOfPorn and Bleeding Cool outputs from `userscripts/builders/content-site-modernizer`.
 
-Browser extensions use rebuilt unsigned XPIs under `extensions/<slug>/dist/`. Because extension IDs are repository-owned, signed upstream packages are not reused.
+
+- `npm run build:content-sites` regenerates MenOfPorn, Bleeding Cool, and AIPT Comics userscripts plus their metadata files.

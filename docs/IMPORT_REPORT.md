@@ -10,3 +10,10 @@
 - Added Telegram Media Downloader as canonical editable extension source with a deterministic package step.
 - Changed the Telegram extension ID from `telegram-media-downloader-complete@local` to `telegram-media-downloader@mikeyphw.scriptexts`.
 - The uploaded Telegram extension ZIP is not preserved anywhere in the repository as an upstream snapshot.
+
+## Content-site builder migration
+
+MenOfPorn Modern UI moved from `userscripts/standalone/menofporn-modern-ui` into `userscripts/builders/content-site-modernizer` so it can share a builder with Bleeding Cool Modern Reader. Bleeding Cool fixtures were imported from the uploaded page snapshot archive for future regression work.
+
+
+- Added AIPT Comics as a third shared content-site-modernizer profile using the provided home, category, and post fixtures.

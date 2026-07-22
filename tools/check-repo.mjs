@@ -24,6 +24,14 @@ async function walk(dir) {
   return out;
 }
 
+async function hasTrackedFilesOrRuntimeArtifacts(path) {
+  if (!await exists(path)) return false;
+  const stats = await stat(path);
+  if (!stats.isDirectory()) return true;
+  const files = await walk(path);
+  return files.length > 0;
+}
+
 function fieldsFromUserscript(text) {
   const block = text.match(/\/\/\s*==UserScript==([\s\S]*?)\/\/\s*==\/UserScript==/);
   if (!block) return null;
@@ -92,10 +100,28 @@ for (const path of files.filter((item) => item.endsWith('.js') && !item.endsWith
   catch (error) { errors.push(`${rel}: JavaScript syntax check failed\n${error.stderr?.toString() || error.message}`); }
 }
 
-const mopPath = join(root, 'userscripts/standalone/menofporn-modern-ui/menofporn-modern-ui.user.js');
+const mopPath = join(root, 'userscripts/builders/content-site-modernizer/dist/menofporn-modern-ui.user.js');
 const mop = await readFile(mopPath, 'utf8');
 for (const marker of ['function hideFeedAds', 'function hideEmptyPostAdBlocks', 'mop-reading-progress', '-webkit-line-clamp: unset !important']) {
   if (!mop.includes(marker)) errors.push(`MenOfPorn source is missing regression marker: ${marker}`);
+}
+
+const bcPath = join(root, 'userscripts/builders/content-site-modernizer/dist/bleeding-cool-modern-reader.user.js');
+if (!await exists(bcPath)) errors.push('Bleeding Cool generated userscript is missing.');
+else {
+  const bc = await readFile(bcPath, 'utf8');
+  for (const marker of ['Bleeding Cool Modern Reader', 'installContentSiteModernizer', 'bleedingcool.com/*', 'csm-bottomnav']) {
+    if (!bc.includes(marker)) errors.push(`Bleeding Cool source is missing marker: ${marker}`);
+  }
+}
+
+const aiptPath = join(root, 'userscripts/builders/content-site-modernizer/dist/aipt-comics-modern-reader.user.js');
+if (!await exists(aiptPath)) errors.push('AIPT Comics generated userscript is missing.');
+else {
+  const aipt = await readFile(aiptPath, 'utf8');
+  for (const marker of ['AIPT Comics Modern Reader', 'installContentSiteModernizer', 'aiptcomics.com/*', 'csm-bottomnav']) {
+    if (!aipt.includes(marker)) errors.push(`AIPT Comics source is missing marker: ${marker}`);
+  }
 }
 
 for (const project of manifest.projects.filter((item) => item.type === 'firefox-extension')) {
@@ -110,6 +136,7 @@ for (const project of manifest.projects.filter((item) => item.type === 'firefox-
 }
 
 const forbiddenPaths = [
+  'userscripts/standalone/menofporn-modern-ui',
   'extensions/mrm-suite-downloader',
   'extensions/stardew-nexus-queue',
   'userscripts/builders/manga-modern-ui',
@@ -119,7 +146,7 @@ const forbiddenPaths = [
   'userscripts/standalone/telegram-media-downloader-userscript'
 ];
 for (const forbidden of forbiddenPaths) {
-  if (await exists(join(root, forbidden))) errors.push(`obsolete path still present: ${forbidden}`);
+  if (await hasTrackedFilesOrRuntimeArtifacts(join(root, forbidden))) errors.push(`obsolete path still present: ${forbidden}`);
 }
 
 if (errors.length) {
