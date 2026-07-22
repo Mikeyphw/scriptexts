@@ -26,6 +26,21 @@ html.csm-modernized body :is(#page,#content,.site,.site-content,.site-main,.cont
   background-image: none !important;
   box-shadow: none !important;
 }
+
+html.csm-modernized.csm-low-resource body {
+  background: var(--csm-bg) !important;
+}
+html.csm-modernized.csm-low-resource .csm-topbar {
+  backdrop-filter: none !important;
+}
+html.csm-modernized.csm-low-resource .csm-card,
+html.csm-modernized.csm-low-resource .csm-article {
+  background: var(--csm-surface) !important;
+}
+html.csm-modernized.csm-low-resource .csm-drawer {
+  backdrop-filter: none !important;
+}
+
 html.csm-modernized img,
 html.csm-modernized video,
 html.csm-modernized iframe {
@@ -126,6 +141,24 @@ html.csm-modernized iframe {
   clear: both !important;
   min-inline-size: 0 !important;
 }
+
+@supports (content-visibility: auto) {
+  html.csm-modernized.csm-low-resource .csm-card {
+    content-visibility: auto;
+    contain-intrinsic-size: 360px 260px;
+  }
+  html.csm-modernized.csm-low-resource .csm-article > * {
+    content-visibility: auto;
+    contain-intrinsic-size: 1px 720px;
+  }
+}
+html.csm-modernized.csm-site-bleeding-cool-modern-reader .csm-layout {
+  contain: layout paint style;
+}
+html.csm-modernized.csm-site-bleeding-cool-modern-reader .csm-feed-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 310px), 1fr));
+}
+
 .csm-feed-grid {
   display: grid !important;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 285px), 1fr));
@@ -329,7 +362,25 @@ html.csm-site-bleeding-cool-modern-reader {
   --csm-max: 1320px;
   --csm-article-width: 820px;
 }
-html.csm-site-bleeding-cool-modern-reader .csm-feed-grid {
+html.csm-site-bleeding-cool-modern-reader 
+@supports (content-visibility: auto) {
+  html.csm-modernized.csm-low-resource .csm-card {
+    content-visibility: auto;
+    contain-intrinsic-size: 360px 260px;
+  }
+  html.csm-modernized.csm-low-resource .csm-article > * {
+    content-visibility: auto;
+    contain-intrinsic-size: 1px 720px;
+  }
+}
+html.csm-modernized.csm-site-bleeding-cool-modern-reader .csm-layout {
+  contain: layout paint style;
+}
+html.csm-modernized.csm-site-bleeding-cool-modern-reader .csm-feed-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 310px), 1fr));
+}
+
+.csm-feed-grid {
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
 }
 html.csm-site-bleeding-cool-modern-reader .csm-feed-grid .csm-card:first-child {

@@ -38,6 +38,12 @@ export default {
       "rebuildFeedGrid": true,
       "minCardTextLength": 24
     },
+    "performance": {
+      "lowResource": true,
+      "disableMutationObserver": true,
+      "maxFeedCards": 42,
+      "feedRootSelector": ".td-ss-main-content,.td-pb-span8,.main-content,.content-area,.site-main,main,#main"
+    },
     "articleHints": [
       "body.single-post",
       "body.post-template-default",
@@ -77,15 +83,17 @@ export default {
         "comments": "#comments,.comments-area"
       },
       "ads": [
-        "[id*='ad']",
-        "[class*='ad-']",
-        "[class*='advert']",
-        "[class*='sponsor']",
-        "[class*='promo']",
+        ".adsbygoogle",
+        ".code-block",
+        "[id*='div-gpt-ad']",
+        "[id^='google_ads']",
+        "[id^='adngin']",
+        "[class*='advertisement']",
+        "[class*='ad-container']",
+        "[class*='ad-slot']",
         "iframe[src*='doubleclick']",
         "iframe[src*='googlesyndication']",
-        "script[src*='googlesyndication']",
-        ".code-block"
+        "script[src*='googlesyndication']"
       ]
     },
     "nav": {
