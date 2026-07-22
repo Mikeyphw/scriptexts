@@ -1,0 +1,110 @@
+{
+  "applied_at": "2026-07-22T18:21:35.129525Z",
+  "artifact": "/home/mike/Downloads/scriptexts_bleeding_cool_restore_feed_devtool_overlay.zip",
+  "artifact_name": "scriptexts_bleeding_cool_restore_feed_devtool_overlay.zip",
+  "type": "overlay",
+  "sha256": "5c26f7c79a330045dd5a0be4b31d0e6155e71e3610aeb9e03a9e6050b8d5f80c",
+  "status": "failed",
+  "validation_status": "ok",
+  "commit_message": "Restore Bleeding Cool feed and polish article cleanup",
+  "commit_hash": "",
+  "file_count": 6,
+  "change_counts": {
+    "modify": 5,
+    "unchanged": 1
+  },
+  "manifest": {
+    "schema_version": 2,
+    "type": "overlay",
+    "name": "scriptexts bleeding-cool restored feed and article cleanup",
+    "description": "Restores the missing Bleeding Cool feed by replacing the hard cap with load-more batching, removes native white backgrounds, filters empty cards, and tightens article/social cleanup.",
+    "repository": {
+      "name": "scriptexts",
+      "remote": "git@github.com:Mikeyphw/scriptexts.git",
+      "branch": "main"
+    },
+    "workspace": {
+      "name": "content-site-modernizer",
+      "root": "userscripts/builders/content-site-modernizer"
+    },
+    "target": "root",
+    "inventory": {
+      "format": 1,
+      "entries": [
+        {
+          "path": "userscripts/builders/content-site-modernizer/src/core/runtime.mjs",
+          "action": "modify",
+          "sha256": "eb034bb4b34de0aa035656bb7f9db7065a8909645c995c0c75244392eb47d7ba",
+          "size": 24597
+        },
+        {
+          "path": "userscripts/builders/content-site-modernizer/src/core/styles.css",
+          "action": "modify",
+          "sha256": "acf79e3f10f929d7873a2b9cdc160cc39c931552a7a3dcee0aef6803ac184deb",
+          "size": 21927
+        },
+        {
+          "path": "userscripts/builders/content-site-modernizer/src/profiles/bleeding-cool.mjs",
+          "action": "modify",
+          "sha256": "6178e4a5183671be66c40d21ac9ee95708a12632d4ffe5246e7752211c2ca3a3",
+          "size": 6268
+        },
+        {
+          "path": "userscripts/builders/content-site-modernizer/dist/aipt-comics-modern-reader.user.js",
+          "action": "modify",
+          "sha256": "8bcabd07d81947529fed996df291853e00452af5da1c319e82454a8d9e335881",
+          "size": 51596
+        },
+        {
+          "path": "userscripts/builders/content-site-modernizer/dist/bleeding-cool-modern-reader.user.js",
+          "action": "modify",
+          "sha256": "32ebdeaba0c4c64807095deae0765577d741779750a2cd59bed30ebf8dc0fa37",
+          "size": 53006
+        },
+        {
+          "path": "userscripts/builders/content-site-modernizer/dist/menofporn-modern-ui.user.js",
+          "action": "modify",
+          "sha256": "5bc96b8f8fa66b7f0135687de8df749d815a58fa4dd9cff7d916e118b2fff1fa",
+          "size": 106928
+        }
+      ]
+    },
+    "apply": {
+      "atomic": true,
+      "conflict_policy": "overwrite",
+      "path_policy": "repository-relative",
+      "requires_clean_worktree": false,
+      "commit": {
+        "enabled": true,
+        "strategy": "single",
+        "message": "Restore Bleeding Cool feed and polish article cleanup"
+      }
+    },
+    "validation": {
+      "required": true,
+      "restore": false,
+      "build": true,
+      "test": true,
+      "rollback_on_failure": true,
+      "script": {
+        "path": ".devtool-artifact/validate.sh",
+        "runner": "bash",
+        "sha256": "726466695d27b0c69e51efb9bce3e2fb44cc8b529329ce9d62c7d47ee99e2e27",
+        "timeout_seconds": 900
+      },
+      "expected": {
+        "build": "pass",
+        "tests": "pass",
+        "maximum_warnings": 0
+      }
+    },
+    "notes": [
+      "Bleeding Cool no longer hard-caps the feed at 24 stories; it discovers all primary story cards and reveals them in lightweight batches.",
+      "A Load more stories button keeps desktop pages responsive without making the rest of the feed disappear.",
+      "Image detection ignores placeholder/tracking images and cloned lazy images preserve real src/srcset data.",
+      "Bleeding Cool page wrappers are forced transparent/dark so the native white column is removed.",
+      "Article pages hide giant native social blocks, related modules, footer cruft, and share links more aggressively."
+    ]
+  },
+  "history_id": "149c2c58df804412b1d05e3b130771b6"
+}

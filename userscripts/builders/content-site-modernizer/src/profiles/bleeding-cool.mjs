@@ -39,6 +39,7 @@ export default {
       "normalizeCards": true,
       "requireCardImage": true,
       "hideFeedRemainder": true,
+      "showFeedLoadMore": true,
       "hideArticleRemainder": true,
       "imageFit": "contain",
       "minCardTextLength": 24
@@ -46,7 +47,9 @@ export default {
     "performance": {
       "lowResource": true,
       "disableMutationObserver": true,
-      "maxFeedCards": 24,
+      "maxFeedCards": 0,
+      "initialFeedCards": 36,
+      "feedBatchSize": 36,
       "feedRootSelector": ".td-ss-main-content,.td-pb-span8,.main-content,.content-area,.site-main,main,#main"
     },
     "articleHints": [
@@ -98,7 +101,28 @@ export default {
         "[class*='ad-slot']",
         "iframe[src*='doubleclick']",
         "iframe[src*='googlesyndication']",
-        "script[src*='googlesyndication']"
+        "script[src*='googlesyndication']",
+        ".td-footer-wrapper",
+        ".td-sub-footer-container",
+        ".td_block_related_posts",
+        ".td-related-title",
+        ".td-related-row",
+        ".td-post-sharing",
+        ".td-social-sharing",
+        ".td-social-icon-wrap",
+        ".sharedaddy",
+        ".sd-sharing-enabled",
+        ".addtoany_share_save_container",
+        ".sharethis-inline-share-buttons",
+        "a[href*='facebook.com/share']",
+        "a[href*='twitter.com/share']",
+        "a[href*='pinterest.com/pin']",
+        "a[href*='reddit.com/submit']",
+        "a:has(img[src*='social-1_square'])",
+        "a:has(img[src*='social_facebook'])",
+        "a:has(img[src*='social_twitter'])",
+        "a:has(img[src*='social_instagram'])",
+        "a:has(img[src*='Google_News_icon'])"
       ]
     },
     "nav": {

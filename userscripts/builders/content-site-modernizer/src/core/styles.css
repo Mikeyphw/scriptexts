@@ -528,3 +528,91 @@ html.csm-article-mode.csm-site-bleeding-cool-modern-reader :is(.td-main-sidebar,
   .csm-card { border-radius: 20px !important; }
   .csm-article { border-radius: 22px !important; padding: .95rem !important; }
 }
+
+/* Bleeding Cool correction pass: keep the rest of the feed reachable and kill native white islands. */
+html.csm-modernized.csm-site-bleeding-cool-modern-reader,
+html.csm-modernized.csm-site-bleeding-cool-modern-reader body,
+html.csm-modernized.csm-site-bleeding-cool-modern-reader :is(#td-outer-wrap,#td-container,#td-mobile-nav,.td-container-wrap,.td-container,.td-main-content-wrap,.td-main-page-wrap,.td-main-content,.td-pb-row,.td-ss-main-content,.td-pb-span8,.td-pb-span12,.td-block-span12,.td-content-wrap,.tdc-content-wrap,.td-page-content,.td-post-content,.td-article-content,.td_block_wrap,.td_block_inner,.td_module_wrap,.td_module_1,.td_module_2,.td_module_3,.td_module_4,.td_module_6,.td_module_10,.td_module_16,.td_module_mx1,.td_module_mx2,.td_module_mx3,.td_module_mx4,.td_module_wrap,.td-theme-wrap,.wpb_wrapper,.vc_row,.vc_column_container,.vc_column-inner,.td_quote_box) {
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+}
+html.csm-modernized.csm-site-bleeding-cool-modern-reader body > :not(.csm-topbar):not(.csm-drawer):not(.csm-drawer-backdrop):not(.csm-bottomnav):not(.csm-progress):not(script):not(style) {
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+}
+html.csm-feed-mode.csm-site-bleeding-cool-modern-reader .csm-layout,
+html.csm-feed-mode.csm-site-bleeding-cool-modern-reader .csm-feed-grid {
+  background: var(--csm-bg) !important;
+}
+html.csm-feed-mode.csm-site-bleeding-cool-modern-reader .csm-layout {
+  padding: .9rem !important;
+  border-radius: 0 !important;
+}
+html.csm-feed-mode.csm-site-bleeding-cool-modern-reader .csm-card-deferred {
+  display: none !important;
+}
+html.csm-feed-mode.csm-site-bleeding-cool-modern-reader .csm-load-more {
+  display: block !important;
+  width: min(100%, 36rem) !important;
+  min-height: 48px !important;
+  margin: 1rem auto 0 !important;
+  border: 0 !important;
+  border-radius: 999px !important;
+  background: rgba(255,255,255,.1) !important;
+  color: var(--csm-text) !important;
+  font: inherit !important;
+  font-weight: 800 !important;
+  cursor: pointer !important;
+}
+html.csm-feed-mode.csm-site-bleeding-cool-modern-reader .csm-load-more[hidden] {
+  display: none !important;
+}
+html.csm-feed-mode.csm-site-bleeding-cool-modern-reader .csm-card:not(:has(.csm-card-title:not(:empty))):not(:has(img[src])) {
+  display: none !important;
+}
+html.csm-feed-mode.csm-site-bleeding-cool-modern-reader .csm-card-media {
+  background: #10151d !important;
+}
+html.csm-feed-mode.csm-site-bleeding-cool-modern-reader .csm-card img {
+  object-fit: contain !important;
+  object-position: center center !important;
+  background: #10151d !important;
+}
+html.csm-feed-mode.csm-site-bleeding-cool-modern-reader .csm-card-title {
+  min-height: 0 !important;
+  margin: 0 !important;
+}
+html.csm-article-mode.csm-site-bleeding-cool-modern-reader .csm-article-shell,
+html.csm-article-mode.csm-site-bleeding-cool-modern-reader .csm-article,
+html.csm-article-mode.csm-site-bleeding-cool-modern-reader .csm-article :is(.td-post-content,.td-article-content,.entry-content,.post-content) {
+  background: #161b23 !important;
+  color: var(--csm-text) !important;
+}
+html.csm-article-mode.csm-site-bleeding-cool-modern-reader :is(.td-post-sharing,.td-post-sharing-top,.td-post-sharing-bottom,.td-social-sharing,.td-social-style,.td-social-icon-wrap,.td-social-box,.td-social-handler,.tdb-social-item,.sharedaddy,.sd-sharing-enabled,.addtoany_share_save_container,.sharethis-inline-share-buttons,.heateor_sss_sharing_container,.sfsi_widget,.sfsi_wDiv,.td_block_related_posts,.td-related-title,.td-related-row,.td-post-next-prev,.td-author-box-wrap,.td-more-articles-box,.td-post-source-tags,.td-footer-wrapper,.td-sub-footer-container,.td-footer-container,.td-footer-template-wrap,.td_block_wrap:has(.td-related-title),.td_block_wrap:has(.td-module-thumb),a:has(img[src*="social-1_square"]),a:has(img[src*="social_facebook"]),a:has(img[src*="social_twitter"]),a:has(img[src*="social_instagram"]),a:has(img[src*="social_website"]),a:has(img[src*="Google_News_icon"]),a[href*="facebook.com/share"],a[href*="twitter.com/share"],a[href*="pinterest.com/pin"],a[href*="reddit.com/submit"]) {
+  display: none !important;
+  visibility: hidden !important;
+  block-size: 0 !important;
+  inline-size: 0 !important;
+  max-block-size: 0 !important;
+  max-inline-size: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+html.csm-article-mode.csm-site-bleeding-cool-modern-reader .csm-article img {
+  max-width: 100% !important;
+  width: auto !important;
+  height: auto !important;
+  object-fit: contain !important;
+  margin-inline: auto !important;
+}
+html.csm-article-mode.csm-site-bleeding-cool-modern-reader .csm-article :is(iframe,video) {
+  max-width: 100% !important;
+  width: 100% !important;
+  height: auto !important;
+  aspect-ratio: 16 / 9 !important;
+  background: #0d1118 !important;
+}
