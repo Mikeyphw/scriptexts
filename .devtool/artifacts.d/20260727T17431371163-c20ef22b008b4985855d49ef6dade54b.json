@@ -1,0 +1,18 @@
+{
+  "applied_at": "2026-07-27T17:43:13.711633Z",
+  "artifact": "/home/mike/Downloads/scriptexts_putinho_content_site_modernizer_devtool_overlay.zip",
+  "artifact_name": "scriptexts_putinho_content_site_modernizer_devtool_overlay.zip",
+  "type": "overlay",
+  "sha256": "093593d6d05df80313f748cf32b2777294bcaa1db31d4b09985981ddeb0379a7",
+  "status": "rolled-back",
+  "validation_status": "failed",
+  "commit_message": "",
+  "commit_hash": "",
+  "file_count": 15,
+  "change_counts": {
+    "add": 8,
+    "modify": 7
+  },
+  "manifest": {},
+  "history_id": "c20ef22b008b4985855d49ef6dade54b"
+}

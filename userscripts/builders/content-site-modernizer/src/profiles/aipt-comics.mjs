@@ -1,7 +1,7 @@
 export default {
   "id": "aipt-comics-modern-reader",
   "name": "AIPT Comics Modern Reader",
-  "version": "0.1.0",
+  "version": "0.1.4",
   "description": "Modern dark mobile-first reader UI for AIPT Comics.",
   "matches": [
     "https://aiptcomics.com/*",
@@ -22,6 +22,7 @@ export default {
     "metaScript": "dist/aipt-comics-modern-reader.meta.js"
   },
   "client": {
+    "schemaVersion": 1,
     "id": "aipt-comics-modern-reader",
     "name": "AIPT Comics Modern Reader",
     "shortName": "AIPT",

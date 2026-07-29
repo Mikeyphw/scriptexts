@@ -1,0 +1,18 @@
+{
+  "applied_at": "2026-07-29T16:40:46.839221Z",
+  "artifact": "/home/mike/Downloads/scriptexts_playwright_smoke_live_baseline_management_devtool_overlay.zip",
+  "artifact_name": "scriptexts_playwright_smoke_live_baseline_management_devtool_overlay.zip",
+  "type": "overlay",
+  "sha256": "002142626843cf69d4ce570f25a192157df88d7765b5889650a39f832dc4a4df",
+  "status": "ok",
+  "validation_status": "ok",
+  "commit_message": "",
+  "commit_hash": "",
+  "file_count": 11,
+  "change_counts": {
+    "add": 1,
+    "modify": 10
+  },
+  "manifest": {},
+  "history_id": "667c007ccc4641b780fd6b7c9cce65be"
+}

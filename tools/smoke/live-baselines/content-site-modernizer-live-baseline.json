@@ -1,0 +1,8 @@
+{
+  "builder": "content-site-modernizer",
+  "entries": {},
+  "schemaVersion": 1,
+  "source": "empty accepted live baseline; run npm run smoke:content-sites:live:baseline:capture to populate",
+  "sourceRun": {},
+  "updatedAt": null
+}

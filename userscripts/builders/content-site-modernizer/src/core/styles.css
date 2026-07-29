@@ -8,6 +8,12 @@
   --csm-accent: #d65cff;
   --csm-accent-2: #5ad7ff;
   --csm-radius: 24px;
+  --csm-text-xs: .82rem;
+  --csm-text-sm: .9rem;
+  --csm-text-md: 1rem;
+  --csm-text-lg: clamp(1.05rem, 1.6vw, 1.24rem);
+  --csm-text-xl: clamp(1.4rem, 4vw, 2.35rem);
+  --csm-focus-ring: 0 0 0 3px rgba(90, 215, 255, .34), 0 0 0 1px rgba(90, 215, 255, .8);
   color-scheme: dark;
 }
 html.csm-modernized {
@@ -46,6 +52,19 @@ html.csm-modernized video,
 html.csm-modernized iframe {
   max-inline-size: 100% !important;
 }
+
+.csm-sr-only {
+  position: absolute !important;
+  inline-size: 1px !important;
+  block-size: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0 0 0 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
 .csm-hidden,
 .csm-ad-hidden,
 .csm-source-hidden {
@@ -219,7 +238,7 @@ html.csm-modernized.csm-site-bleeding-cool-modern-reader .csm-feed-grid {
 .csm-card-title {
   margin: 0 !important;
   color: var(--csm-text) !important;
-  font-size: clamp(.98rem, 1.6vw, 1.24rem) !important;
+  font-size: var(--csm-text-lg) !important;
   line-height: 1.12 !important;
   letter-spacing: -.025em !important;
   display: -webkit-box !important;
@@ -229,7 +248,7 @@ html.csm-modernized.csm-site-bleeding-cool-modern-reader .csm-feed-grid {
 }
 .csm-card-body .csm-meta {
   margin: 0 !important;
-  font-size: .78rem !important;
+  font-size: var(--csm-text-xs) !important;
   line-height: 1.2 !important;
 }
 .csm-card img {
@@ -284,7 +303,7 @@ html.csm-modernized.csm-site-bleeding-cool-modern-reader .csm-feed-grid {
 .csm-section-title {
   grid-column: 1 / -1;
   margin: 1.4rem 0 .8rem;
-  font-size: clamp(1.4rem, 4vw, 2.35rem);
+  font-size: var(--csm-text-xl);
   line-height: 1.05;
   letter-spacing: -.04em;
   color: var(--csm-text) !important;
@@ -387,7 +406,7 @@ html.csm-modernized.csm-site-bleeding-cool-modern-reader .csm-feed-grid {
   background: transparent;
   color: var(--csm-muted);
   font: inherit;
-  font-size: .76rem;
+  font-size: var(--csm-text-xs);
   font-weight: 760;
 }
 .csm-bottomnav button[aria-current="page"],
@@ -401,16 +420,6 @@ html.csm-site-bleeding-cool-modern-reader {
   --csm-accent-2: #6fd2ff;
   --csm-max: 1320px;
   --csm-article-width: 820px;
-}
-@supports (content-visibility: auto) {
-  html.csm-modernized.csm-low-resource .csm-card {
-    content-visibility: auto;
-    contain-intrinsic-size: 360px 260px;
-  }
-  html.csm-modernized.csm-low-resource .csm-article > * {
-    content-visibility: auto;
-    contain-intrinsic-size: 1px 720px;
-  }
 }
 html.csm-modernized.csm-site-bleeding-cool-modern-reader .csm-layout {
   contain: layout paint style;
@@ -615,4 +624,224 @@ html.csm-article-mode.csm-site-bleeding-cool-modern-reader .csm-article :is(ifra
   height: auto !important;
   aspect-ratio: 16 / 9 !important;
   background: #0d1118 !important;
+}
+
+/* Feed pagination and video-duration repair pass. */
+.csm-card-media {
+  position: relative !important;
+}
+.csm-duration-badge {
+  position: absolute !important;
+  inset: auto .62rem .62rem auto !important;
+  z-index: 4 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-height: 28px !important;
+  padding: .24rem .56rem !important;
+  border-radius: 999px !important;
+  background: rgba(4, 7, 12, .86) !important;
+  color: #fff !important;
+  font-size: .9rem !important;
+  line-height: 1 !important;
+  font-weight: 850 !important;
+  letter-spacing: .01em !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .38) !important;
+  pointer-events: none !important;
+}
+.csm-pagination {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  justify-content: center !important;
+  align-items: center !important;
+  gap: .45rem !important;
+  width: min(100%, var(--csm-max, 1360px)) !important;
+  margin: 1.2rem auto 0 !important;
+  padding: .35rem !important;
+  color: var(--csm-text) !important;
+  position: relative !important;
+  z-index: 2 !important;
+}
+.csm-page-link,
+.csm-page-current,
+.csm-page-ellipsis {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-width: 42px !important;
+  min-height: 42px !important;
+  padding: .45rem .72rem !important;
+  border-radius: 999px !important;
+  background: rgba(255,255,255,.08) !important;
+  color: var(--csm-text) !important;
+  text-decoration: none !important;
+  font: inherit !important;
+  font-size: .95rem !important;
+  line-height: 1 !important;
+  font-weight: 800 !important;
+}
+.csm-page-link:hover,
+.csm-page-current {
+  background: rgba(214,92,255,.22) !important;
+}
+.csm-page-ellipsis {
+  min-width: auto !important;
+  background: transparent !important;
+  color: var(--csm-muted) !important;
+}
+
+/* PageTual compatibility: keep its infinite-scroll page bars usable inside the modern shell. */
+html.csm-modernized #pagetual-sideController,
+html.csm-modernized [id^="pagetual-sideController"] {
+  display: block !important;
+  visibility: visible !important;
+  z-index: 2147480900 !important;
+}
+html.csm-modernized .pagetual_pageBar,
+html.csm-modernized .autopagerize_page_info,
+html.csm-modernized [id^="pagetual_pageBar"] {
+  display: flex !important;
+  visibility: visible !important;
+  inline-size: min(100%, var(--csm-max, 1360px)) !important;
+  max-inline-size: min(100%, var(--csm-max, 1360px)) !important;
+  min-block-size: 44px !important;
+  margin: 1rem auto !important;
+  padding: .45rem .75rem !important;
+  justify-content: center !important;
+  align-items: center !important;
+  border-radius: 999px !important;
+  background: rgba(18, 22, 29, .86) !important;
+  border: 1px solid rgba(255,255,255,.1) !important;
+  box-shadow: 0 12px 34px rgba(0,0,0,.28) !important;
+  color: var(--csm-text) !important;
+  text-indent: 0 !important;
+  opacity: 1 !important;
+  position: relative !important;
+  z-index: 20 !important;
+}
+html.csm-modernized .pagetual_pageBar a,
+html.csm-modernized .autopagerize_page_info a,
+html.csm-modernized [id^="pagetual_pageBar"] a,
+html.csm-modernized .pagetual_pageBar span,
+html.csm-modernized .autopagerize_page_info span,
+html.csm-modernized [id^="pagetual_pageBar"] span {
+  color: var(--csm-text) !important;
+  font: 800 .95rem/1.1 Inter, ui-sans-serif, system-ui, sans-serif !important;
+  text-decoration: none !important;
+}
+
+/* Section-aware home feeds: preserve category lanes on WP-Drudge style homepages. */
+.csm-feed-sections {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: clamp(1.2rem, 3vw, 2rem) !important;
+  width: 100% !important;
+  min-inline-size: 0 !important;
+}
+.csm-feed-section {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: clamp(.7rem, 1.6vw, 1rem) !important;
+  width: 100% !important;
+  min-inline-size: 0 !important;
+}
+.csm-feed-section-title {
+  margin: 0 !important;
+  padding: .1rem .05rem 0 !important;
+  color: var(--csm-text) !important;
+  font-size: clamp(1.15rem, 3vw, 1.85rem) !important;
+  line-height: 1.05 !important;
+  letter-spacing: -.035em !important;
+  font-weight: 900 !important;
+}
+.csm-layout-sectioned > .csm-section-title {
+  margin-bottom: clamp(1rem, 2vw, 1.5rem) !important;
+}
+html.csm-site-str8upgayporn-modern-ui .csm-feed-section[data-csm-section-key="featured"] .csm-feed-grid {
+  grid-template-columns: minmax(0, 1fr) !important;
+}
+html.csm-site-str8upgayporn-modern-ui .csm-feed-section[data-csm-section-key="featured"] .csm-card {
+  max-inline-size: min(100%, 820px) !important;
+}
+html.csm-site-str8upgayporn-modern-ui .csm-feed-section[data-csm-section-key="featured"] .csm-card-title {
+  font-size: clamp(1.28rem, 3.5vw, 2.05rem) !important;
+  -webkit-line-clamp: 2 !important;
+}
+html.csm-site-str8upgayporn-modern-ui .csm-excluded-feed-section,
+html.csm-site-str8upgayporn-modern-ui .csm-drawer a[href*="/category/hot-links/"] {
+  display: none !important;
+}
+
+
+/* Shared UX-state hardening: search, saved filtering, live load-more and drawer focus. */
+.csm-filter-hidden,
+.csm-saved-hidden,
+.csm-deferred-hidden,
+.csm-card-deferred {
+  display: none !important;
+}
+.csm-feed-status {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: .65rem !important;
+  width: 100% !important;
+  margin: 0 0 .8rem !important;
+  padding: .65rem .75rem !important;
+  border-radius: 18px !important;
+  background: rgba(255,255,255,.07) !important;
+  color: var(--csm-muted) !important;
+  font-size: var(--csm-text-sm) !important;
+  font-weight: 760 !important;
+}
+.csm-feed-status[hidden] {
+  display: none !important;
+}
+html.csm-drawer-open {
+  overflow: hidden !important;
+}
+html.csm-modernized :is(a,button,input,select,textarea,summary,[tabindex]):focus-visible {
+  outline: 0 !important;
+  box-shadow: var(--csm-focus-ring) !important;
+}
+.csm-drawer[aria-hidden="false"] {
+  outline: 0 !important;
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .csm-topbar,
+  .csm-bottomnav,
+  html.csm-modernized .pagetual_pageBar,
+  html.csm-modernized .autopagerize_page_info,
+  html.csm-modernized [id^="pagetual_pageBar"] {
+    background: #0f131a !important;
+  }
+}
+
+.csm-card-summary {
+  margin: 0.15rem 0 0;
+  color: var(--csm-muted);
+  font-size: var(--csm-text-sm);
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+html.csm-site-putinho-modern-ui {
+  --csm-accent: #ff4d8d;
+  --csm-accent-2: #ff76a7;
+}
+
+html.csm-site-menofporn-modern-ui {
+  --csm-accent: #d9b66a;
+  --csm-accent-2: #f1cf85;
+}
+
+html.csm-site-putinho-modern-ui .csm-card-title,
+html.csm-site-menofporn-modern-ui .csm-card-title {
+  -webkit-line-clamp: unset;
+  line-clamp: unset;
 }

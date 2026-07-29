@@ -1,0 +1,17 @@
+{
+  "applied_at": "2026-07-29T18:11:13.710902Z",
+  "artifact": "/home/mike/Downloads/scriptexts_content_site_accessibility_hardening_devtool_overlay.zip",
+  "artifact_name": "scriptexts_content_site_accessibility_hardening_devtool_overlay.zip",
+  "type": "overlay",
+  "sha256": "902bc8854516b98c32f977d8b076e77983d9f8b91ab11f58a57375baf3abc95f",
+  "status": "ok",
+  "validation_status": "ok",
+  "commit_message": "",
+  "commit_hash": "",
+  "file_count": 34,
+  "change_counts": {
+    "modify": 34
+  },
+  "manifest": {},
+  "history_id": "789529d8bd14410e93cc318320329fd3"
+}

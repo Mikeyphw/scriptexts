@@ -5,7 +5,7 @@
 // @supportURL   https://github.com/Mikeyphw/scriptexts/issues
 // @updateURL    https://raw.githubusercontent.com/Mikeyphw/scriptexts/main/userscripts/builders/content-site-modernizer/dist/bleeding-cool-modern-reader.meta.js
 // @downloadURL  https://raw.githubusercontent.com/Mikeyphw/scriptexts/main/userscripts/builders/content-site-modernizer/dist/bleeding-cool-modern-reader.user.js
-// @version      0.1.0
+// @version      0.1.4
 // @description  Modern dark mobile-first reader UI for Bleeding Cool.
 // @author       Mikeyphw
 // @match        https://bleedingcool.com/*

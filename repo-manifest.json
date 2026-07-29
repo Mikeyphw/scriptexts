@@ -13,7 +13,7 @@
     {
       "path": "userscripts/builders/content-site-modernizer",
       "type": "userscript-builder",
-      "source_model": "shared-builder",
+      "source_model": "shared-profile-runtime-builder",
       "builder": "build.mjs",
       "source": "src/",
       "install_artifacts": [
@@ -22,12 +22,115 @@
         "dist/menofporn-modern-ui.user.js",
         "dist/menofporn-modern-ui.meta.js",
         "dist/bleeding-cool-modern-reader.user.js",
-        "dist/bleeding-cool-modern-reader.meta.js"
+        "dist/bleeding-cool-modern-reader.meta.js",
+        "dist/putinho-modern-ui.user.js",
+        "dist/putinho-modern-ui.meta.js",
+        "dist/gayteam-modern-ui.user.js",
+        "dist/gayteam-modern-ui.meta.js",
+        "dist/justthegays-modern-ui.meta.js",
+        "dist/justthegays-modern-ui.user.js",
+        "dist/str8upgayporn-modern-ui.user.js",
+        "dist/str8upgayporn-modern-ui.meta.js"
       ],
       "versions": {
-        "aipt-comics-modern-reader": "0.1.0",
-        "bleeding-cool-modern-reader": "0.1.0",
-        "menofporn-modern-ui": "1.4.0"
+        "aipt-comics-modern-reader": "0.1.4",
+        "bleeding-cool-modern-reader": "0.1.4",
+        "menofporn-modern-ui": "1.5.2",
+        "putinho-modern-ui": "1.1.2",
+        "gayteam-modern-ui": "1.0.5",
+        "justthegays-modern-ui": "1.0.3",
+        "str8upgayporn-modern-ui": "1.0.4"
+      },
+      "smoke": {
+        "config": "userscripts/builders/content-site-modernizer/smoke.config.json",
+        "runner": "tools/smoke/run-content-site-smoke.py",
+        "optional_env": "PLAYWRIGHT_SMOKE=1",
+        "requirements": "requirements-smoke.txt",
+        "evidence_dir": "smoke-results/content-site-modernizer",
+        "json_report": "content-site-smoke-results.json",
+        "markdown_report": "content-site-smoke-summary.md",
+        "matrix": "mobile,desktop",
+        "interactions": "drawer,cardActions,searchFilter,loadMore,pagetualAppend",
+        "focused_interaction_script": "npm run smoke:content-sites:interactions",
+        "fixture_click_policy": "first-visible-dom-click",
+        "fixture_noise_policy": "ignore-local-resource-404-and-captured-ad-overlays",
+        "sectioned_pagetual_policy": "append-into-source-section-lists",
+        "live_evidence_dir": "smoke-results/content-site-modernizer-live",
+        "live_script": "npm run smoke:content-sites:live",
+        "focused_live_script": "npm run smoke:content-sites:live:focused",
+        "live_policy": "flag-only; third-party requests blocked by default; interactions and PageTual injection require explicit flags",
+        "live_drift_script": "npm run smoke:content-sites:live:drift",
+        "focused_live_drift_script": "npm run smoke:content-sites:live:drift:focused",
+        "live_drift_report": "content-site-live-drift.md",
+        "live_drift_policy": "report-only by default; --fail-on-live-drift turns high/critical shape drift into a failure",
+        "live_baseline_script": "npm run smoke:content-sites:live:baseline:compare",
+        "live_baseline_capture_script": "npm run smoke:content-sites:live:baseline:capture",
+        "live_baseline_update_script": "npm run smoke:content-sites:live:baseline:update",
+        "live_baseline_file": "tools/smoke/live-baselines/content-site-modernizer-live-baseline.json",
+        "live_baseline_report": "content-site-live-baseline.md",
+        "live_baseline_policy": "accepted-live baseline compare is report-only by default; --fail-on-live-baseline-drift turns high/critical accepted drift into failure",
+        "accessibility_script": "npm run smoke:content-sites:a11y",
+        "focused_accessibility_script": "npm run smoke:content-sites:a11y:focused",
+        "accessibility_contract": "visibleControlNames,mobileDesktopControlVisibility,drawerDialogSemantics,drawerFocusTrap,drawerEscapeClose,searchInputLabel,bottomNavLabels,cardLinkNames,articleProgressbarSemantics",
+        "accessibility_policy": "flag-only browser smoke; no axe dependency; checks shared chrome semantics and keyboard behavior",
+        "visual_script": "npm run smoke:content-sites:visual:compare",
+        "visual_capture_script": "npm run smoke:content-sites:visual:capture",
+        "focused_visual_script": "npm run smoke:content-sites:visual:focused",
+        "visual_baseline_dir": "tools/smoke/visual-baselines/content-site-modernizer",
+        "visual_evidence_dir": "smoke-results/content-site-modernizer-visual",
+        "visual_report": "content-site-visual-regression.md",
+        "visual_policy": "opt-in browser smoke; compare is report-only by default; --fail-on-visual-diff turns baseline drift into a failure",
+        "visual_runner": "tools/smoke/run-content-site-visual.py"
+      },
+      "onboarding_tools": {
+        "new_site": "npm run content-sites:new",
+        "new_site_dry_run": "npm run content-sites:new:dry-run",
+        "fixture_refresh_plan": "npm run content-sites:fixtures:plan",
+        "fixture_refresh_apply": "npm run content-sites:fixtures:apply"
+      },
+      "runtime_migration": {
+        "menofporn-modern-ui": "migrated from retired src/sites/menofporn direct source to src/profiles/menofporn.mjs",
+        "putinho-modern-ui": "migrated from retired src/sites/putinho direct source to src/profiles/putinho.mjs",
+        "retired_source_stubs": [
+          "userscripts/builders/content-site-modernizer/src/sites/menofporn/menofporn-modern-ui.source.js",
+          "userscripts/builders/content-site-modernizer/src/sites/putinho/putinho-modern-ui.source.js"
+        ]
+      },
+      "profile_schema": {
+        "version": 1,
+        "module": "userscripts/builders/content-site-modernizer/src/core/profile-schema.mjs",
+        "check_script": "npm run content-sites:profiles:check",
+        "normalization": "build-time defaults plus explicit capability map",
+        "defaults": [
+          "layout",
+          "performance",
+          "selectors",
+          "capabilities"
+        ],
+        "normalValidation": "browser-free"
+      },
+      "final_seal": {
+        "script": "npm run content-sites:seal",
+        "json_script": "npm run content-sites:seal:json",
+        "tool": "tools/content-sites/final-seal.mjs",
+        "builder_alias": "npm run seal",
+        "policy": "browser-free release-readiness gate for profile/schema, generated outputs, smoke config, manifest coverage, and docs markers",
+        "normalValidation": "browser-free"
+      },
+      "release_pack": {
+        "script": "npm run content-sites:release-pack",
+        "check_script": "npm run content-sites:release-pack:check",
+        "tool": "tools/content-sites/release-pack.mjs",
+        "output": "release/content-site-modernizer/content-site-modernizer-userscripts.zip",
+        "includes": [
+          "scripts/*.user.js",
+          "meta/*.meta.js",
+          "manifest.json",
+          "checksums.sha256",
+          "RELEASE_INDEX.md"
+        ],
+        "policy": "dependency-free ZIP packer for generated content-site userscripts; check mode is browser-free and does not write output",
+        "normalValidation": "browser-free"
       }
     },
     {
@@ -149,5 +252,109 @@
         "dist/SHA256SUMS"
       ]
     }
-  ]
+  ],
+  "pagetual_contract_v2_policy": {
+    "scope": "content-site-modernizer",
+    "commands": [
+      "smoke:content-sites:pagetual",
+      "smoke:content-sites:pagetual:focused"
+    ],
+    "checks": [
+      "multiAppend",
+      "duplicateLinks",
+      "activeFilterAppend",
+      "restoreAfterFilter"
+    ],
+    "normalValidation": "browser-free"
+  },
+  "content_site_onboarding_policy": {
+    "scope": "content-site-modernizer",
+    "generator": "tools/content-sites/new-site.mjs",
+    "fixture_refresh": "tools/content-sites/fixture-refresh.mjs",
+    "safety": [
+      "new-site refuses overwrites unless --force is passed",
+      "fixture-refresh backs up targets before replacement",
+      "fixture-refresh refuses retained smoke snapshots unless --allow-smoke-snapshot is passed"
+    ],
+    "normalValidation": "browser-free"
+  },
+  "content_site_accessibility_contract_policy": {
+    "scope": "content-site-modernizer",
+    "commands": [
+      "smoke:content-sites:a11y",
+      "smoke:content-sites:a11y:focused"
+    ],
+    "checks": [
+      "visibleControlNames",
+      "mobileDesktopControlVisibility",
+      "drawerDialogSemantics",
+      "drawerFocusTrap",
+      "drawerEscapeClose",
+      "searchInputLabel",
+      "bottomNavLabels",
+      "cardLinkNames",
+      "articleProgressbarSemantics"
+    ],
+    "normalValidation": "browser-free",
+    "dependencyPolicy": "no additional npm dependency; Playwright remains optional through requirements-smoke.txt"
+  },
+  "content_site_visual_regression_policy": {
+    "scope": "content-site-modernizer",
+    "commands": [
+      "smoke:content-sites:visual:capture",
+      "smoke:content-sites:visual:compare",
+      "smoke:content-sites:visual:focused"
+    ],
+    "baselineDir": "tools/smoke/visual-baselines/content-site-modernizer",
+    "evidenceDir": "smoke-results/content-site-modernizer-visual",
+    "report": "content-site-visual-regression.md",
+    "thresholdRatio": 0.015,
+    "normalValidation": "browser-free",
+    "dependencyPolicy": "Playwright plus optional Pillow through requirements-smoke.txt; no npm dependency"
+  },
+  "content_site_profile_schema_policy": {
+    "scope": "content-site-modernizer",
+    "commands": [
+      "content-sites:profiles:check"
+    ],
+    "module": "userscripts/builders/content-site-modernizer/src/core/profile-schema.mjs",
+    "normalizedAt": "build-time",
+    "checks": [
+      "unique profile ids",
+      "unique outputs",
+      "semver versions",
+      "https match rules",
+      "allowed grants",
+      "nav actions",
+      "selector shape",
+      "capability prerequisites"
+    ],
+    "normalValidation": "browser-free",
+    "dependencyPolicy": "no npm dependency; pure Node schema module"
+  },
+  "content_site_final_seal_policy": {
+    "tool": "tools/content-sites/final-seal.mjs",
+    "script": "npm run content-sites:seal",
+    "json_script": "npm run content-sites:seal:json",
+    "scope": "content-site-modernizer shared-runtime builder",
+    "browserExecution": "never during normal validation",
+    "checks": [
+      "profileSchema",
+      "sharedRuntimeOnly",
+      "generatedOutputFreshness",
+      "metaHeaderOnly",
+      "smokeConfigCoverage",
+      "manifestCoverage",
+      "docsMarkers",
+      "packageScripts"
+    ]
+  },
+  "content_site_release_pack_policy": {
+    "scope": "content-site-modernizer",
+    "script": "npm run content-sites:release-pack",
+    "check_script": "npm run content-sites:release-pack:check",
+    "output": "release/content-site-modernizer/content-site-modernizer-userscripts.zip",
+    "checksum": "checksums.sha256",
+    "index": "RELEASE_INDEX.md"
+  }
 }

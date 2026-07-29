@@ -1,7 +1,7 @@
 export default {
   "id": "bleeding-cool-modern-reader",
   "name": "Bleeding Cool Modern Reader",
-  "version": "0.1.0",
+  "version": "0.1.4",
   "description": "Modern dark mobile-first reader UI for Bleeding Cool.",
   "matches": [
     "https://bleedingcool.com/*",
@@ -22,6 +22,7 @@ export default {
     "metaScript": "dist/bleeding-cool-modern-reader.meta.js"
   },
   "client": {
+    "schemaVersion": 1,
     "id": "bleeding-cool-modern-reader",
     "name": "Bleeding Cool Modern Reader",
     "shortName": "Bleeding Cool",

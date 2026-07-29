@@ -1,0 +1,18 @@
+{
+  "applied_at": "2026-07-29T15:28:56.149351Z",
+  "artifact": "/home/mike/Downloads/scriptexts_repo_wide_playwright_smoke_devtool_overlay.zip",
+  "artifact_name": "scriptexts_repo_wide_playwright_smoke_devtool_overlay.zip",
+  "type": "overlay",
+  "sha256": "363660e441b970e2f9945cdaafbebeb7d41e3b264f6899634bff1432e266077b",
+  "status": "ok",
+  "validation_status": "ok",
+  "commit_message": "",
+  "commit_hash": "",
+  "file_count": 12,
+  "change_counts": {
+    "add": 5,
+    "modify": 7
+  },
+  "manifest": {},
+  "history_id": "8151c35c2a5c4c009e5879042ca50d72"
+}

@@ -1,0 +1,18 @@
+{
+  "applied_at": "2026-07-29T18:20:19.624516Z",
+  "artifact": "/home/mike/Downloads/scriptexts_content_site_visual_regression_devtool_overlay.zip",
+  "artifact_name": "scriptexts_content_site_visual_regression_devtool_overlay.zip",
+  "type": "overlay",
+  "sha256": "9eb731ec09180433f21ebbfeebbc399c0563f44b10ff376c9495c1058bb787dd",
+  "status": "ok",
+  "validation_status": "ok",
+  "commit_message": "",
+  "commit_hash": "",
+  "file_count": 13,
+  "change_counts": {
+    "add": 4,
+    "modify": 9
+  },
+  "manifest": {},
+  "history_id": "a88f2d02c3194f298583d316e401d3ce"
+}

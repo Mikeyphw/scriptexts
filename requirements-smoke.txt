@@ -1,0 +1,9 @@
+# Optional repo-wide browser smoke-test dependencies.
+# Install only when you want Playwright runtime checks:
+#   python3 -m venv .venv-smoke
+#   . .venv-smoke/bin/activate
+#   pip install -r requirements-smoke.txt
+#   python -m playwright install chromium
+playwright>=1.48
+# Optional visual regression image diffing/thumbnails.
+Pillow>=10.0

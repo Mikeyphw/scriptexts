@@ -1,0 +1,17 @@
+{
+  "applied_at": "2026-07-29T17:07:48.536403Z",
+  "artifact": "/home/mike/Downloads/scriptexts_pagetual_contract_v2_devtool_overlay.zip",
+  "artifact_name": "scriptexts_pagetual_contract_v2_devtool_overlay.zip",
+  "type": "overlay",
+  "sha256": "3e645cec9d6159fd9c222d0a622cd3708a9a701b62535cc28ef8b765a398ee7e",
+  "status": "ok",
+  "validation_status": "ok",
+  "commit_message": "",
+  "commit_hash": "",
+  "file_count": 18,
+  "change_counts": {
+    "modify": 18
+  },
+  "manifest": {},
+  "history_id": "61522625de0f4c67943b3854da8711f8"
+}

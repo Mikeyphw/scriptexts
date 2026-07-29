@@ -1,0 +1,17 @@
+{
+  "applied_at": "2026-07-29T16:31:20.784361Z",
+  "artifact": "/home/mike/Downloads/scriptexts_playwright_smoke_live_drift_report_devtool_overlay.zip",
+  "artifact_name": "scriptexts_playwright_smoke_live_drift_report_devtool_overlay.zip",
+  "type": "overlay",
+  "sha256": "13f2b8d7aa898020bba86dd048931dd826ab3e8a54bbc9ab0d21f4eb479f5205",
+  "status": "ok",
+  "validation_status": "ok",
+  "commit_message": "",
+  "commit_hash": "",
+  "file_count": 9,
+  "change_counts": {
+    "modify": 9
+  },
+  "manifest": {},
+  "history_id": "71de205b9381402790e8238997a7395f"
+}

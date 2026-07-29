@@ -1,0 +1,17 @@
+{
+  "applied_at": "2026-07-29T15:35:54.323221Z",
+  "artifact": "/home/mike/Downloads/scriptexts_playwright_smoke_evidence_matrix_devtool_overlay.zip",
+  "artifact_name": "scriptexts_playwright_smoke_evidence_matrix_devtool_overlay.zip",
+  "type": "overlay",
+  "sha256": "38318fcabd3cf58a5d8f7e8a50a7b07b5d54405653a62e56725403b47f4f62bc",
+  "status": "ok",
+  "validation_status": "ok",
+  "commit_message": "",
+  "commit_hash": "",
+  "file_count": 10,
+  "change_counts": {
+    "modify": 10
+  },
+  "manifest": {},
+  "history_id": "442b52939397431781facc717af197c9"
+}

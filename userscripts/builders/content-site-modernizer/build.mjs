@@ -4,6 +4,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { spawnSync } from 'node:child_process';
 import builder from './scripts.config.mjs';
 import { runtime } from './src/core/runtime.mjs';
+import { validateBuilderConfig } from './src/core/profile-schema.mjs';
 
 const root = resolve(fileURLToPath(new URL('.', import.meta.url)));
 const repoRoot = resolve(root, '../../..');
@@ -51,8 +52,9 @@ async function buildScript(profile) {
   return { outPath, rel, user: `${header}\n\n${body.endsWith('\n') ? body : `${body}\n`}`, meta: `${header}\n` };
 }
 
+const normalizedProfiles = validateBuilderConfig(builder);
 const built = [];
-for (const profile of builder.scripts) built.push(await buildScript(profile));
+for (const profile of normalizedProfiles) built.push(await buildScript(profile));
 
 if (!checkOnly) await rm(resolve(root, builder.distDir), { recursive: true, force: true });
 

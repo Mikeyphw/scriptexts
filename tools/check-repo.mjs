@@ -102,15 +102,15 @@ for (const path of files.filter((item) => item.endsWith('.js') && !item.endsWith
 
 const mopPath = join(root, 'userscripts/builders/content-site-modernizer/dist/menofporn-modern-ui.user.js');
 const mop = await readFile(mopPath, 'utf8');
-for (const marker of ['function hideFeedAds', 'function hideEmptyPostAdBlocks', 'mop-reading-progress', '-webkit-line-clamp: unset !important']) {
-  if (!mop.includes(marker)) errors.push(`MenOfPorn source is missing regression marker: ${marker}`);
+for (const marker of ['MenOfPorn Modern UI', 'menofporn.blog/*', 'menofporn-modern-ui', 'installContentSiteModernizer', 'article.bloglo-article', 'summaryTextFor', '.csm-card-summary', '-webkit-line-clamp: unset', 'pagetual_pageBar']) {
+  if (!mop.includes(marker)) errors.push(`MenOfPorn shared-runtime output is missing marker: ${marker}`);
 }
 
 const bcPath = join(root, 'userscripts/builders/content-site-modernizer/dist/bleeding-cool-modern-reader.user.js');
 if (!await exists(bcPath)) errors.push('Bleeding Cool generated userscript is missing.');
 else {
   const bc = await readFile(bcPath, 'utf8');
-  for (const marker of ['Bleeding Cool Modern Reader', 'installContentSiteModernizer', 'bleedingcool.com/*', 'csm-bottomnav']) {
+  for (const marker of ['Bleeding Cool Modern Reader', 'installContentSiteModernizer', 'bleedingcool.com/*', 'csm-bottomnav', 'pagetual_pageBar']) {
     if (!bc.includes(marker)) errors.push(`Bleeding Cool source is missing marker: ${marker}`);
   }
 }
@@ -119,8 +119,48 @@ const aiptPath = join(root, 'userscripts/builders/content-site-modernizer/dist/a
 if (!await exists(aiptPath)) errors.push('AIPT Comics generated userscript is missing.');
 else {
   const aipt = await readFile(aiptPath, 'utf8');
-  for (const marker of ['AIPT Comics Modern Reader', 'installContentSiteModernizer', 'aiptcomics.com/*', 'csm-bottomnav']) {
+  for (const marker of ['AIPT Comics Modern Reader', 'installContentSiteModernizer', 'aiptcomics.com/*', 'csm-bottomnav', 'pagetual_pageBar']) {
     if (!aipt.includes(marker)) errors.push(`AIPT Comics source is missing marker: ${marker}`);
+  }
+}
+
+const putinhoPath = join(root, 'userscripts/builders/content-site-modernizer/dist/putinho-modern-ui.user.js');
+if (!await exists(putinhoPath)) errors.push('Putinho generated userscript is missing.');
+else {
+  const putinho = await readFile(putinhoPath, 'utf8');
+  for (const marker of ['Putinho Modern UI', 'putinho.net/*', 'putinho-modern-ui', 'installContentSiteModernizer', '.post-item', '#the-post', 'summaryTextFor', '.csm-card-summary', 'pagetual_pageBar']) {
+    if (!putinho.includes(marker)) errors.push(`Putinho shared-runtime output is missing marker: ${marker}`);
+  }
+}
+
+
+const gayteamPath = join(root, 'userscripts/builders/content-site-modernizer/dist/gayteam-modern-ui.user.js');
+if (!await exists(gayteamPath)) errors.push('Gayteam generated userscript is missing.');
+else {
+  const gayteam = await readFile(gayteamPath, 'utf8');
+  for (const marker of ['Gayteam Modern UI', 'gayteam.club/*', 'gayteam-modern-ui', 'installContentSiteModernizer', '.thumb-item', '.inner-page', 'pagetual_pageBar']) {
+    if (!gayteam.includes(marker)) errors.push(`Gayteam source is missing marker: ${marker}`);
+  }
+}
+
+
+const justTheGaysPath = join(root, 'userscripts/builders/content-site-modernizer/dist/justthegays-modern-ui.user.js');
+if (!await exists(justTheGaysPath)) errors.push('JustTheGays generated userscript is missing.');
+else {
+  const justTheGays = await readFile(justTheGaysPath, 'utf8');
+  for (const marker of ['JustTheGays Modern UI', 'justthegays.tv/*', 'justthegays-modern-ui', 'installContentSiteModernizer', '.video-item', '.duration-pill', 'pagetual_pageBar']) {
+    if (!justTheGays.includes(marker)) errors.push(`JustTheGays source is missing marker: ${marker}`);
+  }
+}
+
+
+
+const str8upPath = join(root, 'userscripts/builders/content-site-modernizer/dist/str8upgayporn-modern-ui.user.js');
+if (!await exists(str8upPath)) errors.push('STR8UPGAYPORN generated userscript is missing.');
+else {
+  const str8up = await readFile(str8upPath, 'utf8');
+  for (const marker of ['STR8UPGAYPORN Modern UI', 'str8upgayporn.com/*', 'str8upgayporn-modern-ui', 'installContentSiteModernizer', '#featured .featured-wrap', '.posts-list > li', 'pagetual_pageBar']) {
+    if (!str8up.includes(marker)) errors.push(`STR8UPGAYPORN source is missing marker: ${marker}`);
   }
 }
 

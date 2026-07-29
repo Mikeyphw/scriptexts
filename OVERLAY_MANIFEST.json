@@ -1,0 +1,145 @@
+{
+  "schema_version": 2,
+  "type": "overlay",
+  "name": "scriptexts content-site release pack command",
+  "description": "Adds a dependency-free all-userscript release pack command for the content-site-modernizer builder, producing a ZIP with generated .user.js/.meta.js files, manifest.json, checksums.sha256, and RELEASE_INDEX.md while keeping normal validation browser-free and npm-install-free.",
+  "repository": {
+    "name": "scriptexts",
+    "remote": "git@github.com:Mikeyphw/scriptexts.git",
+    "branch": "main"
+  },
+  "workspace": {
+    "name": "content-site-modernizer",
+    "root": "userscripts/builders/content-site-modernizer"
+  },
+  "target": "content-site-modernizer",
+  "inventory": {
+    "format": 1,
+    "entries": [
+      {
+        "path": ".devtool-artifact/validate.sh",
+        "action": "modify",
+        "sha256": "e47e5e8edf493e988806af6e0e3328fffaaac43d0e5ab199f8eb59b94fad1286",
+        "size": 4229,
+        "source_sha256": "1a87863cc4988c8b2fd10cce76712b855b751d5ef8f1c2123c9997b37fd826d0"
+      },
+      {
+        "path": ".gitignore",
+        "action": "modify",
+        "sha256": "aba223cf691429698a94b43deccbd0e0af4b2dfea6bb60c1b10b3de9b29a3b42",
+        "size": 371,
+        "source_sha256": "1baa951443d7d7f4fbcf8b2f796a4cbb61c6017c4b2ea6ebaa1bf2e141a29e33"
+      },
+      {
+        "path": "README.md",
+        "action": "modify",
+        "sha256": "912bc3a9cf41d3c99952e0360254285ad1e268c5ab7eaf4b433f247853518d34",
+        "size": 10400,
+        "source_sha256": "209c4c44918df9951ed068daeb9e5c40635010dbdd2054862f850dc4c9a1e313"
+      },
+      {
+        "path": "docs/RELEASE_WORKFLOW.md",
+        "action": "modify",
+        "sha256": "14908cdc8d0a420815ced2c1ceffeaa9a01a48cd708ace5dd39c2a1ea673a4cb",
+        "size": 2333,
+        "source_sha256": "6bbf986ad5f8530a0cb90ff49b4bcf2f323d89f9b8a16c7d3849b53dab0f8ecd"
+      },
+      {
+        "path": "docs/REPOSITORY_LAYOUT.md",
+        "action": "modify",
+        "sha256": "54ede0bfc942729eaba7e415145bc70a7e9517a64709e1770d4c51c455e2c31d",
+        "size": 8560,
+        "source_sha256": "9dbad6fb96f17af2b9726e9bb9c790d6b6501b1bde46602b9114192403aec417"
+      },
+      {
+        "path": "package.json",
+        "action": "modify",
+        "sha256": "f258ea4f488b6cd22cf15b1536ed7a17475a361e1759761dba3c846e91b7486f",
+        "size": 5997,
+        "source_sha256": "8a0be0eda5a4090524fb18d13ac6847c83e3eb05639a36f5f99a4a841f7e3d64"
+      },
+      {
+        "path": "repo-manifest.json",
+        "action": "modify",
+        "sha256": "be8ec366e6aee088caa6eafd245d1d180d36daf6ab70277e160eba52fed09ecf",
+        "size": 15306,
+        "source_sha256": "8a6c928be6bd3e8212e9b240b9053d0c64d0de5aecbec203f4218a615349ae73"
+      },
+      {
+        "path": "tools/content-sites/final-seal.mjs",
+        "action": "modify",
+        "sha256": "8e54766aeb18ffa8fcfc03286de2ba2796ae96dfa0549cdb6e6d5e1b08dda71b",
+        "size": 10564,
+        "source_sha256": "0dd2513cdc8fe98e74250821e97d32ed37423c8ce6f1b2f17c15bd4268d0ea21"
+      },
+      {
+        "path": "tools/content-sites/release-pack.mjs",
+        "action": "add",
+        "sha256": "9e61eb2bdd9ec10d5a8e0f6b9f4a39e5369c226e903ba2998e1783a284d0ce1c",
+        "size": 10605
+      },
+      {
+        "path": "userscripts/builders/content-site-modernizer/README.md",
+        "action": "modify",
+        "sha256": "dbbe6e61e450d36fceb9658b83484ac948afab3c0e10eb57f6ac5293c328e148",
+        "size": 10817,
+        "source_sha256": "7783bd486a7e7275ff4788cd2b72da229b86b1a8a1ecabe3775102313a4eb064"
+      },
+      {
+        "path": "userscripts/builders/content-site-modernizer/docs/FINAL_SEAL.md",
+        "action": "modify",
+        "sha256": "cf8b1889489692db9acdce1745639ee11ea486b49ac5bb6a29a9f0e6c62ff8ff",
+        "size": 2763,
+        "source_sha256": "5770645980ed33a47db2952d84d8b4926e1a7cbc79e8d0e4895cc63bc36553a4"
+      },
+      {
+        "path": "userscripts/builders/content-site-modernizer/package.json",
+        "action": "modify",
+        "sha256": "4a9ca0724eaf5bb09612d7dbc0d98f3ece56dbdbc279c04fc52392b4240b16b5",
+        "size": 732,
+        "source_sha256": "7bc99bf097962f43b2ceba994f6d0607d1eb53d41995c7e4a06641084cbc9ffa"
+      },
+      {
+        "path": "userscripts/builders/content-site-modernizer/test/release-pack.test.mjs",
+        "action": "add",
+        "sha256": "ec9c311ac3f1ecec725ba2a357a39b00b140e4c96c16525a5fcb9a2c2cf81ec0",
+        "size": 4256
+      }
+    ]
+  },
+  "apply": {
+    "atomic": true,
+    "conflict_policy": "overwrite",
+    "path_policy": "repository-relative",
+    "requires_clean_worktree": false,
+    "commit": {
+      "enabled": true,
+      "strategy": "single",
+      "message": "Add content-site release pack command"
+    }
+  },
+  "validation": {
+    "required": true,
+    "restore": false,
+    "build": true,
+    "test": true,
+    "rollback_on_failure": true,
+    "script": {
+      "path": ".devtool-artifact/validate.sh",
+      "runner": "bash",
+      "sha256": "e47e5e8edf493e988806af6e0e3328fffaaac43d0e5ab199f8eb59b94fad1286",
+      "timeout_seconds": 900
+    },
+    "expected": {
+      "build": "pass",
+      "tests": "pass",
+      "maximum_warnings": 0
+    }
+  },
+  "notes": [
+    "Apply after the content-site final seal/docs overlay baseline.",
+    "Use --target content-site-modernizer so devtool avoids the root npm install phase.",
+    "Normal validation is browser-free and release ZIP write-free; set CONTENT_SITE_RELEASE_PACK_WRITE_SMOKE=1 to exercise real ZIP writing into a temporary directory.",
+    "Generated release bundles are derived artifacts under release/ and are ignored by git."
+  ]
+}

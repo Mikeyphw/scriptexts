@@ -583,6 +583,376 @@
         ]
       },
       "history_id": "93605bd572dc49279d0f0ac2db072e04"
+    },
+    {
+      "applied_at": "2026-07-27T17:43:13.711633Z",
+      "artifact": "/home/mike/Downloads/scriptexts_putinho_content_site_modernizer_devtool_overlay.zip",
+      "artifact_name": "scriptexts_putinho_content_site_modernizer_devtool_overlay.zip",
+      "type": "overlay",
+      "sha256": "093593d6d05df80313f748cf32b2777294bcaa1db31d4b09985981ddeb0379a7",
+      "status": "rolled-back",
+      "validation_status": "failed",
+      "commit_message": "",
+      "commit_hash": "",
+      "file_count": 15,
+      "change_counts": {
+        "add": 8,
+        "modify": 7
+      },
+      "manifest": {},
+      "history_id": "c20ef22b008b4985855d49ef6dade54b"
+    },
+    {
+      "applied_at": "2026-07-27T17:55:10.340085Z",
+      "artifact": "/home/mike/Downloads/scriptexts_putinho_content_site_modernizer_devtool_overlay.zip",
+      "artifact_name": "scriptexts_putinho_content_site_modernizer_devtool_overlay.zip",
+      "type": "overlay",
+      "sha256": "093593d6d05df80313f748cf32b2777294bcaa1db31d4b09985981ddeb0379a7",
+      "status": "ok",
+      "validation_status": "ok",
+      "commit_message": "",
+      "commit_hash": "",
+      "file_count": 15,
+      "change_counts": {
+        "add": 8,
+        "modify": 7
+      },
+      "manifest": {},
+      "history_id": "2243a639abdb47a0ac10e6500abbfb3c"
+    },
+    {
+      "applied_at": "2026-07-27T18:09:40.979641Z",
+      "artifact": "/home/mike/Downloads/scriptexts_gayteam_content_site_modernizer_devtool_overlay.zip",
+      "artifact_name": "scriptexts_gayteam_content_site_modernizer_devtool_overlay.zip",
+      "type": "overlay",
+      "sha256": "da1066530132c49d351a99071865a32e9603022a0fb50360757628b8a12550a8",
+      "status": "ok",
+      "validation_status": "ok",
+      "commit_message": "",
+      "commit_hash": "",
+      "file_count": 14,
+      "change_counts": {
+        "add": 7,
+        "modify": 7
+      },
+      "manifest": {},
+      "history_id": "e7bacd5be3534bb1910caea3d492841f"
+    },
+    {
+      "applied_at": "2026-07-27T18:23:05.423206Z",
+      "artifact": "/home/mike/Downloads/scriptexts_gayteam_pagination_duration_repair_devtool_overlay.zip",
+      "artifact_name": "scriptexts_gayteam_pagination_duration_repair_devtool_overlay.zip",
+      "type": "overlay",
+      "sha256": "e794140ead6d6143947a9a18434478f8a2848724cfc1efd8eb8b1b145225febd",
+      "status": "ok",
+      "validation_status": "ok",
+      "commit_message": "",
+      "commit_hash": "",
+      "file_count": 10,
+      "change_counts": {
+        "modify": 10
+      },
+      "manifest": {},
+      "history_id": "43c3820344224c1aaded124dac841e17"
+    },
+    {
+      "applied_at": "2026-07-27T18:37:03.778818Z",
+      "artifact": "/home/mike/Downloads/scriptexts_pagetual_compat_content_site_modernizer_devtool_overlay.zip",
+      "artifact_name": "scriptexts_pagetual_compat_content_site_modernizer_devtool_overlay.zip",
+      "type": "overlay",
+      "sha256": "6f4afc8dd7b8317d7667eb06f65ee2cdddabf0e1efe3e5a38f5c4760855e3b41",
+      "status": "ok",
+      "validation_status": "ok",
+      "commit_message": "",
+      "commit_hash": "",
+      "file_count": 26,
+      "change_counts": {
+        "add": 1,
+        "modify": 25
+      },
+      "manifest": {},
+      "history_id": "c67328f90ce34ad0995e4df083b658fd"
+    },
+    {
+      "applied_at": "2026-07-29T15:01:03.836354Z",
+      "artifact": "/home/mike/Downloads/scriptexts_content_site_modernizer_audit_fixes_devtool_overlay.zip",
+      "artifact_name": "scriptexts_content_site_modernizer_audit_fixes_devtool_overlay.zip",
+      "type": "overlay",
+      "sha256": "8b96389814f2fe3f3092ee9dd3aa97cf9be054ff2a905cdbfbcab21e9fbb0036",
+      "status": "ok",
+      "validation_status": "ok",
+      "commit_message": "",
+      "commit_hash": "",
+      "file_count": 30,
+      "change_counts": {
+        "add": 1,
+        "modify": 29
+      },
+      "manifest": {},
+      "history_id": "b340831b487e46b7852b9bcc8f7e140e"
+    },
+    {
+      "applied_at": "2026-07-29T15:28:56.149351Z",
+      "artifact": "/home/mike/Downloads/scriptexts_repo_wide_playwright_smoke_devtool_overlay.zip",
+      "artifact_name": "scriptexts_repo_wide_playwright_smoke_devtool_overlay.zip",
+      "type": "overlay",
+      "sha256": "363660e441b970e2f9945cdaafbebeb7d41e3b264f6899634bff1432e266077b",
+      "status": "ok",
+      "validation_status": "ok",
+      "commit_message": "",
+      "commit_hash": "",
+      "file_count": 12,
+      "change_counts": {
+        "add": 5,
+        "modify": 7
+      },
+      "manifest": {},
+      "history_id": "8151c35c2a5c4c009e5879042ca50d72"
+    },
+    {
+      "applied_at": "2026-07-29T15:35:54.323221Z",
+      "artifact": "/home/mike/Downloads/scriptexts_playwright_smoke_evidence_matrix_devtool_overlay.zip",
+      "artifact_name": "scriptexts_playwright_smoke_evidence_matrix_devtool_overlay.zip",
+      "type": "overlay",
+      "sha256": "38318fcabd3cf58a5d8f7e8a50a7b07b5d54405653a62e56725403b47f4f62bc",
+      "status": "ok",
+      "validation_status": "ok",
+      "commit_message": "",
+      "commit_hash": "",
+      "file_count": 10,
+      "change_counts": {
+        "modify": 10
+      },
+      "manifest": {},
+      "history_id": "442b52939397431781facc717af197c9"
+    },
+    {
+      "applied_at": "2026-07-29T15:54:33.988399Z",
+      "artifact": "/home/mike/Downloads/scriptexts_playwright_smoke_interactions_devtool_overlay.zip",
+      "artifact_name": "scriptexts_playwright_smoke_interactions_devtool_overlay.zip",
+      "type": "overlay",
+      "sha256": "b0d50b9b3ad73047f8382012032b58a9ff09d1267ba36082e8e2426d83174292",
+      "status": "ok",
+      "validation_status": "ok",
+      "commit_message": "",
+      "commit_hash": "",
+      "file_count": 9,
+      "change_counts": {
+        "modify": 9
+      },
+      "manifest": {},
+      "history_id": "ed7f17440f3e47e5bdc54e847daced90"
+    },
+    {
+      "applied_at": "2026-07-29T16:14:53.627692Z",
+      "artifact": "/home/mike/Downloads/scriptexts_playwright_smoke_runtime_repair_devtool_overlay.zip",
+      "artifact_name": "scriptexts_playwright_smoke_runtime_repair_devtool_overlay.zip",
+      "type": "overlay",
+      "sha256": "49e86f6e900c15bd9d2b71379c54796a65379700990d439a53d69f7537ef0e47",
+      "status": "ok",
+      "validation_status": "ok",
+      "commit_message": "",
+      "commit_hash": "",
+      "file_count": 8,
+      "change_counts": {
+        "modify": 8
+      },
+      "manifest": {},
+      "history_id": "6313abeddd6b43ca989a7be0c4115854"
+    },
+    {
+      "applied_at": "2026-07-29T16:20:31.350663Z",
+      "artifact": "/home/mike/Downloads/scriptexts_playwright_smoke_live_mode_devtool_overlay.zip",
+      "artifact_name": "scriptexts_playwright_smoke_live_mode_devtool_overlay.zip",
+      "type": "overlay",
+      "sha256": "8973039cd606fb4dcd81771b5ace857b8b4652e117c009bc7c089d759a5180f2",
+      "status": "ok",
+      "validation_status": "ok",
+      "commit_message": "",
+      "commit_hash": "",
+      "file_count": 9,
+      "change_counts": {
+        "modify": 9
+      },
+      "manifest": {},
+      "history_id": "51123108fefa4092af4a0ef3ee30237d"
+    },
+    {
+      "applied_at": "2026-07-29T16:31:20.784361Z",
+      "artifact": "/home/mike/Downloads/scriptexts_playwright_smoke_live_drift_report_devtool_overlay.zip",
+      "artifact_name": "scriptexts_playwright_smoke_live_drift_report_devtool_overlay.zip",
+      "type": "overlay",
+      "sha256": "13f2b8d7aa898020bba86dd048931dd826ab3e8a54bbc9ab0d21f4eb479f5205",
+      "status": "ok",
+      "validation_status": "ok",
+      "commit_message": "",
+      "commit_hash": "",
+      "file_count": 9,
+      "change_counts": {
+        "modify": 9
+      },
+      "manifest": {},
+      "history_id": "71de205b9381402790e8238997a7395f"
+    },
+    {
+      "applied_at": "2026-07-29T16:40:46.839221Z",
+      "artifact": "/home/mike/Downloads/scriptexts_playwright_smoke_live_baseline_management_devtool_overlay.zip",
+      "artifact_name": "scriptexts_playwright_smoke_live_baseline_management_devtool_overlay.zip",
+      "type": "overlay",
+      "sha256": "002142626843cf69d4ce570f25a192157df88d7765b5889650a39f832dc4a4df",
+      "status": "ok",
+      "validation_status": "ok",
+      "commit_message": "",
+      "commit_hash": "",
+      "file_count": 11,
+      "change_counts": {
+        "add": 1,
+        "modify": 10
+      },
+      "manifest": {},
+      "history_id": "667c007ccc4641b780fd6b7c9cce65be"
+    },
+    {
+      "applied_at": "2026-07-29T17:07:48.536403Z",
+      "artifact": "/home/mike/Downloads/scriptexts_pagetual_contract_v2_devtool_overlay.zip",
+      "artifact_name": "scriptexts_pagetual_contract_v2_devtool_overlay.zip",
+      "type": "overlay",
+      "sha256": "3e645cec9d6159fd9c222d0a622cd3708a9a701b62535cc28ef8b765a398ee7e",
+      "status": "ok",
+      "validation_status": "ok",
+      "commit_message": "",
+      "commit_hash": "",
+      "file_count": 18,
+      "change_counts": {
+        "modify": 18
+      },
+      "manifest": {},
+      "history_id": "61522625de0f4c67943b3854da8711f8"
+    },
+    {
+      "applied_at": "2026-07-29T17:41:53.715416Z",
+      "artifact": "/home/mike/Downloads/scriptexts_content_site_onboarding_fixture_refresh_devtool_overlay.zip",
+      "artifact_name": "scriptexts_content_site_onboarding_fixture_refresh_devtool_overlay.zip",
+      "type": "overlay",
+      "sha256": "9dc6880934380e7199b4b2dca461580b57eebacf1b5daa70882a6ac2fdd1dd1e",
+      "status": "ok",
+      "validation_status": "ok",
+      "commit_message": "",
+      "commit_hash": "",
+      "file_count": 10,
+      "change_counts": {
+        "add": 3,
+        "modify": 7
+      },
+      "manifest": {},
+      "history_id": "5b61119893ab463cb253cac656dc8ba2"
+    },
+    {
+      "applied_at": "2026-07-29T17:55:34.209947Z",
+      "artifact": "/home/mike/Downloads/scriptexts_content_site_shared_runtime_migration_devtool_overlay.zip",
+      "artifact_name": "scriptexts_content_site_shared_runtime_migration_devtool_overlay.zip",
+      "type": "overlay",
+      "sha256": "642270caa8f9d42cf3a8068a8436d54ff844ebe7c30b377c4d2b1cabc4579bda",
+      "status": "ok",
+      "validation_status": "ok",
+      "commit_message": "",
+      "commit_hash": "",
+      "file_count": 26,
+      "change_counts": {
+        "add": 1,
+        "modify": 25
+      },
+      "manifest": {},
+      "history_id": "36bd1512c42448768f7aafb233b520fa"
+    },
+    {
+      "applied_at": "2026-07-29T18:11:13.710902Z",
+      "artifact": "/home/mike/Downloads/scriptexts_content_site_accessibility_hardening_devtool_overlay.zip",
+      "artifact_name": "scriptexts_content_site_accessibility_hardening_devtool_overlay.zip",
+      "type": "overlay",
+      "sha256": "902bc8854516b98c32f977d8b076e77983d9f8b91ab11f58a57375baf3abc95f",
+      "status": "ok",
+      "validation_status": "ok",
+      "commit_message": "",
+      "commit_hash": "",
+      "file_count": 34,
+      "change_counts": {
+        "modify": 34
+      },
+      "manifest": {},
+      "history_id": "789529d8bd14410e93cc318320329fd3"
+    },
+    {
+      "applied_at": "2026-07-29T18:20:19.624516Z",
+      "artifact": "/home/mike/Downloads/scriptexts_content_site_visual_regression_devtool_overlay.zip",
+      "artifact_name": "scriptexts_content_site_visual_regression_devtool_overlay.zip",
+      "type": "overlay",
+      "sha256": "9eb731ec09180433f21ebbfeebbc399c0563f44b10ff376c9495c1058bb787dd",
+      "status": "ok",
+      "validation_status": "ok",
+      "commit_message": "",
+      "commit_hash": "",
+      "file_count": 13,
+      "change_counts": {
+        "add": 4,
+        "modify": 9
+      },
+      "manifest": {},
+      "history_id": "a88f2d02c3194f298583d316e401d3ce"
+    },
+    {
+      "applied_at": "2026-07-29T18:30:10.828057Z",
+      "artifact": "/home/mike/Downloads/scriptexts_content_site_profile_schema_normalization_devtool_overlay.zip",
+      "artifact_name": "scriptexts_content_site_profile_schema_normalization_devtool_overlay.zip",
+      "type": "overlay",
+      "sha256": "28a3b196bc90976127f909c7a068759ad28abaf9a4484c8888e09605f7517bf0",
+      "status": "ok",
+      "validation_status": "ok",
+      "commit_message": "",
+      "commit_hash": "",
+      "file_count": 35,
+      "change_counts": {
+        "add": 3,
+        "modify": 32
+      },
+      "manifest": {},
+      "history_id": "151b16c5b5454662ae8efe7547c025f7"
+    },
+    {
+      "applied_at": "2026-07-29T18:41:05.253045Z",
+      "artifact": "/home/mike/Downloads/scriptexts_content_site_final_seal_docs_devtool_overlay.zip",
+      "artifact_name": "scriptexts_content_site_final_seal_docs_devtool_overlay.zip",
+      "type": "overlay",
+      "sha256": "db014c02dc568e8e60b3a5e6d9801b496bb2ff192043b1deb5eebaba5540df98",
+      "status": "ok",
+      "validation_status": "ok",
+      "commit_message": "",
+      "commit_hash": "",
+      "file_count": 11,
+      "change_counts": {
+        "add": 3,
+        "modify": 8
+      },
+      "manifest": {},
+      "history_id": "9e3e81cb4dd6402bb7bf12f2177dca3b"
+    },
+    {
+      "applied_at": "2026-07-29T18:51:54.766353Z",
+      "artifact": "/home/mike/Downloads/scriptexts_content_site_release_pack_devtool_overlay.zip",
+      "artifact_name": "scriptexts_content_site_release_pack_devtool_overlay.zip",
+      "type": "overlay",
+      "sha256": "4f63ec6342c8652738c252b89e70e0ed2cd7afe93ae8cf77a61335e4dff4d643",
+      "status": "ok",
+      "validation_status": "ok",
+      "commit_message": "",
+      "commit_hash": "",
+      "file_count": 13,
+      "change_counts": {
+        "add": 2,
+        "modify": 11
+      },
+      "manifest": {},
+      "history_id": "602e920a58db4c318772a2474565c308"
     }
   ]
 }

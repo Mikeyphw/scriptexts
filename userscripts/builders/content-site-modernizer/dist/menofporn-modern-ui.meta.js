@@ -5,8 +5,8 @@
 // @supportURL   https://github.com/Mikeyphw/scriptexts/issues
 // @updateURL    https://raw.githubusercontent.com/Mikeyphw/scriptexts/main/userscripts/builders/content-site-modernizer/dist/menofporn-modern-ui.meta.js
 // @downloadURL  https://raw.githubusercontent.com/Mikeyphw/scriptexts/main/userscripts/builders/content-site-modernizer/dist/menofporn-modern-ui.user.js
-// @version      1.4.0
-// @description  Modern dark mobile-first interface for MenOfPorn.blog.
+// @version      1.5.2
+// @description  Modern dark mobile-first interface for MenOfPorn.blog, now driven by the shared content-site runtime.
 // @author       Mikeyphw
 // @match        https://menofporn.blog/*
 // @match        https://www.menofporn.blog/*

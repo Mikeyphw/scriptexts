@@ -21,3 +21,10 @@ Thumbs.db
 *.tmp
 *.bak
 *.orig
+# Optional repo-wide Python/Playwright smoke environment
+.venv-smoke/
+.playwright/
+smoke-results/
+
+# Derived release bundles
+release/

@@ -1,0 +1,309 @@
+#!/usr/bin/env node
+import { createHash } from 'node:crypto';
+import { mkdir, readFile, stat, writeFile } from 'node:fs/promises';
+import { spawnSync } from 'node:child_process';
+import { dirname, join, relative, resolve, basename } from 'node:path';
+import { pathToFileURL } from 'node:url';
+
+const args = process.argv.slice(2);
+const options = {
+  builder: valueAfter('--builder') || 'content-site-modernizer',
+  out: valueAfter('--out') || '',
+  json: args.includes('--json'),
+  dryRun: args.includes('--dry-run') || args.includes('--check'),
+  check: args.includes('--check'),
+  skipBuildCheck: args.includes('--skip-build-check'),
+  includeSourceMap: args.includes('--include-source-map')
+};
+
+function valueAfter(name) {
+  const index = args.indexOf(name);
+  return index === -1 ? '' : args[index + 1] || '';
+}
+
+async function exists(path) {
+  try { await stat(path); return true; } catch { return false; }
+}
+
+async function readJson(path) {
+  return JSON.parse(await readFile(path, 'utf8'));
+}
+
+async function findRepoRoot(start = process.cwd()) {
+  let current = resolve(start);
+  while (current !== dirname(current)) {
+    if (await exists(join(current, 'repo-manifest.json')) && await exists(join(current, 'package.json'))) return current;
+    current = dirname(current);
+  }
+  throw new Error('could not find repository root from current directory');
+}
+
+function runNode(cwd, command) {
+  const result = spawnSync(process.execPath, command, { cwd, encoding: 'utf8', stdio: 'pipe' });
+  return {
+    ok: result.status === 0,
+    status: result.status,
+    stdout: result.stdout || '',
+    stderr: result.stderr || '',
+    command: `${process.execPath} ${command.join(' ')}`
+  };
+}
+
+function sha256(buffer) {
+  return createHash('sha256').update(buffer).digest('hex');
+}
+
+function userscriptFields(text) {
+  const block = text.match(/\/\/\s*==UserScript==([\s\S]*?)\/\/\s*==\/UserScript==/);
+  if (!block) return null;
+  const fields = new Map();
+  for (const line of block[1].split(/\r?\n/)) {
+    const match = line.match(/^\s*\/\/\s*@([A-Za-z0-9:_-]+)\s+(.+)$/);
+    if (!match) continue;
+    if (!fields.has(match[1])) fields.set(match[1], []);
+    fields.get(match[1]).push(match[2].trim());
+  }
+  return fields;
+}
+
+function field(fields, name) {
+  return fields?.get(name)?.[0] || '';
+}
+
+function dosDateTime(date = new Date()) {
+  const year = Math.max(date.getFullYear(), 1980);
+  const dosTime = (date.getHours() << 11) | (date.getMinutes() << 5) | Math.floor(date.getSeconds() / 2);
+  const dosDate = ((year - 1980) << 9) | ((date.getMonth() + 1) << 5) | date.getDate();
+  return { dosTime, dosDate };
+}
+
+const crcTable = new Uint32Array(256);
+for (let n = 0; n < 256; n += 1) {
+  let c = n;
+  for (let k = 0; k < 8; k += 1) c = (c & 1) ? (0xedb88320 ^ (c >>> 1)) : (c >>> 1);
+  crcTable[n] = c >>> 0;
+}
+
+function crc32(buffer) {
+  let crc = 0xffffffff;
+  for (const byte of buffer) crc = crcTable[(crc ^ byte) & 0xff] ^ (crc >>> 8);
+  return (crc ^ 0xffffffff) >>> 0;
+}
+
+function u16(value) {
+  const buffer = Buffer.alloc(2);
+  buffer.writeUInt16LE(value & 0xffff, 0);
+  return buffer;
+}
+
+function u32(value) {
+  const buffer = Buffer.alloc(4);
+  buffer.writeUInt32LE(value >>> 0, 0);
+  return buffer;
+}
+
+function writeZip(entries) {
+  const locals = [];
+  const centrals = [];
+  let offset = 0;
+  const { dosTime, dosDate } = dosDateTime(new Date(2026, 0, 1, 0, 0, 0));
+
+  for (const entry of entries) {
+    const name = Buffer.from(entry.name.replaceAll('\\', '/'), 'utf8');
+    const data = Buffer.isBuffer(entry.data) ? entry.data : Buffer.from(entry.data, 'utf8');
+    const crc = crc32(data);
+    const local = Buffer.concat([
+      u32(0x04034b50),
+      u16(20),
+      u16(0x0800),
+      u16(0),
+      u16(dosTime),
+      u16(dosDate),
+      u32(crc),
+      u32(data.length),
+      u32(data.length),
+      u16(name.length),
+      u16(0),
+      name,
+      data
+    ]);
+    locals.push(local);
+
+    const central = Buffer.concat([
+      u32(0x02014b50),
+      u16(20),
+      u16(20),
+      u16(0x0800),
+      u16(0),
+      u16(dosTime),
+      u16(dosDate),
+      u32(crc),
+      u32(data.length),
+      u32(data.length),
+      u16(name.length),
+      u16(0),
+      u16(0),
+      u16(0),
+      u16(0),
+      u32(0o100644 << 16),
+      u32(offset),
+      name
+    ]);
+    centrals.push(central);
+    offset += local.length;
+  }
+
+  const centralDir = Buffer.concat(centrals);
+  const eocd = Buffer.concat([
+    u32(0x06054b50),
+    u16(0),
+    u16(0),
+    u16(entries.length),
+    u16(entries.length),
+    u32(centralDir.length),
+    u32(offset),
+    u16(0)
+  ]);
+  return Buffer.concat([...locals, centralDir, eocd]);
+}
+
+function makeIndex(builder, profiles, files) {
+  const lines = [
+    `# ${builder.name} release pack`,
+    '',
+    'This ZIP contains installable userscripts generated by the content-site shared runtime builder.',
+    '',
+    '## Scripts',
+    ''
+  ];
+  for (const profile of profiles) {
+    lines.push(`### ${profile.name}`);
+    lines.push('');
+    lines.push(`- Version: ${profile.version}`);
+    lines.push(`- Userscript: \`scripts/${basename(profile.output.userScript)}\``);
+    lines.push(`- Metadata: \`meta/${basename(profile.output.metaScript)}\``);
+    lines.push(`- Matches: ${(profile.matches || []).map((match) => `\`${match}\``).join(', ')}`);
+    if (profile.description) lines.push(`- Description: ${profile.description}`);
+    lines.push('');
+  }
+  lines.push('## Files');
+  lines.push('');
+  for (const file of files) lines.push(`- \`${file.name}\` — ${file.bytes} bytes — sha256 \`${file.sha256}\``);
+  lines.push('');
+  lines.push('## Verification');
+  lines.push('');
+  lines.push('Use `checksums.sha256` to verify individual files after extracting the ZIP.');
+  lines.push('');
+  return `${lines.join('\n')}\n`;
+}
+
+async function main() {
+  const repoRoot = await findRepoRoot();
+  const builderRoot = join(repoRoot, 'userscripts/builders', options.builder);
+  const builder = (await import(pathToFileURL(join(builderRoot, 'scripts.config.mjs')).href)).default;
+  const { validateBuilderConfig } = await import(pathToFileURL(join(builderRoot, 'src/core/profile-schema.mjs')).href);
+  const profiles = validateBuilderConfig(builder);
+
+  if (!options.skipBuildCheck) {
+    const freshness = runNode(repoRoot, [`userscripts/builders/${options.builder}/build.mjs`, '--check']);
+    if (!freshness.ok) {
+      throw new Error(`generated outputs are stale; run npm run build:content-sites first\n${freshness.stdout}${freshness.stderr}`);
+    }
+  }
+
+  const manifest = await readJson(join(repoRoot, 'repo-manifest.json'));
+  const project = manifest.projects.find((item) => item.path === `userscripts/builders/${options.builder}`);
+  if (!project) throw new Error(`repo-manifest.json does not list userscripts/builders/${options.builder}`);
+
+  const files = [];
+  const zipEntries = [];
+  const profileRecords = [];
+  for (const profile of profiles) {
+    const userRel = profile.output.userScript;
+    const metaRel = profile.output.metaScript;
+    const userPath = join(builderRoot, userRel);
+    const metaPath = join(builderRoot, metaRel);
+    if (!await exists(userPath)) throw new Error(`missing generated userscript: ${userRel}`);
+    if (!await exists(metaPath)) throw new Error(`missing generated meta: ${metaRel}`);
+
+    const userData = await readFile(userPath);
+    const metaData = await readFile(metaPath);
+    const fields = userscriptFields(userData.toString('utf8'));
+    if (!fields) throw new Error(`missing userscript metadata block: ${userRel}`);
+    if (field(fields, 'version') !== profile.version) throw new Error(`metadata version mismatch for ${profile.id}: ${field(fields, 'version')} != ${profile.version}`);
+
+    for (const [kind, rel, data] of [['scripts', userRel, userData], ['meta', metaRel, metaData]]) {
+      const name = `${kind}/${basename(rel)}`;
+      const record = { name, source: `userscripts/builders/${options.builder}/${rel}`, bytes: data.length, sha256: sha256(data) };
+      files.push(record);
+      zipEntries.push({ name, data });
+    }
+
+    profileRecords.push({
+      id: profile.id,
+      name: profile.name,
+      version: profile.version,
+      description: profile.description,
+      matches: profile.matches || [],
+      userscript: `scripts/${basename(userRel)}`,
+      meta: `meta/${basename(metaRel)}`,
+      sha256: {
+        userscript: files[files.length - 2].sha256,
+        meta: files[files.length - 1].sha256
+      }
+    });
+  }
+
+  const releaseManifest = {
+    schemaVersion: 1,
+    builder: {
+      id: builder.id,
+      name: builder.name,
+      sourceModel: project.source_model,
+      profileSchema: project.profile_schema?.version || null
+    },
+    generatedAt: new Date().toISOString(),
+    scripts: profileRecords,
+    files,
+    counts: { scripts: profiles.length, files: files.length }
+  };
+
+  const index = makeIndex(builder, profiles, files);
+  const manifestText = `${JSON.stringify(releaseManifest, null, 2)}\n`;
+  const checksumsText = `${files.map((file) => `${file.sha256}  ${file.name}`).join('\n')}\n${sha256(Buffer.from(manifestText))}  manifest.json\n${sha256(Buffer.from(index))}  RELEASE_INDEX.md\n`;
+  zipEntries.push({ name: 'manifest.json', data: manifestText });
+  zipEntries.push({ name: 'checksums.sha256', data: checksumsText });
+  zipEntries.push({ name: 'RELEASE_INDEX.md', data: index });
+
+  const defaultOut = join(repoRoot, 'release', options.builder, `${options.builder}-userscripts.zip`);
+  const outPath = resolve(repoRoot, options.out || defaultOut);
+  const zipData = writeZip(zipEntries.sort((a, b) => a.name.localeCompare(b.name)));
+  const result = {
+    ok: true,
+    dryRun: options.dryRun,
+    builder: builder.id,
+    output: relative(repoRoot, outPath).replaceAll('\\', '/'),
+    bytes: zipData.length,
+    sha256: sha256(zipData),
+    counts: releaseManifest.counts,
+    files: zipEntries.map((entry) => entry.name).sort()
+  };
+
+  if (!options.dryRun) {
+    await mkdir(dirname(outPath), { recursive: true });
+    await writeFile(outPath, zipData);
+  }
+
+  if (options.json) console.log(JSON.stringify(result, null, 2));
+  else {
+    console.log(`content-site release pack ${options.dryRun ? 'ready' : 'written'}: ${result.output}`);
+    console.log(`${result.counts.scripts} scripts, ${result.counts.files} generated files, zip sha256 ${result.sha256}`);
+    if (options.dryRun) console.log('dry run: no ZIP written');
+  }
+}
+
+main().catch((error) => {
+  if (options.json) console.log(JSON.stringify({ ok: false, error: error.message }, null, 2));
+  else console.error(error.stack || error.message);
+  process.exit(1);
+});

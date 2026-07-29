@@ -1,0 +1,479 @@
+{
+  "schemaVersion": 1,
+  "builder": "content-site-modernizer",
+  "builderRoot": "userscripts/builders/content-site-modernizer",
+  "defaultBrowser": "chromium",
+  "defaultSites": [
+    "gayteam",
+    "putinho",
+    "str8upgayporn"
+  ],
+  "sites": [
+    {
+      "id": "aipt-comics",
+      "name": "AIPT Comics Modern Reader",
+      "script": "userscripts/builders/content-site-modernizer/dist/aipt-comics-modern-reader.user.js",
+      "drawer": {
+        "openSelector": "[data-action=\"open-browse\"]"
+      },
+      "fixtures": [
+        {
+          "id": "home",
+          "path": "userscripts/builders/content-site-modernizer/test/fixtures/aipt-comics-home.html",
+          "expect": {
+            "minCards": 3,
+            "selectors": [
+              ".csm-topbar",
+              ".csm-feed-grid",
+              ".csm-bottomnav"
+            ]
+          }
+        },
+        {
+          "id": "post",
+          "path": "userscripts/builders/content-site-modernizer/test/fixtures/aipt-comics-post.html",
+          "assertDrawer": false,
+          "expect": {
+            "minCards": 0,
+            "selectors": [
+              ".csm-topbar",
+              ".csm-article"
+            ]
+          }
+        }
+      ],
+      "pagetual": {
+        "fixture": "userscripts/builders/content-site-modernizer/test/fixtures/aipt-comics-category.html",
+        "sourceSelector": "article, .post, .post-card",
+        "appendTargetSelector": "main, body",
+        "expectMinAddedCards": 1,
+        "maxDuplicateCardGrowth": 0
+      },
+      "live": {
+        "url": "https://aiptcomics.com/",
+        "allowConsoleErrors": true,
+        "assertDrawer": true,
+        "assertInteractions": false,
+        "expect": {
+          "minCards": 1
+        }
+      }
+    },
+    {
+      "id": "bleeding-cool",
+      "name": "Bleeding Cool Modern Reader",
+      "script": "userscripts/builders/content-site-modernizer/dist/bleeding-cool-modern-reader.user.js",
+      "drawer": {
+        "openSelector": "[data-action=\"open-browse\"]"
+      },
+      "fixtures": [
+        {
+          "id": "home",
+          "path": "userscripts/builders/content-site-modernizer/test/fixtures/bleeding-cool-home.html",
+          "expect": {
+            "minCards": 3,
+            "selectors": [
+              ".csm-topbar",
+              ".csm-feed-grid",
+              ".csm-bottomnav"
+            ]
+          }
+        },
+        {
+          "id": "post",
+          "path": "userscripts/builders/content-site-modernizer/test/fixtures/bleeding-cool-post.html",
+          "assertDrawer": false,
+          "expect": {
+            "minCards": 0,
+            "selectors": [
+              ".csm-topbar",
+              ".csm-article"
+            ]
+          }
+        }
+      ],
+      "pagetual": {
+        "fixture": "userscripts/builders/content-site-modernizer/test/fixtures/bleeding-cool-comics.html",
+        "sourceSelector": "article, .bc-post, .post",
+        "appendTargetSelector": "main, body",
+        "expectMinAddedCards": 1,
+        "maxDuplicateCardGrowth": 0
+      },
+      "live": {
+        "url": "https://bleedingcool.com/",
+        "allowConsoleErrors": true,
+        "assertDrawer": true,
+        "assertInteractions": false,
+        "expect": {
+          "minCards": 1
+        }
+      }
+    },
+    {
+      "id": "menofporn",
+      "name": "MenOfPorn Modern UI",
+      "script": "userscripts/builders/content-site-modernizer/dist/menofporn-modern-ui.user.js",
+      "drawer": {
+        "openSelector": "[data-action=\"open-browse\"]"
+      },
+      "fixtures": [
+        {
+          "id": "home",
+          "path": "userscripts/builders/content-site-modernizer/test/fixtures/menofporn-home.html",
+          "expect": {
+            "minCards": 3,
+            "shellSelector": "html.csm-modernized",
+            "cardSelector": ".csm-card",
+            "selectors": [
+              ".csm-topbar"
+            ]
+          }
+        },
+        {
+          "id": "post",
+          "path": "userscripts/builders/content-site-modernizer/test/fixtures/menofporn-post.html",
+          "assertDrawer": false,
+          "expect": {
+            "minCards": 0,
+            "shellSelector": "html.csm-modernized",
+            "selectors": [
+              ".csm-topbar"
+            ]
+          }
+        }
+      ],
+      "pagetual": {
+        "fixture": "userscripts/builders/content-site-modernizer/test/fixtures/menofporn-home.html",
+        "sourceSelector": "article.bloglo-article, article, .post",
+        "appendTargetSelector": "#content, main, body",
+        "cardSelector": ".csm-card",
+        "expectMinAddedCards": 1,
+        "maxDuplicateCardGrowth": 0
+      },
+      "live": {
+        "url": "https://menofporn.blog/",
+        "allowConsoleErrors": true,
+        "assertDrawer": true,
+        "assertInteractions": false,
+        "expect": {
+          "minCards": 1
+        }
+      }
+    },
+    {
+      "id": "putinho",
+      "name": "Putinho Modern UI",
+      "script": "userscripts/builders/content-site-modernizer/dist/putinho-modern-ui.user.js",
+      "drawer": {
+        "openSelector": "[data-action=\"open-browse\"]"
+      },
+      "fixtures": [
+        {
+          "id": "home",
+          "path": "userscripts/builders/content-site-modernizer/test/fixtures/putinho-home.html",
+          "simulatePageTual": true,
+          "expect": {
+            "minCards": 1,
+            "shellSelector": "html.csm-modernized",
+            "cardSelector": ".csm-card",
+            "selectors": [
+              ".csm-topbar"
+            ]
+          }
+        },
+        {
+          "id": "post",
+          "path": "userscripts/builders/content-site-modernizer/test/fixtures/putinho-post.html",
+          "assertDrawer": false,
+          "expect": {
+            "minCards": 0,
+            "shellSelector": "html.csm-modernized",
+            "selectors": [
+              ".csm-topbar"
+            ]
+          }
+        }
+      ],
+      "pagetual": {
+        "fixture": "userscripts/builders/content-site-modernizer/test/fixtures/putinho-home.html",
+        "sourceSelector": "article.post-item, .post-item, article",
+        "appendTargetSelector": "#posts-container, main, body",
+        "cardSelector": ".csm-card",
+        "expectMinAddedCards": 1,
+        "maxDuplicateCardGrowth": 0
+      },
+      "live": {
+        "url": "https://putinho.net/",
+        "allowConsoleErrors": true,
+        "assertDrawer": true,
+        "assertInteractions": false,
+        "expect": {
+          "minCards": 1
+        }
+      }
+    },
+    {
+      "id": "gayteam",
+      "name": "Gayteam Modern UI",
+      "script": "userscripts/builders/content-site-modernizer/dist/gayteam-modern-ui.user.js",
+      "drawer": {
+        "openSelector": "[data-action=\"open-browse\"]"
+      },
+      "fixtures": [
+        {
+          "id": "home",
+          "path": "userscripts/builders/content-site-modernizer/test/fixtures/gayteam-home.html",
+          "simulatePageTual": true,
+          "expect": {
+            "minCards": 3,
+            "selectors": [
+              ".csm-topbar",
+              ".csm-feed-grid",
+              ".csm-duration-badge"
+            ]
+          }
+        },
+        {
+          "id": "post",
+          "path": "userscripts/builders/content-site-modernizer/test/fixtures/gayteam-post.html",
+          "assertDrawer": false,
+          "expect": {
+            "minCards": 0,
+            "selectors": [
+              ".csm-topbar",
+              ".csm-article"
+            ]
+          }
+        }
+      ],
+      "pagetual": {
+        "fixture": "userscripts/builders/content-site-modernizer/test/fixtures/gayteam-category.html",
+        "sourceSelector": ".thumb-item, .shortstory, .poster, article",
+        "appendTargetSelector": ".section__content.section__items, #dle-content, main, body",
+        "expectMinAddedCards": 1,
+        "maxDuplicateCardGrowth": 0
+      },
+      "live": {
+        "url": "https://gayteam.club/",
+        "allowConsoleErrors": true,
+        "assertDrawer": true,
+        "assertInteractions": false,
+        "expect": {
+          "minCards": 1
+        }
+      }
+    },
+    {
+      "id": "justthegays",
+      "name": "JustTheGays Modern UI",
+      "script": "userscripts/builders/content-site-modernizer/dist/justthegays-modern-ui.user.js",
+      "drawer": {
+        "openSelector": "[data-action=\"open-browse\"]"
+      },
+      "fixtures": [
+        {
+          "id": "home",
+          "path": "userscripts/builders/content-site-modernizer/test/fixtures/justthegays-home.html",
+          "expect": {
+            "minCards": 3,
+            "selectors": [
+              ".csm-topbar",
+              ".csm-feed-grid",
+              ".csm-bottomnav"
+            ]
+          }
+        },
+        {
+          "id": "post",
+          "path": "userscripts/builders/content-site-modernizer/test/fixtures/justthegays-post.html",
+          "assertDrawer": false,
+          "expect": {
+            "minCards": 0,
+            "selectors": [
+              ".csm-topbar",
+              ".csm-article"
+            ]
+          }
+        }
+      ],
+      "pagetual": {
+        "fixture": "userscripts/builders/content-site-modernizer/test/fixtures/justthegays-category.html",
+        "sourceSelector": ".thumb-item, .item, article, .post",
+        "appendTargetSelector": ".section__content, #dle-content, main, body",
+        "expectMinAddedCards": 1,
+        "maxDuplicateCardGrowth": 0
+      },
+      "live": {
+        "url": "https://justthegays.tv/",
+        "allowConsoleErrors": true,
+        "assertDrawer": true,
+        "assertInteractions": false,
+        "expect": {
+          "minCards": 1
+        }
+      }
+    },
+    {
+      "id": "str8upgayporn",
+      "name": "STR8UPGAYPORN Modern UI",
+      "script": "userscripts/builders/content-site-modernizer/dist/str8upgayporn-modern-ui.user.js",
+      "drawer": {
+        "openSelector": "[data-action=\"open-browse\"]"
+      },
+      "fixtures": [
+        {
+          "id": "home",
+          "path": "userscripts/builders/content-site-modernizer/test/fixtures/str8upgayporn-home.html",
+          "simulatePageTual": true,
+          "expect": {
+            "minCards": 3,
+            "selectors": [
+              ".csm-topbar",
+              ".csm-feed-section",
+              ".csm-feed-section-title"
+            ],
+            "forbiddenSelectors": []
+          }
+        }
+      ],
+      "pagetual": {
+        "fixture": "userscripts/builders/content-site-modernizer/test/fixtures/str8upgayporn-home.html",
+        "sourceSelector": ".wpd-posted-links:not(:has(.widget-head a[href*=hot-links])) li.cf.the-content, li.cf.the-content",
+        "appendTargetSelector": ".wpd-posted-links:not(:has(.widget-head a[href*=\"hot-links\"])) ul.posts-list, #content-wrap, main, body",
+        "expectMinAddedCards": 1,
+        "maxDuplicateCardGrowth": 0
+      },
+      "live": {
+        "url": "https://str8upgayporn.com/",
+        "allowConsoleErrors": true,
+        "assertDrawer": true,
+        "assertInteractions": false,
+        "expect": {
+          "minCards": 1
+        }
+      }
+    }
+  ],
+  "viewports": [
+    {
+      "id": "mobile",
+      "width": 390,
+      "height": 900
+    },
+    {
+      "id": "desktop",
+      "width": 1280,
+      "height": 900
+    }
+  ],
+  "defaultMatrixViewports": [
+    "mobile",
+    "desktop"
+  ],
+  "evidence": {
+    "output": "smoke-results/content-site-modernizer",
+    "json": "content-site-smoke-results.json",
+    "markdown": "content-site-smoke-summary.md",
+    "failureArtifacts": [
+      "screenshot",
+      "htmlSnapshot",
+      "trace",
+      "consoleLog"
+    ],
+    "liveOutput": "smoke-results/content-site-modernizer-live"
+  },
+  "interactions": {
+    "enabledByDefault": true,
+    "checks": [
+      "drawer",
+      "cardActions",
+      "searchFilter",
+      "loadMore",
+      "pagetualAppend"
+    ],
+    "feedFixturesOnly": true
+  },
+  "liveSmoke": {
+    "enabledByFlagOnly": true,
+    "blocksThirdPartyByDefault": true,
+    "interactionsRequireFlag": true,
+    "pagetualInjectionRequiresFlag": true,
+    "driftReport": {
+      "report": "content-site-live-drift.md",
+      "minCardRatio": 0.5,
+      "warnCardRatio": 0.75,
+      "missingSelectorSeverity": "medium",
+      "failSeverity": "high",
+      "nonFailingByDefault": true
+    },
+    "baseline": {
+      "path": "tools/smoke/live-baselines/content-site-modernizer-live-baseline.json",
+      "report": "content-site-live-baseline.md",
+      "minCardRatio": 0.6,
+      "warnCardRatio": 0.8,
+      "warnHighCardRatio": 1.5,
+      "maxCardRatio": 2.0,
+      "missingSelectorSeverity": "high",
+      "missingBaselineSeverity": "medium",
+      "failSeverity": "high",
+      "nonFailingByDefault": true
+    }
+  },
+  "pagetualContract": {
+    "version": 2,
+    "enabledByFlagOnly": true,
+    "checks": [
+      "multiAppend",
+      "duplicateLinks",
+      "activeFilterAppend",
+      "restoreAfterFilter"
+    ],
+    "maxDuplicateCardGrowth": 0
+  },
+  "accessibilityContract": {
+    "enabledByFlagOnly": true,
+    "checks": [
+      "visibleControlNames",
+      "mobileDesktopControlVisibility",
+      "drawerDialogSemantics",
+      "drawerFocusTrap",
+      "drawerEscapeClose",
+      "searchInputLabel",
+      "bottomNavLabels",
+      "cardLinkNames",
+      "articleProgressbarSemantics"
+    ],
+    "focusedSites": [
+      "gayteam",
+      "putinho",
+      "str8upgayporn"
+    ]
+  },
+  "visualRegression": {
+    "enabledByFlagOnly": true,
+    "baselineDir": "tools/smoke/visual-baselines/content-site-modernizer",
+    "outputDir": "smoke-results/content-site-modernizer-visual",
+    "report": "content-site-visual-regression.md",
+    "defaultFixtures": [
+      "home"
+    ],
+    "focusedSites": [
+      "gayteam",
+      "putinho",
+      "str8upgayporn"
+    ],
+    "viewports": [
+      "mobile",
+      "desktop"
+    ],
+    "thresholdRatio": 0.015,
+    "nonFailingByDefault": true,
+    "checks": [
+      "fixtureScreenshot",
+      "acceptedBaselineCompare",
+      "thresholdRatio",
+      "thumbnailArtifacts",
+      "diffArtifacts"
+    ]
+  }
+}

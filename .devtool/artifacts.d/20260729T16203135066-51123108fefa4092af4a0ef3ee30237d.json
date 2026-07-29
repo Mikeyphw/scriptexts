@@ -1,0 +1,17 @@
+{
+  "applied_at": "2026-07-29T16:20:31.350663Z",
+  "artifact": "/home/mike/Downloads/scriptexts_playwright_smoke_live_mode_devtool_overlay.zip",
+  "artifact_name": "scriptexts_playwright_smoke_live_mode_devtool_overlay.zip",
+  "type": "overlay",
+  "sha256": "8973039cd606fb4dcd81771b5ace857b8b4652e117c009bc7c089d759a5180f2",
+  "status": "ok",
+  "validation_status": "ok",
+  "commit_message": "",
+  "commit_hash": "",
+  "file_count": 9,
+  "change_counts": {
+    "modify": 9
+  },
+  "manifest": {},
+  "history_id": "51123108fefa4092af4a0ef3ee30237d"
+}

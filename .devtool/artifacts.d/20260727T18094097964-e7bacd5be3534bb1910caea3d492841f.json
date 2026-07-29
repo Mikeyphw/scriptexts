@@ -1,0 +1,18 @@
+{
+  "applied_at": "2026-07-27T18:09:40.979641Z",
+  "artifact": "/home/mike/Downloads/scriptexts_gayteam_content_site_modernizer_devtool_overlay.zip",
+  "artifact_name": "scriptexts_gayteam_content_site_modernizer_devtool_overlay.zip",
+  "type": "overlay",
+  "sha256": "da1066530132c49d351a99071865a32e9603022a0fb50360757628b8a12550a8",
+  "status": "ok",
+  "validation_status": "ok",
+  "commit_message": "",
+  "commit_hash": "",
+  "file_count": 14,
+  "change_counts": {
+    "add": 7,
+    "modify": 7
+  },
+  "manifest": {},
+  "history_id": "e7bacd5be3534bb1910caea3d492841f"
+}

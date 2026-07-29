@@ -1,0 +1,18 @@
+{
+  "applied_at": "2026-07-29T15:01:03.836354Z",
+  "artifact": "/home/mike/Downloads/scriptexts_content_site_modernizer_audit_fixes_devtool_overlay.zip",
+  "artifact_name": "scriptexts_content_site_modernizer_audit_fixes_devtool_overlay.zip",
+  "type": "overlay",
+  "sha256": "8b96389814f2fe3f3092ee9dd3aa97cf9be054ff2a905cdbfbcab21e9fbb0036",
+  "status": "ok",
+  "validation_status": "ok",
+  "commit_message": "",
+  "commit_hash": "",
+  "file_count": 30,
+  "change_counts": {
+    "add": 1,
+    "modify": 29
+  },
+  "manifest": {},
+  "history_id": "b340831b487e46b7852b9bcc8f7e140e"
+}

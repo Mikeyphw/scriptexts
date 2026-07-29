@@ -5,7 +5,7 @@
 // @supportURL   https://github.com/Mikeyphw/scriptexts/issues
 // @updateURL    https://raw.githubusercontent.com/Mikeyphw/scriptexts/main/userscripts/builders/content-site-modernizer/dist/aipt-comics-modern-reader.meta.js
 // @downloadURL  https://raw.githubusercontent.com/Mikeyphw/scriptexts/main/userscripts/builders/content-site-modernizer/dist/aipt-comics-modern-reader.user.js
-// @version      0.1.0
+// @version      0.1.4
 // @description  Modern dark mobile-first reader UI for AIPT Comics.
 // @author       Mikeyphw
 // @match        https://aiptcomics.com/*
