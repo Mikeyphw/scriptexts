@@ -190,3 +190,9 @@ npm run smoke:content-sites:visual:focused -- --executable /usr/bin/chromium
 ```
 
 Capture/update writes accepted screenshots to `tools/smoke/visual-baselines/content-site-modernizer/`. Compare writes current screenshots, thumbnails, optional pixel diffs, JSON, and Markdown under `smoke-results/content-site-modernizer-visual/`. Compare remains report-only unless `--fail-on-visual-diff` is passed. Install `Pillow` from `requirements-smoke.txt` to get pixel diff ratios and generated diff images; without it, the runner still detects changed screenshot hashes.
+
+### PageTual direct-ingest smoke note
+
+The focused interaction smoke now exercises the direct PageTual ingest path. The simulated append emits the same insert signals that real PageTual uses, then expects raw candidates to be selected and enhanced into modern `.csm-card` nodes. The Markdown summary includes `PageTual ingest: simulated insert -> raw candidates selected -> modern cards appended` when PageTual evidence is present.
+
+For Devtool overlays, set `PLAYWRIGHT_SMOKE=1` and `PAGETUAL_SCRIPT=/path/to/Pagetual.user.js` to run this browser lane inside the validator.

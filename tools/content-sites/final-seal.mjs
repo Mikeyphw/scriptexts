@@ -82,6 +82,9 @@ async function main() {
   const builderPackage = await readJson(join(builderRoot, 'package.json'));
   const manifest = await readJson(join(repoRoot, 'repo-manifest.json'));
   const project = manifest.projects.find((item) => item.path === `userscripts/builders/${builderId}`);
+  const runtimeText = await readFile(join(builderRoot, 'src/core/runtime.template.js'), 'utf8');
+  const smokeRunnerText = await readFile(join(repoRoot, 'tools/smoke/run-content-site-smoke.py'), 'utf8');
+  const validatorText = await readFile(join(repoRoot, '.devtool-artifact/validate.sh'), 'utf8').catch(() => '');
   const checks = [];
 
   push(checks, 'builder id', builder.id === builderId, builder.id);
@@ -153,6 +156,16 @@ async function main() {
   ];
   for (const script of requiredRootScripts) push(checks, `root script ${script}`, Boolean(repoPackage.scripts?.[script]), 'package.json');
   for (const script of ['build', 'check', 'test', 'profiles:check', 'seal', 'release-pack', 'release-pack:check']) push(checks, `builder script ${script}`, Boolean(builderPackage.scripts?.[script]), 'builder package.json');
+
+  push(checks, 'PageTual candidate marker compatibility', runtimeText.includes('data-csm-page-tual-candidate="1"') && runtimeText.includes('data-csm-pagetual-candidate="1"') && runtimeText.includes('csmPageTualCandidate'), 'new and legacy markers');
+  push(checks, 'PageTual hidden-root inclusion', runtimeText.includes('hasPageTualCandidate') && runtimeText.includes('(!isExcluded(explicitRoot) || hasPageTualCandidate(explicitRoot))'), 'hidden roots with marked candidates are scanned');
+  push(checks, 'PageTual source selection starvation guard', runtimeText.includes('if (node.dataset.csmCard) continue') && runtimeText.includes('selectCardNodes(candidates, currentFeedLinkSet(), { allowHiddenSource: true, limit: 0 })'), 'skip enhanced cards and select raw candidates');
+  push(checks, 'PageTual direct ingest path', runtimeText.includes('const ingestPageTualCandidates') && runtimeText.includes('grid.append(item);') && runtimeText.includes('enhanceCard(item);') && runtimeText.includes("reconcileFeed({ reason: 'pagetual' })"), 'insert event ingests raw candidates immediately');
+  push(checks, 'PageTual inserted-root marking', runtimeText.includes('root instanceof HTMLElement && root.matches?.(sel)') && runtimeText.includes('markNode(root)'), 'inserted root can be the candidate');
+  push(checks, 'PageTual smoke growth wait', smokeRunnerText.includes('def pagetual_growth_timeout') && smokeRunnerText.includes('growthTimeoutMs", 12000'), 'longer wait window for browser smoke');
+  push(checks, 'PageTual env fallback', smokeRunnerText.includes('os.environ.get("PAGETUAL_SCRIPT")'), 'empty --pagetual falls back to PAGETUAL_SCRIPT');
+  push(checks, 'PageTual ingest summary marker', smokeRunnerText.includes('PageTual ingest: simulated insert -> raw candidates selected -> modern cards appended'), 'Markdown summary explains ingest path');
+  push(checks, 'PageTual managed validator gate', validatorText.includes('PLAYWRIGHT_SMOKE=1') && validatorText.includes('PAGETUAL_SCRIPT') && validatorText.includes('smoke:content-sites:interactions:managed'), 'optional browser smoke gate');
 
   const docs = [
     ['README.md', 'Content-site final seal'],

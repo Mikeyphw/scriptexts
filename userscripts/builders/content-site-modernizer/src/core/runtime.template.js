@@ -905,10 +905,12 @@ function installContentSiteModernizer(profile, cssText) {
         ...selectorList(profile.selectors?.feed?.featuredItems || ''),
         ...selectorList('article')
       ];
+      const markNode = (node) => {
+        if (node instanceof HTMLElement && !node.dataset.csmCard) node.dataset.csmPageTualCandidate = '1';
+      };
       for (const sel of selectors) {
-        for (const node of $$(sel, root)) {
-          if (node instanceof HTMLElement && !node.dataset.csmCard) node.dataset.csmPageTualCandidate = '1';
-        }
+        if (root instanceof HTMLElement && root.matches?.(sel)) markNode(root);
+        for (const node of $$(sel, root)) markNode(node);
       }
     };
     const ingestPageTualCandidates = (root = d) => {

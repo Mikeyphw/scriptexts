@@ -1163,7 +1163,7 @@ def append_pagetual_page(
                 const url = new URL(link.href, location.href);
                 const linkSuffix = `${suffix}-${linkIndex}`;
                 if (url.origin === location.origin) {
-                  const clean = url.pathname.replace(/\/$/, '');
+                  const clean = url.pathname.replace(/\\/$/, '');
                   url.pathname = `${clean}-${linkSuffix}/`;
                   url.search = '';
                 } else {
@@ -1250,6 +1250,11 @@ def should_run_pagetual_contract(page: Any, site: dict[str, Any], fixture: dict[
     return True, "", before
 
 
+def pagetual_growth_timeout(site: dict[str, Any], timeout: int) -> int:
+    cfg = pagetual_config(site) or {}
+    return max(timeout, int(cfg.get("growthTimeoutMs", 12000)))
+
+
 def assert_pagetual_contract_v2(page: Any, paths: RepoPaths, site: dict[str, Any], fixture: dict[str, Any], timeout: int) -> dict[str, Any]:
     cfg = pagetual_config(site)
     if not cfg:
@@ -1259,20 +1264,21 @@ def assert_pagetual_contract_v2(page: Any, paths: RepoPaths, site: dict[str, Any
         return {"skipped": True, "reason": reason, "beforeCards": before}
     card_selector = pagetual_card_selector(site)
     min_added = int(cfg.get("expectMinAddedCards", 1))
-    result: dict[str, Any] = {"version": 2, "cardSelector": card_selector}
+    p_timeout = pagetual_growth_timeout(site, timeout)
+    result: dict[str, Any] = {"version": 2, "cardSelector": card_selector, "ingestPath": "direct-pagetual-insert"}
 
-    first = append_pagetual_page(page, paths, site, label="page-2", timeout=timeout)
-    after_first = wait_for_card_growth(page, card_selector, before, min_added, timeout)
+    first = append_pagetual_page(page, paths, site, label="page-2", timeout=p_timeout)
+    after_first = wait_for_card_growth(page, card_selector, before, min_added, p_timeout)
     result["firstAppend"] = {"beforeCards": before, "afterCards": after_first, "appendedSourceNodes": first.get("appended", 0)}
 
     before_second = after_first
-    second = append_pagetual_page(page, paths, site, label="page-3", timeout=timeout)
-    after_second = wait_for_card_growth(page, card_selector, before_second, min_added, timeout)
+    second = append_pagetual_page(page, paths, site, label="page-3", timeout=p_timeout)
+    after_second = wait_for_card_growth(page, card_selector, before_second, min_added, p_timeout)
     result["secondAppend"] = {"beforeCards": before_second, "afterCards": after_second, "appendedSourceNodes": second.get("appended", 0)}
 
     before_dupe = after_second
     dupes_before = duplicate_href_count(page, card_selector)
-    duplicate = append_pagetual_page(page, paths, site, label="duplicate-page", duplicate=True, timeout=timeout)
+    duplicate = append_pagetual_page(page, paths, site, label="duplicate-page", duplicate=True, timeout=p_timeout)
     page.wait_for_timeout(min(max(timeout // 10, 250), 900))
     after_dupe = page.locator(card_selector).count()
     dupes_after = duplicate_href_count(page, card_selector)
@@ -1289,10 +1295,10 @@ def assert_pagetual_contract_v2(page: Any, paths: RepoPaths, site: dict[str, Any
         "appendedSourceNodes": duplicate.get("appended", 0),
     }
 
-    filter_state = assert_pagetual_filter_preserved(page, fixture, timeout)
+    filter_state = assert_pagetual_filter_preserved(page, fixture, p_timeout)
     before_filter_append = page.locator(card_selector).count()
-    append_pagetual_page(page, paths, site, label="filtered-page", timeout=timeout)
-    after_filter_append = wait_for_card_growth(page, card_selector, before_filter_append, min_added, timeout)
+    append_pagetual_page(page, paths, site, label="filtered-page", timeout=p_timeout)
+    after_filter_append = wait_for_card_growth(page, card_selector, before_filter_append, min_added, p_timeout)
     visible_after_filter_append = visible_count(page, card_selector)
     if not filter_state.get("skipped") and visible_after_filter_append != 0:
         raise SmokeError(f"PageTual append while no-match filter is active should remain hidden; visible={visible_after_filter_append}")
@@ -1331,9 +1337,10 @@ def simulate_pagetual(page: Any, paths: RepoPaths, site: dict[str, Any], timeout
     if not should_run:
         return {"skipped": True, "reason": reason, "beforeCards": before}
     card_selector = pagetual_card_selector(site)
-    appended = append_pagetual_page(page, paths, site, label="next-page", timeout=timeout)
-    after = wait_for_card_growth(page, cfg.get("cardSelector", ".csm-card"), before, int(cfg.get("expectMinAddedCards", 1)), timeout)
-    return {"beforeCards": before, "afterCards": after, "appendedSourceNodes": appended.get("appended", 0)}
+    p_timeout = pagetual_growth_timeout(site, timeout)
+    appended = append_pagetual_page(page, paths, site, label="next-page", timeout=p_timeout)
+    after = wait_for_card_growth(page, cfg.get("cardSelector", ".csm-card"), before, int(cfg.get("expectMinAddedCards", 1)), p_timeout)
+    return {"beforeCards": before, "afterCards": after, "appendedSourceNodes": appended.get("appended", 0), "ingestPath": "direct-pagetual-insert"}
 
 
 def is_ignored_console_error(text: str) -> bool:
@@ -1425,6 +1432,13 @@ def render_markdown_report(result: dict[str, Any]) -> str:
             f"- Matrix: `{', '.join(run.get('viewports', []) or []) or 'custom'}`",
             "",
         ])
+        if any(row.get("pagetual") or row.get("pagetualContract") for row in fixture_rows(result)):
+            lines.extend([
+                "## PageTual ingest",
+                "",
+                "PageTual ingest: simulated insert -> raw candidates selected -> modern cards appended",
+                "",
+            ])
     lines.extend([
         "## Fixtures",
         "",
@@ -2093,6 +2107,10 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--trace", choices=["off", "on", "retain-on-failure"], default="retain-on-failure")
     parser.add_argument("--snapshot", choices=["off", "on", "retain-on-failure"], default="retain-on-failure", help="Write post-injection HTML snapshots")
     args = parser.parse_args(argv)
+    if not args.pagetual:
+        env_pagetual = os.environ.get("PAGETUAL_SCRIPT")
+        if env_pagetual:
+            args.pagetual = env_pagetual
 
     try:
         paths = resolve_paths(args.builder, args.config)

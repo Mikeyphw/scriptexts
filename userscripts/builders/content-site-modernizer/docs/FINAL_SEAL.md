@@ -72,3 +72,21 @@ npm run content-sites:release-pack
 ```
 
 The release packer verifies generated output freshness, profile metadata versions, and per-file SHA-256 checksums before writing `release/content-site-modernizer/content-site-modernizer-userscripts.zip`. Use `npm run content-sites:release-pack:check` for the same release-pack validation without writing the ZIP.
+
+## PageTual ingest final seal
+
+The seal now guards the exact PageTual append repair that keeps Gayteam, Putinho, and STR8UPGAYPORN stable in managed interaction smoke:
+
+- recognize both `data-csm-page-tual-candidate` and legacy `data-csm-pagetual-candidate` markers
+- include hidden feed roots when marked PageTual candidates are present
+- skip already-enhanced `data-csm-card` nodes so raw appended nodes are not starved out
+- immediately ingest marked raw candidates on `pagetual:insert` / PageTual postMessage events
+- refresh feed state and load-more state after direct ingest
+- fall back to `PAGETUAL_SCRIPT` when a smoke command receives an empty `--pagetual` value
+- expose the managed browser lane through the opt-in `PLAYWRIGHT_SMOKE=1` validator gate
+
+Normal final seal remains browser-free. The browser proof command is:
+
+```bash
+npm run smoke:content-sites:interactions:managed -- --pagetual "$HOME/Downloads/Pagetual-1.9.37.132.user.js" --trace retain-on-failure --snapshot retain-on-failure
+```

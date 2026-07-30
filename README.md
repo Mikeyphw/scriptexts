@@ -238,3 +238,9 @@ npm run content-sites:release-pack:check
 ```
 
 The release packer is dependency-free and browser-free, so it is safe for normal Devtool validation. Generated release ZIPs stay untracked under `release/`.
+
+### PageTual ingest final seal
+
+The final seal now locks the repaired PageTual ingest path. A PageTual insert event marks raw next-page nodes with the normalized `data-csm-page-tual-candidate` marker while still accepting the older `data-csm-pagetual-candidate` spelling, scans marked nodes even when they live under hidden original feed roots, skips already-modernized `data-csm-card` nodes during source selection, and immediately appends/enhances raw candidates into the existing modern feed grid.
+
+Browser validation remains opt-in. Set `PLAYWRIGHT_SMOKE=1` and `PAGETUAL_SCRIPT=/path/to/Pagetual.user.js` when applying an overlay to make the Devtool validator run the managed interaction smoke with traces and retained failure snapshots.

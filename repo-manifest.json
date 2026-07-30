@@ -90,7 +90,9 @@
         "managed_pagetual_script": "npm run smoke:content-sites:pagetual:managed",
         "managed_a11y_script": "npm run smoke:content-sites:a11y:managed",
         "managed_visual_script": "npm run smoke:content-sites:visual:managed",
-        "browser_executable_env": "PLAYWRIGHT_EXECUTABLE_PATH"
+        "browser_executable_env": "PLAYWRIGHT_EXECUTABLE_PATH",
+        "pagetual_ingest_policy": "direct-pagetual-insert; simulated append emits insert events and requires new .csm-card growth",
+        "validator_gate": "PLAYWRIGHT_SMOKE=1 with PAGETUAL_SCRIPT"
       },
       "onboarding_tools": {
         "new_site": "npm run content-sites:new",
@@ -125,7 +127,8 @@
         "tool": "tools/content-sites/final-seal.mjs",
         "builder_alias": "npm run seal",
         "policy": "browser-free release-readiness gate for profile/schema, generated outputs, smoke config, manifest coverage, and docs markers",
-        "normalValidation": "browser-free"
+        "normalValidation": "browser-free",
+        "pagetual_ingest": "marker compatibility, hidden-root inclusion, anti-starvation source selection, direct insert ingest, PAGETUAL_SCRIPT fallback, and opt-in managed browser smoke gate"
       },
       "release_pack": {
         "script": "npm run content-sites:release-pack",
@@ -378,5 +381,14 @@
     "normal_validation": "browser-free",
     "subprocess_activation": "auto-activate and auto-deactivate",
     "browser_cache": "PLAYWRIGHT_BROWSERS_PATH defaults to ~/.cache/ms-playwright"
+  },
+  "content_site_pagetual_final_seal_policy": {
+    "candidate_marker": "data-csm-page-tual-candidate",
+    "legacy_candidate_marker": "data-csm-pagetual-candidate",
+    "hidden_root_policy": "scan hidden source roots when they contain marked PageTual candidates",
+    "source_selection_policy": "skip already-enhanced data-csm-card nodes before selecting raw PageTual candidates",
+    "direct_ingest_policy": "pagetual:insert and PageTual postMessage events immediately ingest marked raw nodes into the existing modern feed grid",
+    "smoke_summary_marker": "PageTual ingest: simulated insert -> raw candidates selected -> modern cards appended",
+    "validator_gate": "PLAYWRIGHT_SMOKE=1 with PAGETUAL_SCRIPT runs managed interaction smoke during Devtool validation"
   }
 }

@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "type": "overlay",
-  "name": "scriptexts smoke validator browser gate r13",
-  "description": "Adds an opt-in managed Playwright interaction smoke gate to the content-site-modernizer Devtool validator via PLAYWRIGHT_SMOKE=1 while preserving fast browser-free validation by default.",
+  "name": "scriptexts content-site PageTual final seal",
+  "description": "Locks the repaired shared-runtime PageTual direct-ingest path, adds browser-free final-seal checks, documents the managed Playwright validator gate, and keeps the optional PLAYWRIGHT_SMOKE=1 browser smoke command wired into Devtool validation.",
   "repository": {
     "name": "scriptexts",
     "remote": "git@github.com:Mikeyphw/scriptexts.git",
@@ -19,9 +19,127 @@
       {
         "path": ".devtool-artifact/validate.sh",
         "action": "modify",
-        "sha256": "4819749ea6bec807ec433fec5b50f70a00868f6240b3424334b20d0087998f8a",
-        "size": 4230,
-        "source_sha256": "33890802bea71a925aa657b4257612940fa534c5567f8cb4a89b2e7b1fdcc358"
+        "sha256": "c6ce7060436133affa46900579ff6ffd45eeb586065ba4d6dc434cad516087ec",
+        "size": 4257,
+        "source_sha256": "35be0525eed6aa6c2612a20afcf75949dbabedf621a42be7154ebf302dc45e77"
+      },
+      {
+        "path": "README.md",
+        "action": "modify",
+        "sha256": "a203c539fde1bcdee596d0a3f383001bf3a2e234df30b98a2f04bfaa00f5b327",
+        "size": 11864,
+        "source_sha256": "ff03f4b4b83cccbe3549bf533bb2487d8e82aced022f491ced3b54207d039307"
+      },
+      {
+        "path": "docs/REPOSITORY_LAYOUT.md",
+        "action": "modify",
+        "sha256": "ed615c9c2238dd5268ea838003323fa88eeae2472df5e16ac91c44617c65d303",
+        "size": 9584,
+        "source_sha256": "7533552ccf10ac240ccff9662dfa930fbf99b0a96bc5ea046e77b7c9ef7048b8"
+      },
+      {
+        "path": "repo-manifest.json",
+        "action": "modify",
+        "sha256": "5b12f3a612076c8d8773afb285a7a0160b9e75c4e9d3ab4e052afac42e3c8605",
+        "size": 17606,
+        "source_sha256": "f251023705463db5b58c860b50f8259e7edd8a455abe24b07c0e8a02bba0d923"
+      },
+      {
+        "path": "tools/content-sites/final-seal.mjs",
+        "action": "modify",
+        "sha256": "f4c33e084089be00436d7b7a5d5cc3282458ef5e019db7e6cceb76b4d4ada52e",
+        "size": 12977,
+        "source_sha256": "8e54766aeb18ffa8fcfc03286de2ba2796ae96dfa0549cdb6e6d5e1b08dda71b"
+      },
+      {
+        "path": "tools/smoke/README.md",
+        "action": "modify",
+        "sha256": "b0ca5c39368ebc8449dc47d0303248f9d26690e5da026de37227445e1ba63531",
+        "size": 9287,
+        "source_sha256": "ae52676170657a2a9540aef7d23c0b529a0f1095d7f44a16bf95b8b38d45e5db"
+      },
+      {
+        "path": "tools/smoke/run-content-site-smoke.py",
+        "action": "modify",
+        "sha256": "22e839313498ff78cde067e4ed57be949944cde677e58945bb7b4b2c2180b483",
+        "size": 106687,
+        "source_sha256": "ff668e72f31d5d3363de8030b820f800db25f9720fa70de5937ef1b2a919d2a1"
+      },
+      {
+        "path": "userscripts/builders/content-site-modernizer/README.md",
+        "action": "modify",
+        "sha256": "67826390d110db5693545e77b6cb77ac23a769f01eddfdd9521192d489bffd16",
+        "size": 12050,
+        "source_sha256": "b775eb2ac05b657d9e697a742ae77e9856f71dd24b64340710c096f22ff99969"
+      },
+      {
+        "path": "userscripts/builders/content-site-modernizer/dist/aipt-comics-modern-reader.user.js",
+        "action": "modify",
+        "sha256": "6a2c7580dc00b8b0e44b8fe61caa67a0b9898616f242e5514394a17b6e710b56",
+        "size": 82046,
+        "source_sha256": "c3b4ab29e6a63b89d75a7598e41b3a083ec3a2902c23976a52f18ede37452995"
+      },
+      {
+        "path": "userscripts/builders/content-site-modernizer/dist/bleeding-cool-modern-reader.user.js",
+        "action": "modify",
+        "sha256": "be41cb8959b9109675f3e7e304db4a9e1ad61dd568264e410f67d7552ab17fe2",
+        "size": 82599,
+        "source_sha256": "cfcb90f4ac2378ff0757a8a8815b0204313f6680a2929b2b3230e3f965ad58c1"
+      },
+      {
+        "path": "userscripts/builders/content-site-modernizer/dist/gayteam-modern-ui.user.js",
+        "action": "modify",
+        "sha256": "05664d62845f9b2b4e050e8b4ac5d1f3b263ee968716664b4b7b98966f648a3f",
+        "size": 81571,
+        "source_sha256": "b55c1af5177404fcc185bf8c9b255b54991e81428b5e987b1f1297de4acc186a"
+      },
+      {
+        "path": "userscripts/builders/content-site-modernizer/dist/justthegays-modern-ui.user.js",
+        "action": "modify",
+        "sha256": "548513b31fb699e197ac233e62d9a70ed7cd10e9dc2b592503e36f6061e8fead",
+        "size": 81197,
+        "source_sha256": "4b59a6abfa30120ed98e988f08c9bf091db1ae849d6450a259ec081ef30f4f17"
+      },
+      {
+        "path": "userscripts/builders/content-site-modernizer/dist/menofporn-modern-ui.user.js",
+        "action": "modify",
+        "sha256": "118d1604583124457da633e3d6967617215503d6041c60dbd488e8ea7e0bcd13",
+        "size": 82048,
+        "source_sha256": "71ed5b19dcfc88332e57b50bbf5b2c63609e96e348b8184bb1d83879e05646ca"
+      },
+      {
+        "path": "userscripts/builders/content-site-modernizer/dist/putinho-modern-ui.user.js",
+        "action": "modify",
+        "sha256": "285e0ef9d41dc2b6b02b97f4091b0761459a990d5d6fcfbabf2ff1a9227eaa3d",
+        "size": 82128,
+        "source_sha256": "97cddb71fe35a88c3fa24560fb432ca7bc075781e69593eb395a558a2e7aefad"
+      },
+      {
+        "path": "userscripts/builders/content-site-modernizer/dist/str8upgayporn-modern-ui.user.js",
+        "action": "modify",
+        "sha256": "8f7f41b854cf7b841e316afb8dc9094164e3c09f784cc59b392920dfed185330",
+        "size": 81855,
+        "source_sha256": "af1574bc8b02fdd624496432d8dc31e8efad51e27a126b049ee19b508638080b"
+      },
+      {
+        "path": "userscripts/builders/content-site-modernizer/docs/FINAL_SEAL.md",
+        "action": "modify",
+        "sha256": "0af41daea290d102023febd0a51e667ee0e212279a983055bdc5c3d37cedb8ba",
+        "size": 3773,
+        "source_sha256": "cf8b1889489692db9acdce1745639ee11ea486b49ac5bb6a29a9f0e6c62ff8ff"
+      },
+      {
+        "path": "userscripts/builders/content-site-modernizer/src/core/runtime.template.js",
+        "action": "modify",
+        "sha256": "d1abe6c8d7f54e83e3def17411c0485da9861b2aba6ecd8d161ea434ffc61dc0",
+        "size": 45573,
+        "source_sha256": "2b05d965525b946abc2adbfad47f40005e2b8ab54ab03809cbbe8dbb171780c6"
+      },
+      {
+        "path": "userscripts/builders/content-site-modernizer/test/pagetual-final-seal.test.mjs",
+        "action": "add",
+        "sha256": "ba0ad721271d8e217fc40f8337bc52f5f2e5038e407f68345bf6b0fe88947638",
+        "size": 3842
       }
     ]
   },
@@ -33,7 +151,7 @@
     "commit": {
       "enabled": true,
       "strategy": "single",
-      "message": "Add opt-in managed browser smoke validator gate"
+      "message": "Seal PageTual direct ingest for content-site smoke"
     }
   },
   "validation": {
@@ -45,8 +163,8 @@
     "script": {
       "path": ".devtool-artifact/validate.sh",
       "runner": "bash",
-      "sha256": "4819749ea6bec807ec433fec5b50f70a00868f6240b3424334b20d0087998f8a",
-      "timeout_seconds": 1200
+      "sha256": "c6ce7060436133affa46900579ff6ffd45eeb586065ba4d6dc434cad516087ec",
+      "timeout_seconds": 1800
     },
     "expected": {
       "build": "pass",
@@ -55,10 +173,9 @@
     }
   },
   "notes": [
-    "Apply after scriptexts_smoke_pagetual_browser_global_repair_r12_overlay.zip.",
-    "Default Devtool validation remains browser-free and fast.",
-    "Set PLAYWRIGHT_SMOKE=1 to make the validator run npm run smoke:content-sites:interactions:managed with retain-on-failure trace and snapshot artifacts.",
-    "PAGETUAL_SCRIPT may override the PageTual userscript path; otherwise the validator defaults to $HOME/Downloads/Pagetual-1.9.37.132.user.js.",
-    "The opt-in gate fails clearly if PLAYWRIGHT_SMOKE=1 is set and the PageTual script is missing."
+    "Apply after the PageTual direct-ingest runtime repair that passed managed interaction smoke for Putinho, Gayteam, and STR8UPGAYPORN.",
+    "Default validation is browser-free and compiles Python with -Werror to catch smoke-runner escape regressions.",
+    "Set PLAYWRIGHT_SMOKE=1 and PAGETUAL_SCRIPT=/path/to/Pagetual.user.js to run npm run smoke:content-sites:interactions:managed inside Devtool validation.",
+    "The final seal now checks PageTual marker compatibility, hidden-root inclusion, already-enhanced card skipping, direct insert ingest, PAGETUAL_SCRIPT fallback, and generated dist coverage."
   ]
 }

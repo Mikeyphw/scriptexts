@@ -218,3 +218,14 @@ npm run smoke:content-sites:interactions:managed -- --pagetual "$HOME/Downloads/
 
 The wrapper prefers uv and auto-deactivates when the command exits.
 
+### PageTual ingest final seal
+
+The final seal now checks the repaired PageTual handoff instead of only checking that PageTual hooks exist. Inserted next-page nodes are marked with `data-csm-page-tual-candidate`, legacy `data-csm-pagetual-candidate` markers remain accepted, hidden source roots are scanned when they contain marked candidates, already-modernized cards are skipped during source selection, and the insert event immediately ingests raw candidates into the existing `.csm-feed-grid`.
+
+Use the managed interaction smoke as the browser proof:
+
+```bash
+npm run smoke:content-sites:interactions:managed -- --pagetual "$HOME/Downloads/Pagetual-1.9.37.132.user.js" --trace retain-on-failure --snapshot retain-on-failure
+```
+
+Devtool can run that same lane during validation when `PLAYWRIGHT_SMOKE=1` and `PAGETUAL_SCRIPT` points to the PageTual userscript.

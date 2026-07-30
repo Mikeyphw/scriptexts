@@ -1198,6 +1198,42 @@
       },
       "manifest": {},
       "history_id": "2b6e2c5bd0b5433f85e55e5dcac039b0"
+    },
+    {
+      "applied_at": "2026-07-30T17:51:51.519574Z",
+      "artifact": "/home/mike/Downloads/scriptexts_content_site_pagetual_final_seal_overlay.zip",
+      "artifact_name": "scriptexts_content_site_pagetual_final_seal_overlay.zip",
+      "type": "overlay",
+      "sha256": "1b1e21e4c6680011d1dd4c61af2d0cc0abffe2b960c5c5b92458ae141f3a1eaf",
+      "status": "rolled-back",
+      "validation_status": "failed",
+      "commit_message": "",
+      "commit_hash": "",
+      "file_count": 18,
+      "change_counts": {
+        "add": 1,
+        "modify": 17
+      },
+      "manifest": {},
+      "history_id": "2b611e4e130647e299a1b08bc09e6e86"
+    },
+    {
+      "applied_at": "2026-07-30T17:53:39.990518Z",
+      "artifact": "/home/mike/Downloads/scriptexts_content_site_pagetual_final_seal_overlay.zip",
+      "artifact_name": "scriptexts_content_site_pagetual_final_seal_overlay.zip",
+      "type": "overlay",
+      "sha256": "1b1e21e4c6680011d1dd4c61af2d0cc0abffe2b960c5c5b92458ae141f3a1eaf",
+      "status": "ok",
+      "validation_status": "ok",
+      "commit_message": "",
+      "commit_hash": "",
+      "file_count": 18,
+      "change_counts": {
+        "add": 1,
+        "modify": 17
+      },
+      "manifest": {},
+      "history_id": "2a158ce6b4244a6c8f1971c172a2d7df"
     }
   ]
 }
