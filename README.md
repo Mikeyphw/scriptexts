@@ -197,6 +197,32 @@ npm run content-sites:seal:json
 
 The seal is the last deterministic gate before optional Playwright checks. It does not launch a browser, so Devtool validation stays fast and offline-friendly.
 
+
+## Managed smoke Python environment
+
+The repo-level Playwright smoke tools use a managed `.venv-smoke` environment.
+Use `uv` when available; the wrapper falls back to `venv` + `pip` when uv is not installed.
+
+```bash
+npm run smoke:env:sync
+npm run smoke:env:doctor
+npm run smoke:env:install-browsers
+```
+
+Managed smoke commands auto-activate that environment for the subprocess and auto-deactivate when it exits:
+
+```bash
+npm run smoke:content-sites:interactions:managed -- --pagetual "$HOME/Downloads/Pagetual-1.9.37.132.user.js" --trace retain-on-failure --snapshot retain-on-failure
+```
+
+For an interactive shell, use:
+
+```bash
+source tools/smoke/activate-smoke-env.sh
+# run smoke commands
+smoke-env-deactivate
+```
+
 ## Content-site release pack
 
 After the final seal passes, generate an installable release ZIP for every content-site userscript:

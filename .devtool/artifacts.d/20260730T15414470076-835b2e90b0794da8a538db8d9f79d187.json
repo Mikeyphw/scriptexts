@@ -1,0 +1,17 @@
+{
+  "applied_at": "2026-07-30T15:41:44.700765Z",
+  "artifact": "/home/mike/Downloads/scriptexts_smoke_runtime_contract_repair_r9_overlay.zip",
+  "artifact_name": "scriptexts_smoke_runtime_contract_repair_r9_overlay.zip",
+  "type": "overlay",
+  "sha256": "caf3f299e260acb8bb245e144cf1c0b0f7216a6e8d6b01b034c64ca31e4de3b4",
+  "status": "ok",
+  "validation_status": "ok",
+  "commit_message": "",
+  "commit_hash": "",
+  "file_count": 3,
+  "change_counts": {
+    "modify": 3
+  },
+  "manifest": {},
+  "history_id": "835b2e90b0794da8a538db8d9f79d187"
+}

@@ -80,7 +80,17 @@
         "visual_evidence_dir": "smoke-results/content-site-modernizer-visual",
         "visual_report": "content-site-visual-regression.md",
         "visual_policy": "opt-in browser smoke; compare is report-only by default; --fail-on-visual-diff turns baseline drift into a failure",
-        "visual_runner": "tools/smoke/run-content-site-visual.py"
+        "visual_runner": "tools/smoke/run-content-site-visual.py",
+        "python_manager": "uv",
+        "python_target": "smoke-python",
+        "python_env": ".venv-smoke",
+        "env_wrapper": "tools/smoke/with-smoke-env.sh",
+        "env_activation_script": "tools/smoke/activate-smoke-env.sh",
+        "managed_interaction_script": "npm run smoke:content-sites:interactions:managed",
+        "managed_pagetual_script": "npm run smoke:content-sites:pagetual:managed",
+        "managed_a11y_script": "npm run smoke:content-sites:a11y:managed",
+        "managed_visual_script": "npm run smoke:content-sites:visual:managed",
+        "browser_executable_env": "PLAYWRIGHT_EXECUTABLE_PATH"
       },
       "onboarding_tools": {
         "new_site": "npm run content-sites:new",
@@ -356,5 +366,17 @@
     "output": "release/content-site-modernizer/content-site-modernizer-userscripts.zip",
     "checksum": "checksums.sha256",
     "index": "RELEASE_INDEX.md"
+  },
+  "content_site_smoke_python_env_policy": {
+    "scope": "content-site-modernizer",
+    "manager": "uv",
+    "fallback": "venv+pip",
+    "environment": ".venv-smoke",
+    "wrapper": "tools/smoke/with-smoke-env.sh",
+    "activation": "tools/smoke/activate-smoke-env.sh",
+    "devtool_target": "smoke-python",
+    "normal_validation": "browser-free",
+    "subprocess_activation": "auto-activate and auto-deactivate",
+    "browser_cache": "PLAYWRIGHT_BROWSERS_PATH defaults to ~/.cache/ms-playwright"
   }
 }

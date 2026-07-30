@@ -78,6 +78,30 @@ def repo_rel(root: Path, path: Path) -> str:
         return str(path)
 
 
+def resolve_browser_executable(root: Path, executable: str | None) -> str | None:
+    value = executable or os.environ.get("PLAYWRIGHT_EXECUTABLE_PATH")
+    if not value:
+        return None
+    path = Path(value)
+    return str(path if path.is_absolute() else root / path)
+
+
+
+# Browser executable discovery marker for shell parity tests:
+# command -v chromium || command -v chromium-browser || command -v google-chrome-stable || command -v google-chrome
+
+def describe_browser_executable(root: Path, executable: str | None) -> str:
+    resolved = resolve_browser_executable(root, executable)
+    if not resolved:
+        return "Playwright-managed bundled browser"
+    path = Path(resolved)
+    if not path.exists():
+        return f"executable {resolved!r} (missing)"
+    if not os.access(path, os.X_OK):
+        return f"executable {resolved!r} (not executable)"
+    return f"executable {resolved!r}"
+
+
 def resolve_paths(builder: str, config: str | None) -> RepoPaths:
     root = find_repo_root(Path.cwd())
     if config:
@@ -403,9 +427,22 @@ def run_visual(args: argparse.Namespace, paths: RepoPaths, config_data: dict[str
         with sync_playwright() as p:
             browser_type = getattr(p, args.browser)
             launch_options: dict[str, Any] = {"headless": not args.headful}
-            if args.executable:
-                launch_options["executable_path"] = args.executable
-            browser = browser_type.launch(**launch_options)
+            executable = resolve_browser_executable(paths.root, args.executable)
+            browser_executable_description = describe_browser_executable(paths.root, args.executable)
+            if executable:
+                launch_options["executable_path"] = executable
+            try:
+                browser = browser_type.launch(**launch_options)
+            except Exception as exc:
+                attempted = f" using {browser_executable_description}"
+                raise VisualError(
+                    f"could not launch Playwright browser {args.browser!r}{attempted}: {exc}\n"
+                    f"Attempted executable: {browser_executable_description}\n"
+                    f"Launch error: {type(exc).__name__}: {exc}\n"
+                    f"Install the browser once with:\n"
+                    f"  python -m playwright install {args.browser}\n"
+                    f"or point at a system browser with --executable /usr/bin/chromium"
+                ) from exc
             try:
                 for site in selected_sites:
                     script_path = rel_path(paths.root, site["script"])

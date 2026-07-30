@@ -1,0 +1,18 @@
+{
+  "applied_at": "2026-07-30T15:11:38.760453Z",
+  "artifact": "/home/mike/Downloads/scriptexts_smoke_uv_env_and_runtime_repair_r5_overlay.zip",
+  "artifact_name": "scriptexts_smoke_uv_env_and_runtime_repair_r5_overlay.zip",
+  "type": "overlay",
+  "sha256": "83463436193dc1cb0dc2c4a138553b629c36d253dcf180201a659a88823dbe08",
+  "status": "rolled-back",
+  "validation_status": "failed",
+  "commit_message": "",
+  "commit_hash": "",
+  "file_count": 14,
+  "change_counts": {
+    "add": 4,
+    "modify": 10
+  },
+  "manifest": {},
+  "history_id": "2c0aa54b93dd4274a4e99b5f685f91fa"
+}

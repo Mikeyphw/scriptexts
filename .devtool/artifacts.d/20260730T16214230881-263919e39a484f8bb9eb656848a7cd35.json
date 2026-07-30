@@ -1,0 +1,17 @@
+{
+  "applied_at": "2026-07-30T16:21:42.308815Z",
+  "artifact": "/home/mike/Downloads/scriptexts_smoke_pagetual_growth_repair_r10_overlay.zip",
+  "artifact_name": "scriptexts_smoke_pagetual_growth_repair_r10_overlay.zip",
+  "type": "overlay",
+  "sha256": "18d6ec9014ce5a4ac495a413a12f1bfc4dbf9fa39decdce14725be939e2644be",
+  "status": "ok",
+  "validation_status": "ok",
+  "commit_message": "",
+  "commit_hash": "",
+  "file_count": 11,
+  "change_counts": {
+    "modify": 11
+  },
+  "manifest": {},
+  "history_id": "263919e39a484f8bb9eb656848a7cd35"
+}

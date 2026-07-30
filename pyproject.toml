@@ -1,0 +1,23 @@
+[project]
+name = "scriptexts-smoke-tools"
+version = "0.1.0"
+description = "Repo-wide optional Playwright smoke tooling for generated userscripts."
+requires-python = ">=3.11"
+dependencies = []
+
+[dependency-groups]
+smoke = [
+  "playwright>=1.48",
+  "Pillow>=10.0",
+]
+
+[project.optional-dependencies]
+smoke = [
+  "playwright>=1.48",
+  "Pillow>=10.0",
+]
+
+[tool.scriptexts.smoke]
+manager = "uv"
+venv = ".venv-smoke"
+requirements = "requirements-smoke.txt"

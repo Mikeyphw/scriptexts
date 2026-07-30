@@ -207,3 +207,14 @@ npm run release-pack
 ```
 
 The default archive is `release/content-site-modernizer/content-site-modernizer-userscripts.zip`. It includes installable userscripts under `scripts/`, update metadata under `meta/`, plus `manifest.json`, `checksums.sha256`, and `RELEASE_INDEX.md`. Use `npm run content-sites:release-pack:check` or `npm run release-pack:check` to validate the release-pack manifest without writing a ZIP.
+
+## Managed Playwright smoke environment
+
+Run browser smoke through the root wrapper so the repo uses one `.venv-smoke`:
+
+```bash
+npm run smoke:content-sites:interactions:managed -- --pagetual "$HOME/Downloads/Pagetual-1.9.37.132.user.js" --trace retain-on-failure --snapshot retain-on-failure
+```
+
+The wrapper prefers uv and auto-deactivates when the command exits.
+

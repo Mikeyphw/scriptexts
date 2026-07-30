@@ -953,6 +953,251 @@
       },
       "manifest": {},
       "history_id": "602e920a58db4c318772a2474565c308"
+    },
+    {
+      "applied_at": "2026-07-30T13:17:14.394500Z",
+      "artifact": "/home/mike/Downloads/scriptexts_playwright_smoke_browser_launch_diagnostics_devtool_overlay.zip",
+      "artifact_name": "scriptexts_playwright_smoke_browser_launch_diagnostics_devtool_overlay.zip",
+      "type": "overlay",
+      "sha256": "c05f8c77df755db36cdf6436fbdb35a5a185f7b19b048d0d3328fc671293336e",
+      "status": "ok",
+      "validation_status": "ok",
+      "commit_message": "",
+      "commit_hash": "",
+      "file_count": 3,
+      "change_counts": {
+        "add": 1,
+        "modify": 2
+      },
+      "manifest": {},
+      "history_id": "0af0f3d145584003a1d757049102e506"
+    },
+    {
+      "applied_at": "2026-07-30T13:39:11.578485Z",
+      "artifact": "/home/mike/Downloads/scriptexts_smoke_uv_env_and_runtime_repair_overlay.zip",
+      "artifact_name": "scriptexts_smoke_uv_env_and_runtime_repair_overlay.zip",
+      "type": "overlay",
+      "sha256": "bd60453856e95b97421371a91068e0973171fc38e441c986cee73cf4481b4218",
+      "status": "rolled-back",
+      "validation_status": "failed",
+      "commit_message": "",
+      "commit_hash": "",
+      "file_count": 13,
+      "change_counts": {
+        "add": 4,
+        "modify": 9
+      },
+      "manifest": {},
+      "history_id": "17d20d4a2c744e38936037fba6d86896"
+    },
+    {
+      "applied_at": "2026-07-30T14:44:18.739366Z",
+      "artifact": "/home/mike/Downloads/scriptexts_smoke_uv_env_and_runtime_repair_r2_overlay.zip",
+      "artifact_name": "scriptexts_smoke_uv_env_and_runtime_repair_r2_overlay.zip",
+      "type": "overlay",
+      "sha256": "b3eff2d79b38f52899c8755a831ae3bec00bdef3bb71c8513256d31b4a6114fe",
+      "status": "rolled-back",
+      "validation_status": "failed",
+      "commit_message": "",
+      "commit_hash": "",
+      "file_count": 14,
+      "change_counts": {
+        "add": 4,
+        "modify": 10
+      },
+      "manifest": {},
+      "history_id": "fc9e58eaeaac4624b8e686512210d72f"
+    },
+    {
+      "applied_at": "2026-07-30T15:05:04.604571Z",
+      "artifact": "/home/mike/Downloads/scriptexts_smoke_uv_env_and_runtime_repair_r3_overlay.zip",
+      "artifact_name": "scriptexts_smoke_uv_env_and_runtime_repair_r3_overlay.zip",
+      "type": "overlay",
+      "sha256": "87d892ad436a473a8e8a25dcb4dddfc0ad6641c84383baaa1bb07c895e000300",
+      "status": "rolled-back",
+      "validation_status": "failed",
+      "commit_message": "",
+      "commit_hash": "",
+      "file_count": 14,
+      "change_counts": {
+        "add": 4,
+        "modify": 10
+      },
+      "manifest": {},
+      "history_id": "78efa59a60594734a3de95d29797aa9b"
+    },
+    {
+      "applied_at": "2026-07-30T15:08:49.786206Z",
+      "artifact": "/home/mike/Downloads/scriptexts_smoke_uv_env_and_runtime_repair_r4_overlay.zip",
+      "artifact_name": "scriptexts_smoke_uv_env_and_runtime_repair_r4_overlay.zip",
+      "type": "overlay",
+      "sha256": "9c8d0dadc359b4a21cc945829faab72867e109139adf5b9cae86c2d9626ca548",
+      "status": "rolled-back",
+      "validation_status": "failed",
+      "commit_message": "",
+      "commit_hash": "",
+      "file_count": 14,
+      "change_counts": {
+        "add": 4,
+        "modify": 10
+      },
+      "manifest": {},
+      "history_id": "791acb51f35c48b6936e06c27c730e70"
+    },
+    {
+      "applied_at": "2026-07-30T15:11:38.760453Z",
+      "artifact": "/home/mike/Downloads/scriptexts_smoke_uv_env_and_runtime_repair_r5_overlay.zip",
+      "artifact_name": "scriptexts_smoke_uv_env_and_runtime_repair_r5_overlay.zip",
+      "type": "overlay",
+      "sha256": "83463436193dc1cb0dc2c4a138553b629c36d253dcf180201a659a88823dbe08",
+      "status": "rolled-back",
+      "validation_status": "failed",
+      "commit_message": "",
+      "commit_hash": "",
+      "file_count": 14,
+      "change_counts": {
+        "add": 4,
+        "modify": 10
+      },
+      "manifest": {},
+      "history_id": "2c0aa54b93dd4274a4e99b5f685f91fa"
+    },
+    {
+      "applied_at": "2026-07-30T15:15:17.287562Z",
+      "artifact": "/home/mike/Downloads/scriptexts_smoke_uv_env_and_runtime_repair_r6_overlay.zip",
+      "artifact_name": "scriptexts_smoke_uv_env_and_runtime_repair_r6_overlay.zip",
+      "type": "overlay",
+      "sha256": "246a7a3b0226fefa878d8dc1e65a3b0159e7d9f10ede856a86664f4189279bab",
+      "status": "rolled-back",
+      "validation_status": "failed",
+      "commit_message": "",
+      "commit_hash": "",
+      "file_count": 14,
+      "change_counts": {
+        "add": 4,
+        "modify": 10
+      },
+      "manifest": {},
+      "history_id": "d9bfcc0fda7c410c8ad533d2d91edc89"
+    },
+    {
+      "applied_at": "2026-07-30T15:19:09.022114Z",
+      "artifact": "/home/mike/Downloads/scriptexts_smoke_uv_env_and_runtime_repair_r7_overlay.zip",
+      "artifact_name": "scriptexts_smoke_uv_env_and_runtime_repair_r7_overlay.zip",
+      "type": "overlay",
+      "sha256": "0667291c6afcb5b3c4330c6e39e16b57644673782df7563ffcebc623164565e5",
+      "status": "rolled-back",
+      "validation_status": "failed",
+      "commit_message": "",
+      "commit_hash": "",
+      "file_count": 14,
+      "change_counts": {
+        "add": 4,
+        "modify": 10
+      },
+      "manifest": {},
+      "history_id": "d8ba3672b8f148959a77a26ca710cbd0"
+    },
+    {
+      "applied_at": "2026-07-30T15:22:27.312403Z",
+      "artifact": "/home/mike/Downloads/scriptexts_smoke_uv_env_and_runtime_repair_r8_overlay.zip",
+      "artifact_name": "scriptexts_smoke_uv_env_and_runtime_repair_r8_overlay.zip",
+      "type": "overlay",
+      "sha256": "cf30edeb370c1044b5b6f4d7b06caf4ca1fef956abe5d0865451bd45b5eb3a1f",
+      "status": "ok",
+      "validation_status": "ok",
+      "commit_message": "",
+      "commit_hash": "",
+      "file_count": 14,
+      "change_counts": {
+        "add": 4,
+        "modify": 10
+      },
+      "manifest": {},
+      "history_id": "ae785ccc21e7415e93af446a03d5868d"
+    },
+    {
+      "applied_at": "2026-07-30T15:41:44.700765Z",
+      "artifact": "/home/mike/Downloads/scriptexts_smoke_runtime_contract_repair_r9_overlay.zip",
+      "artifact_name": "scriptexts_smoke_runtime_contract_repair_r9_overlay.zip",
+      "type": "overlay",
+      "sha256": "caf3f299e260acb8bb245e144cf1c0b0f7216a6e8d6b01b034c64ca31e4de3b4",
+      "status": "ok",
+      "validation_status": "ok",
+      "commit_message": "",
+      "commit_hash": "",
+      "file_count": 3,
+      "change_counts": {
+        "modify": 3
+      },
+      "manifest": {},
+      "history_id": "835b2e90b0794da8a538db8d9f79d187"
+    },
+    {
+      "applied_at": "2026-07-30T16:21:42.308815Z",
+      "artifact": "/home/mike/Downloads/scriptexts_smoke_pagetual_growth_repair_r10_overlay.zip",
+      "artifact_name": "scriptexts_smoke_pagetual_growth_repair_r10_overlay.zip",
+      "type": "overlay",
+      "sha256": "18d6ec9014ce5a4ac495a413a12f1bfc4dbf9fa39decdce14725be939e2644be",
+      "status": "ok",
+      "validation_status": "ok",
+      "commit_message": "",
+      "commit_hash": "",
+      "file_count": 11,
+      "change_counts": {
+        "modify": 11
+      },
+      "manifest": {},
+      "history_id": "263919e39a484f8bb9eb656848a7cd35"
+    },
+    {
+      "applied_at": "2026-07-30T16:39:20.191494Z",
+      "artifact": "/home/mike/Downloads/scriptexts_smoke_pagetual_hidden_source_repair_r11_overlay.zip",
+      "artifact_name": "scriptexts_smoke_pagetual_hidden_source_repair_r11_overlay.zip",
+      "type": "overlay",
+      "sha256": "808672537160007b0f033b4cac19192ec173299f971e31223e49adf551fc9e96",
+      "status": "ok",
+      "validation_status": "ok",
+      "commit_message": "",
+      "commit_hash": "",
+      "file_count": 10,
+      "change_counts": {
+        "modify": 10
+      },
+      "manifest": {},
+      "history_id": "038fd5c26c5b43a7bf477d20e8027c50"
+    },
+    {
+      "applied_at": "2026-07-30T17:10:23.222521Z",
+      "artifact": "/home/mike/Downloads/scriptexts_smoke_pagetual_browser_global_repair_r12_overlay.zip",
+      "artifact_name": "scriptexts_smoke_pagetual_browser_global_repair_r12_overlay.zip",
+      "type": "overlay",
+      "sha256": "",
+      "status": "failed",
+      "validation_status": "ok",
+      "commit_message": "",
+      "commit_hash": "",
+      "file_count": 0,
+      "change_counts": {},
+      "manifest": {},
+      "history_id": "62c21cad06894e58b18280ebf6563626"
+    },
+    {
+      "applied_at": "2026-07-30T17:10:45.744639Z",
+      "artifact": "/home/mike/Downloads/scriptexts_smoke_validator_browser_gate_r13_overlay.zip",
+      "artifact_name": "scriptexts_smoke_validator_browser_gate_r13_overlay.zip",
+      "type": "overlay",
+      "sha256": "4c81bc0bdf0dcd4472852ed0ffbee0ba9eb78eb92d0522102cadd782f40af4e7",
+      "status": "ok",
+      "validation_status": "ok",
+      "commit_message": "",
+      "commit_hash": "",
+      "file_count": 1,
+      "change_counts": {
+        "modify": 1
+      },
+      "manifest": {},
+      "history_id": "2b6e2c5bd0b5433f85e55e5dcac039b0"
     }
   ]
 }

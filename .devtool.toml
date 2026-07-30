@@ -39,3 +39,15 @@ build_command = "python3 build.py"
 type = "command"
 root = "extensions/telegram-media-downloader"
 build_command = "python3 build.py"
+
+[targets.smoke-python]
+type = "python"
+root = "."
+test_command = "python tools/smoke/run-content-site-smoke.py --builder content-site-modernizer --check-config && python tools/smoke/run-content-site-visual.py --builder content-site-modernizer --check-config"
+
+[targets.smoke-python.python]
+manager = "uv"
+environment = ".venv-smoke"
+groups = ["smoke"]
+install_project = false
+offline = false

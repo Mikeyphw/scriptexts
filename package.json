@@ -52,7 +52,17 @@
     "content-sites:seal": "node tools/content-sites/final-seal.mjs",
     "content-sites:seal:json": "node tools/content-sites/final-seal.mjs --json",
     "content-sites:release-pack": "node tools/content-sites/release-pack.mjs",
-    "content-sites:release-pack:check": "node tools/content-sites/release-pack.mjs --check --json"
+    "content-sites:release-pack:check": "node tools/content-sites/release-pack.mjs --check --json",
+    "smoke:env:doctor": "bash tools/smoke/with-smoke-env.sh --doctor",
+    "smoke:env:sync": "bash tools/smoke/with-smoke-env.sh --sync",
+    "smoke:env:install-browsers": "bash tools/smoke/with-smoke-env.sh --install-browsers",
+    "smoke:env:shell": "bash tools/smoke/with-smoke-env.sh --shell",
+    "smoke:with-env": "bash tools/smoke/with-smoke-env.sh --",
+    "smoke:content-sites:interactions:managed": "bash tools/smoke/with-smoke-env.sh -- npm run smoke:content-sites:interactions --",
+    "smoke:content-sites:pagetual:managed": "bash tools/smoke/with-smoke-env.sh -- npm run smoke:content-sites:pagetual:focused --",
+    "smoke:content-sites:a11y:managed": "bash tools/smoke/with-smoke-env.sh -- npm run smoke:content-sites:a11y:focused --",
+    "smoke:content-sites:visual:managed": "bash tools/smoke/with-smoke-env.sh -- npm run smoke:content-sites:visual:focused --",
+    "smoke:content-sites:live:managed": "bash tools/smoke/with-smoke-env.sh -- npm run smoke:content-sites:live:focused --"
   },
   "engines": {
     "node": ">=20"

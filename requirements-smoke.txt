@@ -1,9 +1,12 @@
 # Optional repo-wide browser smoke-test dependencies.
-# Install only when you want Playwright runtime checks:
-#   python3 -m venv .venv-smoke
-#   . .venv-smoke/bin/activate
-#   pip install -r requirements-smoke.txt
-#   python -m playwright install chromium
+# Preferred managed setup:
+#   npm run smoke:env:sync
+#   npm run smoke:env:install-browsers
+#
+# One-shot smoke commands use tools/smoke/with-smoke-env.sh, which prefers uv
+# and falls back to venv+pip. Manual activation is still available through:
+#   source tools/smoke/activate-smoke-env.sh
+#   smoke-env-deactivate
 playwright>=1.48
 # Optional visual regression image diffing/thumbnails.
 Pillow>=10.0

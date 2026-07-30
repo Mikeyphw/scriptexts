@@ -1,0 +1,18 @@
+{
+  "applied_at": "2026-07-30T13:17:14.394500Z",
+  "artifact": "/home/mike/Downloads/scriptexts_playwright_smoke_browser_launch_diagnostics_devtool_overlay.zip",
+  "artifact_name": "scriptexts_playwright_smoke_browser_launch_diagnostics_devtool_overlay.zip",
+  "type": "overlay",
+  "sha256": "c05f8c77df755db36cdf6436fbdb35a5a185f7b19b048d0d3328fc671293336e",
+  "status": "ok",
+  "validation_status": "ok",
+  "commit_message": "",
+  "commit_hash": "",
+  "file_count": 3,
+  "change_counts": {
+    "add": 1,
+    "modify": 2
+  },
+  "manifest": {},
+  "history_id": "0af0f3d145584003a1d757049102e506"
+}

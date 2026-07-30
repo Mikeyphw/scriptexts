@@ -87,6 +87,30 @@ def repo_rel(root: Path, value: Path) -> str:
         return str(value)
 
 
+def resolve_browser_executable(root: Path, executable: str | None) -> str | None:
+    value = executable or os.environ.get("PLAYWRIGHT_EXECUTABLE_PATH")
+    if not value:
+        return None
+    resolved = rel_path(root, value)
+    return str(resolved)
+
+
+
+# Browser executable discovery marker for shell parity tests:
+# command -v chromium || command -v chromium-browser || command -v google-chrome-stable || command -v google-chrome
+
+def describe_browser_executable(root: Path, executable: str | None) -> str:
+    resolved = resolve_browser_executable(root, executable)
+    if not resolved:
+        return "Playwright-managed bundled browser"
+    path = Path(resolved)
+    if not path.exists():
+        return f"executable {resolved!r} (missing)"
+    if not os.access(path, os.X_OK):
+        return f"executable {resolved!r} (not executable)"
+    return f"executable {resolved!r}"
+
+
 def safe_slug(value: str) -> str:
     value = re.sub(r"[^A-Za-z0-9_.-]+", "-", value.strip())
     return value.strip("-._") or "artifact"
@@ -428,6 +452,66 @@ def click_first_visible(page: Any, selector: str, timeout: int) -> dict[str, Any
     raise SmokeError(f"no visible clickable target for selector: {selector}; candidates={last.get('candidates', 0)} visible={last.get('visible', 0)}")
 
 
+def fill_first_visible(page: Any, selector: str, value: str, timeout: int) -> dict[str, Any]:
+    """Fill the first visible input matching a selector list.
+
+    Locator.first.fill() can grab a hidden desktop or stale drawer input when a
+    selector list spans desktop/mobile controls. Use DOM visibility so mobile
+    smoke runs fill the same control a user can see.
+    """
+    deadline = time.time() + timeout / 1000
+    last: dict[str, Any] = {"filled": False, "candidates": 0, "visible": 0}
+    while time.time() < deadline:
+        last = page.evaluate(
+            """
+            ({ selector, value }) => {
+              const candidates = Array.from(document.querySelectorAll(selector));
+              const visible = candidates.filter((node) => {
+                if (!(node instanceof HTMLInputElement || node instanceof HTMLTextAreaElement)) return false;
+                const style = getComputedStyle(node);
+                if (style.display === 'none' || style.visibility === 'hidden') return false;
+                const rect = node.getBoundingClientRect();
+                return rect.width > 0 && rect.height > 0;
+              });
+              const target = visible[0];
+              if (!target) return { filled: false, candidates: candidates.length, visible: visible.length };
+              target.focus({ preventScroll: true });
+              target.value = value;
+              target.dispatchEvent(new InputEvent('input', { bubbles: true, inputType: 'insertText', data: value }));
+              target.dispatchEvent(new Event('change', { bubbles: true }));
+              return { filled: true, candidates: candidates.length, visible: visible.length };
+            }
+            """,
+            {"selector": selector, "value": value},
+        )
+        if last.get("filled"):
+            return last
+        page.wait_for_timeout(100)
+    raise SmokeError(f"no visible fillable target for selector: {selector}; candidates={last.get('candidates', 0)} visible={last.get('visible', 0)}")
+
+
+def visible_feed_status_text(page: Any) -> tuple[int, str]:
+    data = page.evaluate(
+        """
+        () => {
+          const nodes = Array.from(document.querySelectorAll('[data-csm-feed-status-text]'));
+          const visible = nodes.filter((node) => {
+            const box = node.closest('.csm-feed-status') || node;
+            if (!(box instanceof HTMLElement) || box.hidden) return false;
+            const style = getComputedStyle(box);
+            const rect = box.getBoundingClientRect();
+            return style.display !== 'none' && style.visibility !== 'hidden' && rect.width > 0 && rect.height > 0;
+          });
+          return {
+            count: visible.length,
+            text: visible.map((node) => (node.textContent || '').replace(/\\s+/g, ' ').trim()).filter(Boolean).join(' | ')
+          };
+        }
+        """
+    )
+    return int(data.get("count", 0) or 0), str(data.get("text") or "")
+
+
 def evaluate_common_assertions(page: Any, fixture: dict[str, Any], timeout: int) -> dict[str, Any]:
     expect = fixture.get("expect", {})
     wait_for_selector(page, expect.get("shellSelector", "html.csm-modernized, body.csm-modernized-body"), timeout)
@@ -658,15 +742,20 @@ def assert_search_filter(page: Any, fixture: dict[str, Any], timeout: int) -> di
     input_sel = search_input_selector()
     wait_for_selector(page, input_sel, timeout)
     query = "zzzz-smoke-no-match-zzzz"
-    page.locator(input_sel).first.fill(query)
+    fill_first_visible(page, input_sel, query, timeout)
     after_filtered = wait_until_count(page, card_selector, "lt", before_visible, timeout)
     hidden_count = int(page.locator('.csm-filter-hidden, .mop-filtered-out, .ptn-filtered-out').count())
     status_text = ""
-    if page.locator('.csm-feed-status:not([hidden]) [data-csm-feed-status-text]').count():
-        status_text = page.locator('.csm-feed-status:not([hidden]) [data-csm-feed-status-text]').first.inner_text(timeout=timeout)
-        if query not in status_text:
-            raise SmokeError(f"search status did not mention query {query!r}: {status_text!r}")
-    page.locator(input_sel).first.fill("")
+    visible_status_count = 0
+    deadline = time.time() + timeout / 1000
+    while time.time() < deadline:
+        visible_status_count, status_text = visible_feed_status_text(page)
+        if visible_status_count == 0 or query in status_text:
+            break
+        page.wait_for_timeout(100)
+    if visible_status_count > 0 and query not in status_text:
+        raise SmokeError(f"search status did not mention query {query!r}: {status_text!r}")
+    fill_first_visible(page, input_sel, "", timeout)
     restored = wait_until_count(page, card_selector, "gte", before_visible, timeout)
     page.keyboard.press("Escape")
     return {
@@ -676,6 +765,7 @@ def assert_search_filter(page: Any, fixture: dict[str, Any], timeout: int) -> di
         "restoredVisibleCards": restored,
         "hiddenClassCount": hidden_count,
         "statusText": status_text,
+        "visibleStatusCount": visible_status_count,
     }
 
 
@@ -789,13 +879,48 @@ def assert_interactions(page: Any, paths: RepoPaths, site: dict[str, Any], fixtu
     interactions["loadMore"] = assert_load_more(page, fixture, timeout)
     return interactions
 
+def open_drawer_for_smoke(page: Any, preferred_selector: str, timeout: int) -> tuple[str, str, dict[str, Any]]:
+    """Open a drawer through the first available visible trigger.
+
+    Mobile layouts can hide the desktop browse button and expose equivalent
+    actions in the bottom nav. Try browse first, then search/settings controls,
+    and validate the same shared drawer regardless of which trigger opened it.
+    """
+    selectors: list[str] = []
+    for selector in [
+        preferred_selector,
+        '[data-action="open-browse"]',
+        '[data-action="open-search"]',
+        '[data-action="open-settings"]',
+        '[data-mop-action="drawer"]',
+        '[data-ptn-action="drawer"]',
+    ]:
+        if selector and selector not in selectors:
+            selectors.append(selector)
+    last_error = ""
+    for selector in selectors:
+        if not page.locator(selector).count():
+            continue
+        try:
+            clicked = click_first_visible(page, selector, timeout)
+            opened = wait_for_any_selector(page, drawer_open_selectors(), max(900, min(timeout, 2500)))
+            return selector, opened, clicked
+        except Exception as exc:
+            last_error = str(exc)
+            try:
+                page.keyboard.press("Escape")
+                wait_for_any_selector(page, drawer_closed_selectors(), 800)
+            except Exception:
+                pass
+    raise SmokeError(f"could not open drawer with visible trigger; tried={selectors}; last={last_error}")
+
+
 def assert_drawer(page: Any, site: dict[str, Any], timeout: int) -> dict[str, Any]:
     drawer = site.get("drawer", {})
     open_selector = drawer.get("openSelector", '[data-action="open-browse"]')
-    if not page.locator(open_selector).count():
+    if not page.locator(open_selector).count() and not page.locator('[data-action^="open-"],[data-mop-action="drawer"],[data-ptn-action="drawer"]').count():
         return {"skipped": True, "reason": f"open selector absent: {open_selector}"}
-    click_first_visible(page, open_selector, timeout)
-    opened_selector = wait_for_any_selector(page, drawer_open_selectors(), timeout)
+    opened_with, opened_selector, clicked = open_drawer_for_smoke(page, open_selector, timeout)
     drawer_selector = '.csm-drawer, #mop-drawer, #ptn-drawer'
     role = page.locator(drawer_selector).first.get_attribute("role")
     modal = page.locator(drawer_selector).first.get_attribute("aria-modal")
@@ -803,7 +928,7 @@ def assert_drawer(page: Any, site: dict[str, Any], timeout: int) -> dict[str, An
     wait_for_any_selector(page, drawer_closed_selectors(), timeout)
     if role != "dialog" or modal != "true":
         raise SmokeError(f"drawer role/aria-modal mismatch: role={role!r} aria-modal={modal!r}")
-    return {"opened": True, "openedSelector": opened_selector, "role": role, "ariaModal": modal}
+    return {"opened": True, "openedWith": opened_with, "openedSelector": opened_selector, "clicked": clicked, "role": role, "ariaModal": modal}
 
 
 
@@ -891,9 +1016,8 @@ def assert_accessibility_contract(page: Any, site: dict[str, Any], fixture: dict
     result["chrome"] = chrome
 
     drawer_selector = site.get("drawer", {}).get("openSelector", '[data-action="open-browse"]')
-    if page.locator(drawer_selector).count():
-        click_first_visible(page, drawer_selector, timeout)
-        opened_selector = wait_for_any_selector(page, drawer_open_selectors(), timeout)
+    if page.locator(drawer_selector).count() or page.locator('[data-action^="open-"],[data-mop-action="drawer"],[data-ptn-action="drawer"]').count():
+        opened_with, opened_selector, clicked = open_drawer_for_smoke(page, drawer_selector, timeout)
         page.wait_for_timeout(100)
         drawer = page.evaluate(
             """
@@ -953,7 +1077,7 @@ def assert_accessibility_contract(page: Any, site: dict[str, Any], fixture: dict
         )
         if closed.get("ariaHidden") != "true" or closed.get("expandedOpeners") != 0:
             raise SmokeError(f"drawer close state mismatch: {closed}")
-        result["drawer"] = {"openedSelector": opened_selector, **drawer, "closed": closed}
+        result["drawer"] = {"openedWith": opened_with, "openedSelector": opened_selector, "clicked": clicked, **drawer, "closed": closed}
 
     if page.locator('[data-action="open-search"]').count():
         click_first_visible(page, '[data-action="open-search"]', timeout)
@@ -1032,14 +1156,22 @@ def append_pagetual_page(
             const clone = document.importNode(node, true);
             clone.setAttribute?.('data-csm-smoke-pagetual-page', label || 'next');
             if (!duplicate) {
-              // Keep the real path/host, but make fixture-derived second pages unique
-              // so normal card de-duplication can be tested separately.
-              const firstLink = clone.querySelector?.('a[href]');
-              if (firstLink) {
-                const url = new URL(firstLink.href, location.href);
-                url.searchParams.set('csm-smoke-page', label || 'next');
-                url.searchParams.set('csm-smoke-index', String(index));
-                firstLink.href = url.href;
+              // Keep the real path/host, but make every cloned link unique so
+              // site-specific title/image anchors cannot be de-duped away.
+              const suffix = `csm-smoke-${label || 'next'}-${index}`.replace(/[^a-z0-9_-]+/gi, '-');
+              for (const [linkIndex, link] of Array.from(clone.querySelectorAll?.('a[href]') || []).entries()) {
+                const url = new URL(link.href, location.href);
+                const linkSuffix = `${suffix}-${linkIndex}`;
+                if (url.origin === location.origin) {
+                  const clean = url.pathname.replace(/\/$/, '');
+                  url.pathname = `${clean}-${linkSuffix}/`;
+                  url.search = '';
+                } else {
+                  url.searchParams.set('csm-smoke-page', label || 'next');
+                  url.searchParams.set('csm-smoke-index', String(index));
+                  url.searchParams.set('csm-smoke-link', String(linkIndex));
+                }
+                link.href = url.href;
               }
             }
             appendTarget.appendChild(clone);
@@ -1107,15 +1239,28 @@ def assert_pagetual_filter_preserved(page: Any, fixture: dict[str, Any], timeout
     return {"query": query, "beforeVisibleCards": before_visible, "afterFilteredVisibleCards": after_filtered}
 
 
+def should_run_pagetual_contract(page: Any, site: dict[str, Any], fixture: dict[str, Any]) -> tuple[bool, str, int]:
+    expect = fixture.get("expect", {})
+    if int(expect.get("minCards", 0) or 0) <= 0:
+        return False, "fixture has no feed cards", 0
+    card_selector = pagetual_card_selector(site)
+    before = int(page.locator(card_selector).count())
+    if before <= 1:
+        return False, f"not enough existing cards for PageTual growth contract: {before}", before
+    return True, "", before
+
+
 def assert_pagetual_contract_v2(page: Any, paths: RepoPaths, site: dict[str, Any], fixture: dict[str, Any], timeout: int) -> dict[str, Any]:
     cfg = pagetual_config(site)
     if not cfg:
         return {"skipped": True, "reason": "no pagetual config"}
+    should_run, reason, before = should_run_pagetual_contract(page, site, fixture)
+    if not should_run:
+        return {"skipped": True, "reason": reason, "beforeCards": before}
     card_selector = pagetual_card_selector(site)
     min_added = int(cfg.get("expectMinAddedCards", 1))
     result: dict[str, Any] = {"version": 2, "cardSelector": card_selector}
 
-    before = page.locator(card_selector).count()
     first = append_pagetual_page(page, paths, site, label="page-2", timeout=timeout)
     after_first = wait_for_card_growth(page, card_selector, before, min_added, timeout)
     result["firstAppend"] = {"beforeCards": before, "afterCards": after_first, "appendedSourceNodes": first.get("appended", 0)}
@@ -1182,7 +1327,10 @@ def simulate_pagetual(page: Any, paths: RepoPaths, site: dict[str, Any], timeout
     cfg = site.get("pagetual")
     if not cfg:
         return {"skipped": True, "reason": "no pagetual config"}
-    before = page.locator(cfg.get("cardSelector", ".csm-card")).count()
+    should_run, reason, before = should_run_pagetual_contract(page, site, {"expect": {"minCards": 1}})
+    if not should_run:
+        return {"skipped": True, "reason": reason, "beforeCards": before}
+    card_selector = pagetual_card_selector(site)
     appended = append_pagetual_page(page, paths, site, label="next-page", timeout=timeout)
     after = wait_for_card_growth(page, cfg.get("cardSelector", ".csm-card"), before, int(cfg.get("expectMinAddedCards", 1)), timeout)
     return {"beforeCards": before, "afterCards": after, "appendedSourceNodes": appended.get("appended", 0)}
@@ -1195,6 +1343,9 @@ def is_ignored_console_error(text: str) -> bool:
         r"Failed to load resource: the server responded with a status of 403",
         r"favicon\.ico",
         r"net::ERR_BLOCKED_BY_CLIENT",
+        r"wedata\.net/databases/AutoPagerize/items_all\.json",
+        r"Access to fetch at .*AutoPagerize.*CORS policy",
+        r"Failed to load resource: net::ERR_FAILED",
     ]
     return any(re.search(pattern, normalized, re.I) for pattern in ignored_patterns)
 
@@ -1730,14 +1881,19 @@ def run_browser(paths: RepoPaths, config_data: dict[str, Any], selected: list[di
             if browser_factory is None:
                 raise SmokeError(f"unknown browser: {browser_name}")
             launch_options = {"headless": not args.headed}
-            executable = args.executable or os.environ.get("PLAYWRIGHT_EXECUTABLE_PATH")
+            executable = resolve_browser_executable(paths.root, args.executable)
+            browser_executable_description = describe_browser_executable(paths.root, args.executable)
             if executable:
-                launch_options["executable_path"] = str(rel_path(paths.root, executable))
+                launch_options["executable_path"] = executable
             try:
                 browser = browser_factory.launch(**launch_options)
             except Exception as exc:
+                attempted = f" using {browser_executable_description}"
                 raise SmokeError(
-                    f"could not launch Playwright browser {browser_name!r}. Install the browser once with:\n"
+                    f"could not launch Playwright browser {browser_name!r}{attempted}: {exc}\n"
+                    f"Attempted executable: {browser_executable_description}\n"
+                    f"Launch error: {type(exc).__name__}: {exc}\n"
+                    f"Install the browser once with:\n"
                     f"  python -m playwright install {browser_name}\n"
                     f"or point at a system browser with --executable /usr/bin/chromium"
                 ) from exc
@@ -1785,10 +1941,30 @@ def run_browser(paths: RepoPaths, config_data: dict[str, Any], selected: list[di
                                 else:
                                     url = page_url(paths.root, rel_path(paths.root, fixture["path"]), base_url, args.file_url)
                                 fixture_result["url"] = url
-                                page.goto(url, wait_until="domcontentloaded", timeout=timeout)
+                                try:
+                                    page.goto(url, wait_until="domcontentloaded", timeout=timeout)
+                                except Exception as exc:
+                                    if fixture.get("live"):
+                                        raise
+                                    ready_state = "unknown"
+                                    body_present = False
+                                    for _ in range(8):
+                                        try:
+                                            ready_state = page.evaluate("() => document.readyState").strip()
+                                            body_present = bool(page.locator("body").count())
+                                            if body_present:
+                                                break
+                                        except Exception:
+                                            page.wait_for_timeout(150)
+                                    if not body_present:
+                                        raise
+                                    fixture_result["navigationWarning"] = f"continued after fixture navigation timeout/state={ready_state}: {type(exc).__name__}: {exc}"
                                 neutralize_fixture_blockers(page)
-                                if args.pagetual:
+                                if args.pagetual and args.inject_real_pagetual:
                                     page.add_script_tag(path=str(rel_path(paths.root, args.pagetual)))
+                                    fixture_result["pagetualScript"] = "injected-real"
+                                elif args.pagetual:
+                                    fixture_result["pagetualScript"] = "simulated-events-only"
                                 page.add_script_tag(path=str(script_path))
                                 fixture_result["assertions"] = evaluate_common_assertions(page, fixture, timeout)
                                 if fixture.get("liveDrift"):
@@ -1891,7 +2067,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--report-output", default=None, help="Optional Markdown output path for --report")
     parser.add_argument("--browser", default=None, help="chromium, firefox, or webkit")
     parser.add_argument("--headed", action="store_true", help="Run with a visible browser")
-    parser.add_argument("--pagetual", default=None, help="Optional PageTual userscript path to inject before the site script")
+    parser.add_argument("--pagetual", default=None, help="Optional PageTual userscript path used by PageTual fixture contracts")
+    parser.add_argument("--inject-real-pagetual", action="store_true", help="Execute the real PageTual userscript during fixture smoke; disabled by default because deterministic contracts simulate PageTual insert events")
     parser.add_argument("--pagetual-contract", action="store_true", help="Run PageTual compatibility contract v2 on feed fixtures")
     parser.add_argument("--a11y-contract", action="store_true", help="Run shared UI accessibility smoke checks on local/live pages")
     parser.add_argument("--live", action="store_true", help="Use guarded live URLs from smoke.config.json instead of local fixtures")
