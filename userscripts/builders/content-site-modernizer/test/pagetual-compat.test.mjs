@@ -31,6 +31,8 @@ test('shared runtime preserves and reacts to PageTual insertions', () => {
     "data.action === 'insert'",
     "addEventListener('pagetual:insert'",
     'handlePageTualInsert',
+    'markPageTualCandidates',
+    'csmPageTualCandidate',
     'reconcileFeed({ reason',
     'revealNextBatch(grid)',
     'csm-deferred-hidden',

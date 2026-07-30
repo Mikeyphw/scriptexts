@@ -520,11 +520,12 @@
   }
 
   function feedRoots() {
+    const hasPageTualCandidate = (node) => node instanceof HTMLElement && !!node.querySelector?.('[data-csm-page-tual-candidate="1"],[data-csm-pagetual-candidate="1"]');
     const explicitRoot = perf.feedRootSelector ? first(perf.feedRootSelector) : null;
-    if (explicitRoot instanceof HTMLElement && !isExcluded(explicitRoot)) return [explicitRoot];
+    if (explicitRoot instanceof HTMLElement && (!isExcluded(explicitRoot) || hasPageTualCandidate(explicitRoot))) return [explicitRoot];
     const roots = selectorList(profile.selectors?.feed?.containers || profile.selectors?.page?.main || 'main,#main,.site-main')
       .flatMap((sel) => $$(sel))
-      .filter((node) => node instanceof HTMLElement && !isExcluded(node));
+      .filter((node) => node instanceof HTMLElement && (!isExcluded(node) || hasPageTualCandidate(node)));
     return roots.length ? [...new Set(roots)] : [d.body];
   }
 
@@ -582,12 +583,14 @@
     const limit = Number(options.limit ?? perf.maxFeedCards ?? profile.layout?.maxFeedCards ?? 0);
     const selected = [];
     const requireImage = profile.layout?.requireCardImage === true;
-    const allowHiddenSource = options.allowHiddenSource === true;
+    const isMarkedPageTualCandidate = (node) => node instanceof HTMLElement && (node.dataset.csmPageTualCandidate === '1' || !!node.closest?.('[data-csm-page-tual-candidate="1"],[data-csm-pagetual-candidate="1"]'));
+    const allowHiddenSourceFor = (node) => options.allowHiddenSource === true || isMarkedPageTualCandidate(node);
     for (const node of nodes) {
       if (!(node instanceof HTMLElement) || seen.has(node)) continue;
       seen.add(node);
+      if (node.dataset.csmCard) continue;
       if (node.closest('.csm-topbar,.csm-drawer,.csm-bottomnav') || isPageTualNode(node)) continue;
-      if (!allowHiddenSource && isExcluded(node)) continue;
+      if (!allowHiddenSourceFor(node) && isExcluded(node)) continue;
       const link = node.querySelector('a[href]');
       if (!link) continue;
       const hrefKey = absolutePath(link.href);
@@ -742,6 +745,10 @@
 
   function feedCards(grid) {
     return Array.from(grid.querySelectorAll(':scope > .csm-card'));
+  }
+
+  function currentFeedLinkSet() {
+    return new Set($$('.csm-card a[href]').map((link) => absolutePath(link.href)));
   }
 
   function gridInitialCount() {
@@ -1135,17 +1142,51 @@
         reconcileFeed({ reason: feedState.reason || 'mutation' });
       }, delay);
     };
-    const handlePageTualInsert = () => {
-      // PageTual posts this after it finishes inserting a fetched page. Re-run twice:
-      // once for the finished insertion and once after its batched DOM work settles.
+    const markPageTualCandidates = (root = d) => {
+      if (!root || typeof root.querySelectorAll !== 'function') return;
+      const selectors = [
+        ...selectorList(profile.selectors?.feed?.items || ''),
+        ...selectorList(profile.selectors?.feed?.sectionItems || ''),
+        ...selectorList(profile.selectors?.feed?.featuredItems || ''),
+        ...selectorList('article')
+      ];
+      for (const sel of selectors) {
+        for (const node of $$(sel, root)) {
+          if (node instanceof HTMLElement && !node.dataset.csmCard) node.dataset.csmPageTualCandidate = '1';
+        }
+      }
+    };
+    const ingestPageTualCandidates = (root = d) => {
+      if (!root || typeof root.querySelectorAll !== 'function') return 0;
+      const candidates = Array.from(root.querySelectorAll('[data-csm-page-tual-candidate="1"],[data-csm-pagetual-candidate="1"]'));
+      const items = selectCardNodes(candidates, currentFeedLinkSet(), { allowHiddenSource: true, limit: 0 });
+      if (!items.length) return 0;
+      const grid = first('.csm-feed-section:not([data-csm-section-key="featured"]) .csm-feed-grid') || first('.csm-feed-grid');
+      if (!(grid instanceof HTMLElement)) return 0;
+      for (const item of items) {
+        grid.append(item);
+        enhanceCard(item);
+      }
+      installLoadMore(grid);
+      applyFeedState(grid);
+      return items.length;
+    };
+    const handlePageTualInsert = (event) => {
+      // PageTual posts this after it finishes inserting a fetched page. Reconcile
+      // immediately, then again after PageTual's own batched DOM work settles.
+      // The immediate pass keeps disabled-MutationObserver profiles compatible
+      // with deterministic fixture smoke and real next-page inserts.
+      markPageTualCandidates(event?.detail?.root || d);
+      ingestPageTualCandidates(event?.detail?.root || d);
       feedState.reason = 'pagetual';
+      reconcileFeed({ reason: 'pagetual' });
       scheduleFeedEnhance(90);
       setTimeout(() => scheduleFeedEnhance(90), 500);
     };
     addEventListener('message', (event) => {
       const data = event?.data;
       if (data && typeof data === 'object' && data.command === 'pagetual' && data.action === 'insert') {
-        handlePageTualInsert();
+        handlePageTualInsert(event);
       }
     });
     addEventListener('pagetual:insert', handlePageTualInsert);
