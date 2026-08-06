@@ -11,6 +11,18 @@ docs/                          Repository layout and release notes
 tools/                         Validation, metadata, and inventory helpers
 ```
 
+## MyReadingManga Reimagined
+
+The repository now contains a second, MRM-only builder at `userscripts/builders/myreadingmanga-reimagined`. It is a clean-room modular rewrite built against captured home, genre, search, and post HTML fixtures. It deliberately coexists with the legacy three-site manga builder while the other manga sites remain on their current implementations.
+
+```bash
+npm run build:mrm-reimagined
+npm run check:mrm-reimagined
+```
+
+Install `userscripts/builders/myreadingmanga-reimagined/dist/myreadingmanga-reimagined.user.js`. Its independent namespace and storage keys permit side-by-side installation, though only one MRM UI script should be enabled during behavioral testing.
+
+
 ## Build
 
 ```bash

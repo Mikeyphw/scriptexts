@@ -132,3 +132,7 @@ an interactive source/deactivate path for manual debugging.
 The content-site final seal includes browser-free source checks for the repaired PageTual ingest path: marker compatibility, hidden-root inclusion, skipping already-enhanced cards, direct `pagetual:insert` ingest, `PAGETUAL_SCRIPT` fallback, and the managed `PLAYWRIGHT_SMOKE=1` validator gate.
 
 The browser lane is still explicit. With `PLAYWRIGHT_SMOKE=1`, Devtool validation runs `npm run smoke:content-sites:interactions:managed -- --pagetual "$PAGETUAL_SCRIPT" --trace retain-on-failure --snapshot retain-on-failure`; without it, validation stays offline-friendly.
+
+### `userscripts/builders/myreadingmanga-reimagined/`
+
+MRM-only clean-room builder. Modular source lives under `src/modules` and `src/styles`; supplied HTML contracts live under `test/fixtures`; generated installable output lives under `dist`. This builder does not import the legacy `manga-reader-modernizer/src/original` scripts.

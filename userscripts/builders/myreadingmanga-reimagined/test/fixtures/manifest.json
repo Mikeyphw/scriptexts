@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-08-06T14:25:51Z",
+  "sourceFormat": "SingleFileZ extracted index.html",
+  "fixtures": [
+    {
+      "file": "mrm-genre.html",
+      "url": "https://myreadingmanga.info/genre/bara/",
+      "sha256": "dc6cce5a965c2c53159c4d677ef2fef47a4d523845356c3f3816ed859bf90d67",
+      "bytes": 80820
+    },
+    {
+      "file": "mrm-post.html",
+      "url": "https://myreadingmanga.info/barayot-sigoonal-search-part-2-eng/",
+      "sha256": "c058f7bf0e2e517a16dad3a4bb690f0c57cec2f9b5b1d249c38dc52f6ca6ba67",
+      "bytes": 39979
+    },
+    {
+      "file": "mrm-home.html",
+      "url": "https://myreadingmanga.info/",
+      "sha256": "b630bb92e9856bcd22f0c9938e2894e166667adc9e6079c9e9a2a92569d67cac",
+      "bytes": 152212
+    },
+    {
+      "file": "mrm-search.html",
+      "url": "https://myreadingmanga.info/?s=search",
+      "sha256": "a408e342e63f8d33516ade79bf047ba729bc2f346b16fe4e3450c6eaf4412c27",
+      "bytes": 90191
+    }
+  ]
+}

@@ -1234,6 +1234,60 @@
       },
       "manifest": {},
       "history_id": "2a158ce6b4244a6c8f1971c172a2d7df"
+    },
+    {
+      "applied_at": "2026-08-06T15:18:28.109658Z",
+      "artifact": "/home/mike/Downloads/scriptexts_myreadingmanga_reimagined_builder_overlay.zip",
+      "artifact_name": "scriptexts_myreadingmanga_reimagined_builder_overlay.zip",
+      "type": "overlay",
+      "sha256": "7f976f69e928431bc7b09187834b0b6df922d4b41ae90c79d3ba5ad7abe6e389",
+      "status": "rolled-back",
+      "validation_status": "failed",
+      "commit_message": "",
+      "commit_hash": "",
+      "file_count": 35,
+      "change_counts": {
+        "add": 28,
+        "modify": 7
+      },
+      "manifest": {},
+      "history_id": "1573b7dae8a4486097323748af998dda"
+    },
+    {
+      "applied_at": "2026-08-06T15:24:39.302881Z",
+      "artifact": "/home/mike/Downloads/scriptexts_myreadingmanga_reimagined_builder_r2_overlay.zip",
+      "artifact_name": "scriptexts_myreadingmanga_reimagined_builder_r2_overlay.zip",
+      "type": "overlay",
+      "sha256": "987c397165d9fe5159543c9ff96cb19c7c60903af7fcbec650aa252976c59711",
+      "status": "rolled-back",
+      "validation_status": "failed",
+      "commit_message": "",
+      "commit_hash": "",
+      "file_count": 35,
+      "change_counts": {
+        "add": 28,
+        "modify": 7
+      },
+      "manifest": {},
+      "history_id": "bdb6fb0839544c6297c41815aa17ffae"
+    },
+    {
+      "applied_at": "2026-08-06T15:34:47.085007Z",
+      "artifact": "/home/mike/Downloads/scriptexts_myreadingmanga_reimagined_builder_r3_overlay.zip",
+      "artifact_name": "scriptexts_myreadingmanga_reimagined_builder_r3_overlay.zip",
+      "type": "overlay",
+      "sha256": "bf49727f2e81c4971ff8560394b5fb2952a7591e4d3eb773026962083f47f3c6",
+      "status": "ok",
+      "validation_status": "ok",
+      "commit_message": "",
+      "commit_hash": "",
+      "file_count": 35,
+      "change_counts": {
+        "add": 28,
+        "modify": 7
+      },
+      "manifest": {},
+      "history_id": "0846afa7892c4d15b7e6e5e1314deff7"
     }
   ]
 }

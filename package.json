@@ -5,11 +5,12 @@
   "workspaces": [
     "userscripts/builders/content-site-modernizer",
     "userscripts/builders/manga-reader-modernizer",
+    "userscripts/builders/myreadingmanga-reimagined",
     "userscripts/builders/sims-cc-download-basket"
   ],
   "scripts": {
     "build": "npm run build:userscripts && npm run build:extensions && npm run userscripts:metadata",
-    "build:userscripts": "npm run build:content-sites && npm run build:manga && npm run build:sims",
+    "build:userscripts": "npm run build:content-sites && npm run build:manga && npm run build:mrm-reimagined && npm run build:sims",
     "build:content-sites": "npm --prefix userscripts/builders/content-site-modernizer run build",
     "build:manga": "npm --prefix userscripts/builders/manga-reader-modernizer run build",
     "build:sims": "npm --prefix userscripts/builders/sims-cc-download-basket run build",
@@ -62,7 +63,10 @@
     "smoke:content-sites:pagetual:managed": "bash tools/smoke/with-smoke-env.sh -- npm run smoke:content-sites:pagetual:focused --",
     "smoke:content-sites:a11y:managed": "bash tools/smoke/with-smoke-env.sh -- npm run smoke:content-sites:a11y:focused --",
     "smoke:content-sites:visual:managed": "bash tools/smoke/with-smoke-env.sh -- npm run smoke:content-sites:visual:focused --",
-    "smoke:content-sites:live:managed": "bash tools/smoke/with-smoke-env.sh -- npm run smoke:content-sites:live:focused --"
+    "smoke:content-sites:live:managed": "bash tools/smoke/with-smoke-env.sh -- npm run smoke:content-sites:live:focused --",
+    "build:mrm-reimagined": "npm --prefix userscripts/builders/myreadingmanga-reimagined run build",
+    "check:mrm-reimagined": "npm --prefix userscripts/builders/myreadingmanga-reimagined run check",
+    "smoke:mrm-reimagined": "npm --prefix userscripts/builders/myreadingmanga-reimagined run smoke"
   },
   "engines": {
     "node": ">=20"

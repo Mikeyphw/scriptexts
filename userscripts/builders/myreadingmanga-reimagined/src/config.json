@@ -1,0 +1,15 @@
+{
+  "id": "myreadingmanga-reimagined",
+  "name": "MyReadingManga Reimagined",
+  "version": "6.0.0",
+  "description": "A clean-room MyReadingManga archive workspace and accessible manga reader with persistent filtering, facets, read history, responsive layouts, and mobile-first controls.",
+  "matches": [
+    "https://myreadingmanga.info/*"
+  ],
+  "runAt": "document-idle",
+  "storagePrefix": "mrm-reimagined-v1",
+  "hostnames": [
+    "myreadingmanga.info"
+  ],
+  "fixtureContractVersion": 1
+}

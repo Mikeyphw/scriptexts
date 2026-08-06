@@ -21,6 +21,11 @@ root = "userscripts/builders/content-site-modernizer"
 type = "node"
 root = "userscripts/builders/manga-reader-modernizer"
 
+
+[targets.myreadingmanga-reimagined]
+type = "node"
+root = "userscripts/builders/myreadingmanga-reimagined"
+
 [targets.sims-cc-download-basket]
 type = "node"
 root = "userscripts/builders/sims-cc-download-basket"

@@ -164,6 +164,26 @@ else {
   }
 }
 
+
+const mrmReimaginedPath = join(root, 'userscripts/builders/myreadingmanga-reimagined/dist/myreadingmanga-reimagined.user.js');
+if (!await exists(mrmReimaginedPath)) errors.push('MyReadingManga Reimagined generated userscript is missing.');
+else {
+  const mrmReimagined = await readFile(mrmReimaginedPath, 'utf8');
+  for (const marker of [
+    'MyReadingManga Reimagined',
+    'myreadingmanga.info/*',
+    'module: 00-core.js',
+    'module: 08-app.js',
+    'ep_filter_post_tag',
+    'mrm-reader-mobile-zones',
+    'Enable MRM UI',
+    '14 * 24 * 60 * 60 * 1000'
+  ]) {
+    if (!mrmReimagined.includes(marker)) errors.push(`MyReadingManga Reimagined output is missing marker: ${marker}`);
+  }
+  if (mrmReimagined.includes('src/original/myreadingmanga-modern-reader')) errors.push('MyReadingManga Reimagined must not import the legacy MRM source.');
+}
+
 for (const project of manifest.projects.filter((item) => item.type === 'firefox-extension')) {
   const src = join(root, project.path, 'src');
   if (await exists(join(src, 'META-INF'))) errors.push(`${project.path}/src: must not contain stale META-INF signatures`);
