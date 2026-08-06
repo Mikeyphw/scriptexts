@@ -213,7 +213,7 @@
     {
       "path": "userscripts/builders/myreadingmanga-reimagined",
       "type": "userscript-builder",
-      "version": "6.0.0",
+      "version": "6.2.0",
       "source_model": "clean-room-modular-builder",
       "builder": "build.mjs",
       "source": "src/",
@@ -225,7 +225,23 @@
       "scope": [
         "myreadingmanga.info"
       ],
-      "legacy_coexistence": "independent namespace and storage prefix; legacy multi-site builder remains unchanged"
+      "legacy_coexistence": "independent namespace and storage prefix; legacy multi-site builder remains unchanged",
+      "visual_shell": "unified responsive header, archive overview, host-independent readable typography, larger metadata chips, modern pagination, and condensed footer",
+      "compatibility": {
+        "pagetual": "direct insert events, postMessage hook, scoped mutation ingestion, and delayed reconciliation without self-observer loops"
+      },
+      "phase_1_ui_contract": {
+        "density_modes": [
+          "comfortable",
+          "balanced",
+          "compact",
+          "custom"
+        ],
+        "default_density": "balanced",
+        "archive_toolbar": "sticky search, quick filters, sorting, density, active filters",
+        "card_hierarchy": "cover badges, two-line title, creator line, compact metadata, reader/original/read controls",
+        "read_state": "read badge, dimmed cover, mark unread, persisted reader progress and resume"
+      }
     },
     {
       "path": "userscripts/builders/sims-cc-download-basket",

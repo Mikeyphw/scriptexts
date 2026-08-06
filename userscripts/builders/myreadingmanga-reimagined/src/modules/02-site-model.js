@@ -43,10 +43,15 @@ MRM.site = (() => {
     const haystack = MRM.util.normalize([title, ...Object.values(taxonomies).flat().map(MRM.util.slugLabel)].join(" "));
     return { article, link, image, url, title, order, taxonomies, haystack, isEnglish: taxonomies.lang?.includes("english") || /\[eng(?:lish)?\]/i.test(title) };
   };
-  const collectCards = (root = document) => MRM.util.qa(MRM.selectors.archiveCards, root)
-    .filter((article) => !article.closest(".yarpp-related, .related-posts, #comments"))
-    .map(parseCard)
-    .filter(Boolean);
+  const collectCards = (root = document) => {
+    const nodes = [];
+    if (root instanceof Element && root.matches(MRM.selectors.archiveCards)) nodes.push(root);
+    if (root && typeof root.querySelectorAll === "function") nodes.push(...MRM.util.qa(MRM.selectors.archiveCards, root));
+    return MRM.util.unique(nodes)
+      .filter((article) => !article.closest(".yarpp-related, .related-posts, #comments"))
+      .map(parseCard)
+      .filter(Boolean);
+  };
   const nativeFacets = (doc = document) => {
     const groups = {};
     for (const widget of MRM.util.qa(MRM.selectors.nativeFacets, doc)) {

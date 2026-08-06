@@ -1,0 +1,17 @@
+{
+  "applied_at": "2026-08-06T16:58:34.794782Z",
+  "artifact": "/home/mike/Downloads/scriptexts_myreadingmanga_reimagined_typography_r6_overlay.zip",
+  "artifact_name": "scriptexts_myreadingmanga_reimagined_typography_r6_overlay.zip",
+  "type": "overlay",
+  "sha256": "01a8f99823f979bc24a215bd6bf98f4d88eb024a77a59475bef339cdab72db6e",
+  "status": "ok",
+  "validation_status": "ok",
+  "commit_message": "",
+  "commit_hash": "",
+  "file_count": 14,
+  "change_counts": {
+    "modify": 14
+  },
+  "manifest": {},
+  "history_id": "e5712c862ad64b08a46e101fed69e072"
+}

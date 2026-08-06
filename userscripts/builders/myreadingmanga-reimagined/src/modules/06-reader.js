@@ -110,10 +110,11 @@ MRM.reader = (() => {
       state.title = MRM.util.pageTitle(doc) || cached?.title || "Reader";
       state.pages = pages;
       MRM.storage.setReaderCache(state.url, state.title, state.pages);
-      state.pageIndex = 0;
+      const savedProgress = MRM.storage.getReaderProgress(state.url);
+      state.pageIndex = savedProgress && !savedProgress.completed ? MRM.util.clamp(savedProgress.pageIndex, 0, state.pages.length - 1) : 0;
       state.commentsVisible = false;
-      MRM.storage.markRead(state.url, state.title);
       render();
+      requestAnimationFrame(() => goTo(state.pageIndex, false));
       prefetchAdjacent();
     } catch (error) {
       const stage = state.modal.querySelector(".mrm-reader-stage");
@@ -197,6 +198,7 @@ MRM.reader = (() => {
     scrubber.max = String(Math.max(1, state.pages.length));
     scrubber.value = String(state.pageIndex + 1);
     state.modal.querySelectorAll(".mrm-reader-thumbnail").forEach((button, i) => button.classList.toggle("is-active", i === state.pageIndex));
+    if (state.url && state.pages.length) MRM.storage.setReaderProgress(state.url, state.title, state.pageIndex, state.pages.length);
     updateNavigation();
   };
   const goTo = (index, smooth = true) => {

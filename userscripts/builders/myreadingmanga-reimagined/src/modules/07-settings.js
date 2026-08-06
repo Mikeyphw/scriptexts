@@ -12,7 +12,8 @@ MRM.settings = (() => {
   const updateFilters = (patch) => MRM.storage.replaceFilters({ ...MRM.storage.preferences.filters, ...patch });
   const renderPanel = () => {
     if (panel) return panel;
-    const launcher = MRM.util.create("button", { attrs: { id: "mrm-panel-launcher", type: "button", "aria-controls": "mrm-control-panel", "aria-expanded": "false", "aria-label": "Open MyReadingManga controls" }, text: "MRM" });
+    const launcher = MRM.util.create("button", { attrs: { id: "mrm-panel-launcher", type: "button", "aria-controls": "mrm-control-panel", "aria-expanded": "false", "aria-label": "Open archive filters and display settings" } });
+    launcher.innerHTML = '<span class="mrm-launcher-icon" aria-hidden="true">☷</span><span>Filters</span><span id="mrm-launcher-count" class="mrm-launcher-count" hidden>0</span>';
     panel = MRM.util.create("aside", { attrs: { id: "mrm-control-panel", role: "dialog", "aria-modal": "false", "aria-labelledby": "mrm-panel-title", hidden: true }, className: "mrm-control-panel" });
     panel.innerHTML = `
       <header class="mrm-panel-header"><div><strong id="mrm-panel-title">MRM workspace</strong><span id="mrm-result-count">0 results</span></div><button type="button" data-panel-action="close" aria-label="Close controls">×</button></header>
@@ -21,7 +22,7 @@ MRM.settings = (() => {
         <section data-panel-section="filters">
           <label class="mrm-field"><span>Search visible archive</span><input id="mrm-live-search" type="search" autocomplete="off" placeholder="Title, artist, tags…"></label>
           <div id="mrm-filter-toggles"></div>
-          <label class="mrm-field"><span>Display order</span><select id="mrm-sort"><option value="default">Default</option><option value="title-asc">Title A–Z</option><option value="title-desc">Title Z–A</option><option value="english-first">English first</option></select></label>
+          <label class="mrm-field"><span>Display order</span><select id="mrm-sort"><option value="default">Newest first</option><option value="title-asc">Title A–Z</option><option value="title-desc">Title Z–A</option><option value="english-first">English first</option></select></label>
           <div id="mrm-native-search-controls"></div>
           <div class="mrm-inline-actions"><button type="button" data-panel-action="mark-read">Mark visible read</button><button type="button" data-panel-action="clear-filters">Clear filters</button></div>
           <div id="mrm-active-filters" class="mrm-active-filters" aria-label="Active filters"></div>
@@ -81,13 +82,45 @@ MRM.settings = (() => {
     const host = panel.querySelector("[data-panel-section='grid']");
     const updateGrid = (patch) => MRM.storage.update({ grid: { ...MRM.storage.preferences.grid, ...patch } });
     const g = MRM.storage.preferences.grid;
-    host.replaceChildren(
-      rangeField("Desktop columns", "desktop", g.desktop, 2, 10, 1, (value) => updateGrid({ desktop: value })),
-      rangeField("Tablet columns", "tablet", g.tablet, 2, 8, 1, (value) => updateGrid({ tablet: value })),
-      rangeField("Mobile columns", "mobile", g.mobile, 1, 4, 1, (value) => updateGrid({ mobile: value })),
-      rangeField("Grid gap", "gap", g.gap, 4, 32, 1, (value) => updateGrid({ gap: value })),
-      rangeField("Cover ratio", "ratio", g.ratio, 0.55, 1.2, 0.01, (value) => updateGrid({ ratio: value })),
+    const density = MRM.util.create("fieldset", { className: "mrm-density-settings" });
+    density.append(MRM.util.create("legend", { text: "Archive density" }));
+    const choices = MRM.util.create("div", { className: "mrm-density-options", attrs: { role: "radiogroup", "aria-label": "Archive density" } });
+    for (const [value, title, description] of [
+      ["comfortable", "Comfortable", "4 columns · larger covers"],
+      ["balanced", "Balanced", "5 columns · recommended"],
+      ["compact", "Compact", "6 columns · more results"],
+    ]) {
+      const button = MRM.util.create("button", { className: "mrm-density-option", attrs: { type: "button", role: "radio", "aria-checked": g.density === value }, dataset: { density: value } });
+      button.append(MRM.util.create("strong", { text: title }), MRM.util.create("span", { text: description }));
+      button.addEventListener("click", () => {
+        updateGrid({ density: value });
+        renderGridSettings();
+      });
+      choices.append(button);
+    }
+    density.append(choices);
+    const advanced = MRM.util.create("details", { className: "mrm-grid-advanced" });
+    advanced.append(MRM.util.create("summary", { text: "Custom grid controls" }));
+    const advancedBody = MRM.util.create("div", { className: "mrm-grid-advanced-body" });
+    const customUpdate = (patch) => updateGrid({ density: "custom", ...patch });
+    advancedBody.append(
+      rangeField("Desktop columns", "desktop", g.desktop, 2, 10, 1, (value) => customUpdate({ desktop: value })),
+      rangeField("Tablet columns", "tablet", g.tablet, 2, 8, 1, (value) => customUpdate({ tablet: value })),
+      rangeField("Mobile columns", "mobile", g.mobile, 1, 4, 1, (value) => customUpdate({ mobile: value })),
+      rangeField("Grid gap", "gap", g.gap, 4, 32, 1, (value) => customUpdate({ gap: value })),
     );
+    advanced.append(advancedBody);
+    const ratio = rangeField("Cover ratio", "ratio", g.ratio, 0.55, 1.2, 0.01, (value) => updateGrid({ ratio: value }));
+    const cover = (() => {
+      const field = MRM.util.create("label", { className: "mrm-field" });
+      const select = MRM.util.create("select");
+      select.innerHTML = '<option value="contain">Fit entire cover</option><option value="cover">Fill card frame</option>';
+      select.value = g.coverFit === "cover" ? "cover" : "contain";
+      select.addEventListener("change", () => updateGrid({ coverFit: select.value }));
+      field.append(MRM.util.create("span", { text: "Cover display" }), select);
+      return field;
+    })();
+    host.replaceChildren(density, ratio, cover, advanced);
   };
   const renderThemeSettings = () => {
     const host = panel.querySelector("[data-panel-section='theme']");
@@ -180,8 +213,15 @@ MRM.settings = (() => {
     modal.addEventListener("keydown", (event) => { if (event.key === "Escape") modal.remove(); else MRM.util.trapFocus(event, modal); });
     render(); input.focus();
   };
-  const togglePanel = (force) => {
+  const selectTab = (section = "filters") => {
     renderPanel();
+    const tab = panel.querySelector(`[data-tab="${section}"]`) || panel.querySelector("[data-tab='filters']");
+    panel.querySelectorAll("[data-tab]").forEach((button) => button.setAttribute("aria-selected", String(button === tab)));
+    panel.querySelectorAll("[data-panel-section]").forEach((node) => node.hidden = node.dataset.panelSection !== tab.dataset.tab);
+  };
+  const togglePanel = (force, section) => {
+    renderPanel();
+    if (section) selectTab(section);
     const open = force ?? panel.hidden;
     panel.hidden = !open;
     MRM.runtime.panelOpen = open;
@@ -190,6 +230,7 @@ MRM.settings = (() => {
     if (open) panel.querySelector("[data-panel-action='close']").focus();
     else launcher.focus();
   };
+  const open = (section = "filters") => togglePanel(true, section);
   const onPanelClick = (event) => {
     const tab = event.target.closest("[data-tab]");
     if (tab) {
@@ -202,8 +243,7 @@ MRM.settings = (() => {
     if (action === "mark-read") MRM.archive.markVisibleRead();
     if (action === "apply-native") MRM.facets.applyNative(panel.querySelector("#mrm-native-sort")?.value || MRM.facets.nativeSortValue());
     if (action === "clear-filters") {
-      const filters = { ...MRM.storage.preferences.filters, query: "", hideRead: false, onlyEnglish: false, include: {}, exclude: {} };
-      MRM.storage.replaceFilters(filters);
+      MRM.archive.clearFilters();
       panel.querySelector("#mrm-live-search").value = "";
       renderFilterToggles();
     }
@@ -226,7 +266,8 @@ MRM.settings = (() => {
     const search = panel.querySelector("#mrm-live-search");
     if (document.activeElement !== search) search.value = MRM.storage.preferences.filters.query;
     panel.querySelector("#mrm-sort").value = MRM.storage.preferences.filters.sort;
+    panel.querySelectorAll(".mrm-density-option").forEach((button) => button.setAttribute("aria-checked", String(button.dataset.density === MRM.storage.preferences.grid.density)));
     refreshFacets();
   });
-  return { init, togglePanel, refreshFacets, openFacetModal, installRecoveryButton };
+  return { init, open, togglePanel, refreshFacets, openFacetModal, installRecoveryButton };
 })();

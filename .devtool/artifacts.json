@@ -1288,6 +1288,110 @@
       },
       "manifest": {},
       "history_id": "0846afa7892c4d15b7e6e5e1314deff7"
+    },
+    {
+      "applied_at": "2026-08-06T16:08:48.218718Z",
+      "artifact": "/home/mike/Downloads/scriptexts_myreadingmanga_reimagined_mobile_layout_r4_overlay.zip",
+      "artifact_name": "scriptexts_myreadingmanga_reimagined_mobile_layout_r4_overlay.zip",
+      "type": "overlay",
+      "sha256": "2e3a1f47afacc1f3e452806f0ec46a310c206765170085dd2021f03034c2eeb4",
+      "status": "ok",
+      "validation_status": "ok",
+      "commit_message": "",
+      "commit_hash": "",
+      "file_count": 9,
+      "change_counts": {
+        "modify": 9
+      },
+      "manifest": {},
+      "history_id": "5305cfdeb448433d804ff07ec6e42f35"
+    },
+    {
+      "applied_at": "2026-08-06T16:47:37.647792Z",
+      "artifact": "/home/mike/Downloads/scriptexts_myreadingmanga_reimagined_visual_overhaul_r5_overlay.zip",
+      "artifact_name": "scriptexts_myreadingmanga_reimagined_visual_overhaul_r5_overlay.zip",
+      "type": "overlay",
+      "sha256": "3d39ddc03e77130fadc492e564de135aaf02010eea5ab4f18bb18fed53fb9b51",
+      "status": "ok",
+      "validation_status": "ok",
+      "commit_message": "",
+      "commit_hash": "",
+      "file_count": 17,
+      "change_counts": {
+        "modify": 16,
+        "unchanged": 1
+      },
+      "manifest": {},
+      "history_id": "471f3807d6c14b01988d79dda94878ff"
+    },
+    {
+      "applied_at": "2026-08-06T16:58:34.794782Z",
+      "artifact": "/home/mike/Downloads/scriptexts_myreadingmanga_reimagined_typography_r6_overlay.zip",
+      "artifact_name": "scriptexts_myreadingmanga_reimagined_typography_r6_overlay.zip",
+      "type": "overlay",
+      "sha256": "01a8f99823f979bc24a215bd6bf98f4d88eb024a77a59475bef339cdab72db6e",
+      "status": "ok",
+      "validation_status": "ok",
+      "commit_message": "",
+      "commit_hash": "",
+      "file_count": 14,
+      "change_counts": {
+        "modify": 14
+      },
+      "manifest": {},
+      "history_id": "e5712c862ad64b08a46e101fed69e072"
+    },
+    {
+      "applied_at": "2026-08-06T17:17:58.789807Z",
+      "artifact": "/home/mike/Downloads/scriptexts_myreadingmanga_reimagined_pagetual_stability_r7_overlay.zip",
+      "artifact_name": "scriptexts_myreadingmanga_reimagined_pagetual_stability_r7_overlay.zip",
+      "type": "overlay",
+      "sha256": "3a4f7f25ff773868490a7b34b7fe8f5d358ae464026ed727c4fd4947262075bc",
+      "status": "ok",
+      "validation_status": "ok",
+      "commit_message": "",
+      "commit_hash": "",
+      "file_count": 7,
+      "change_counts": {
+        "modify": 7
+      },
+      "manifest": {},
+      "history_id": "dab646624dda43cabc32de558e64407a"
+    },
+    {
+      "applied_at": "2026-08-06T18:21:44.799623Z",
+      "artifact": "/home/mike/Downloads/scriptexts_myreadingmanga_reimagined_phase1_archive_experience_r8_overlay.zip",
+      "artifact_name": "scriptexts_myreadingmanga_reimagined_phase1_archive_experience_r8_overlay.zip",
+      "type": "overlay",
+      "sha256": "f99d684b72ac7523dc331922ddbd50c09df29c90423285329c2d883cdbc661bf",
+      "status": "rolled-back",
+      "validation_status": "failed",
+      "commit_message": "",
+      "commit_hash": "",
+      "file_count": 17,
+      "change_counts": {
+        "modify": 17
+      },
+      "manifest": {},
+      "history_id": "f0f4ab301c884f6e911f7bc6672cee6b"
+    },
+    {
+      "applied_at": "2026-08-06T18:35:41.962325Z",
+      "artifact": "/home/mike/Downloads/scriptexts_myreadingmanga_reimagined_phase1_archive_experience_r9_overlay.zip",
+      "artifact_name": "scriptexts_myreadingmanga_reimagined_phase1_archive_experience_r9_overlay.zip",
+      "type": "overlay",
+      "sha256": "f01b4004d8b5d2e3382b0bbbf07aca3661c5e94c8501447985907a08bd0d3c0a",
+      "status": "ok",
+      "validation_status": "ok",
+      "commit_message": "",
+      "commit_hash": "",
+      "file_count": 30,
+      "change_counts": {
+        "modify": 20,
+        "unchanged": 10
+      },
+      "manifest": {},
+      "history_id": "e372fa8b9df74e1386f26453c3edb1f4"
     }
   ]
 }

@@ -4,8 +4,8 @@ html.mrm-reader-open, html.mrm-reader-open body { overflow: hidden !important; }
 html[data-mrm-border-reader="on"] .mrm-reader-modal { box-shadow: inset 0 0 0 1px var(--mrm-line); }
 .mrm-reader-toolbar { z-index: 3; display: grid; gap: 6px; padding: 8px 10px; background: rgba(15,17,23,.96); backdrop-filter: blur(14px); transition: transform .18s ease; }
 .mrm-reader-toolbar-primary { display: grid; grid-template-columns: auto auto minmax(0,1fr) auto auto; align-items: center; gap: 8px; }
-.mrm-reader-toolbar-primary h2 { margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 1rem; text-align: center; }
-.mrm-reader-toolbar button, .mrm-reader-footer button { min-height: 40px; border: 0; border-radius: 9px; background: var(--mrm-surface-2); color: var(--mrm-text); padding: 6px 10px; }
+.mrm-reader-toolbar-primary h2 { margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 16px; text-align: center; }
+.mrm-reader-toolbar button, .mrm-reader-footer button { min-height: 42px; font-size: 14px; border: 0; border-radius: 9px; background: var(--mrm-surface-2); color: var(--mrm-text); padding: 6px 10px; }
 .mrm-reader-toolbar-secondary { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: thin; }
 .mrm-reader-toolbar-secondary button { flex: 0 0 auto; }
 .mrm-reader-progress { background: var(--mrm-surface); padding: 3px 10px; }
@@ -18,7 +18,7 @@ html[data-mrm-border-reader="on"] .mrm-reader-modal { box-shadow: inset 0 0 0 1p
 .mrm-reader-stage { min-width: 0; min-height: 0; overflow: auto; scroll-snap-type: y proximity; background: #050608; }
 .mrm-reader-page { width: min(100%, 980px); margin: 0 auto; display: grid; justify-items: center; scroll-snap-align: start; }
 .mrm-reader-page img { display: block; max-width: 100%; width: auto; height: auto; background: #111; }
-.mrm-reader-page figcaption { padding: 6px 10px; color: var(--mrm-muted); font-size: .76rem; }
+.mrm-reader-page figcaption { padding: 6px 10px; color: var(--mrm-muted); font-size: 12px; }
 .mrm-reader-modal[data-view="strip-gaps"] .mrm-reader-page { margin-block: 14px; }
 .mrm-reader-modal[data-view="paged"] .mrm-reader-stage { display: grid; place-items: center; padding: 8px; }
 .mrm-reader-modal[data-view="paged"] .mrm-reader-page { height: 100%; align-content: center; }
@@ -35,7 +35,7 @@ html[data-mrm-border-reader="on"] .mrm-reader-modal { box-shadow: inset 0 0 0 1p
 .mrm-reader-mobile-zones { display: none; }
 .mrm-reader-modal.is-toolbar-hidden .mrm-reader-toolbar { transform: translateY(-100%); position: absolute; width: 100%; }
 .mrm-post-actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 18px; }
-.mrm-post-actions button { min-height: 46px; border: 0; border-radius: 11px; padding: 10px 16px; background: var(--mrm-surface-2); color: var(--mrm-text); }
+.mrm-post-actions button { min-height: 46px; font-size: 14px; border: 0; border-radius: 11px; padding: 10px 16px; background: var(--mrm-surface-2); color: var(--mrm-text); }
 html.mrm-ui-enabled .mrm-post-page .entry-content > div:has(> img.img-myreadingmanga) { display: grid; justify-items: center; }
 html.mrm-ui-enabled .mrm-post-page .img-myreadingmanga { max-width: min(100%, 1100px); height: auto; }
 @media (max-width: 760px) {
@@ -55,3 +55,69 @@ html.mrm-ui-enabled .mrm-post-page .img-myreadingmanga { max-width: min(100%, 11
 
 .mrm-post-taxonomies { flex-basis: 100%; display: flex; flex-wrap: wrap; gap: 6px; }
 .mrm-reader-toolbar button:disabled, .mrm-reader-footer button:disabled { opacity: .42; cursor: not-allowed; }
+
+/* Inline post reading layout */
+html.mrm-ui-enabled .mrm-post-page main.content,
+html.mrm-ui-enabled .mrm-post-page .content,
+html.mrm-ui-enabled .mrm-post-page article.entry,
+html.mrm-ui-enabled .mrm-post-page .entry-content {
+  width: 100% !important;
+  max-width: none !important;
+  min-width: 0 !important;
+  float: none !important;
+}
+html.mrm-ui-enabled .mrm-post-page article.entry {
+  margin: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+html.mrm-ui-enabled .mrm-post-page .entry-header,
+html.mrm-ui-enabled .mrm-post-page #mrm-post-actions,
+html.mrm-ui-enabled .mrm-post-page .entry-content > :not(div:has(> img.img-myreadingmanga)),
+html.mrm-ui-enabled .mrm-post-page #comments,
+html.mrm-ui-enabled .mrm-post-page .entry-comments {
+  box-sizing: border-box !important;
+  width: min(100%, 1100px) !important;
+  margin-inline: auto !important;
+}
+html.mrm-ui-enabled .mrm-post-page .entry-header {
+  padding: clamp(14px, 2.5vw, 26px) !important;
+  border-radius: var(--mrm-radius);
+  background: var(--mrm-surface) !important;
+}
+html.mrm-ui-enabled .mrm-post-page .entry-title {
+  margin: 0 !important;
+  color: var(--mrm-text) !important;
+  font-size: clamp(20px, 3vw, 32px) !important;
+  line-height: 1.25 !important;
+}
+html.mrm-ui-enabled .mrm-post-page .entry-content > div:has(> img.img-myreadingmanga) {
+  display: grid !important;
+  justify-items: center;
+  width: 100% !important;
+  max-width: none !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+html.mrm-ui-enabled .mrm-post-page .img-myreadingmanga {
+  display: block !important;
+  width: min(100%, 1100px) !important;
+  max-width: 1100px !important;
+  min-width: 0 !important;
+  height: auto !important;
+  margin: 0 auto !important;
+  object-fit: contain !important;
+}
+html.mrm-ui-enabled .mrm-post-page .mrm-post-actions {
+  padding: 12px 0 18px;
+}
+@media (max-width: 680px) {
+  html.mrm-ui-enabled .mrm-post-page .site-inner { padding-inline: 0 !important; }
+  html.mrm-ui-enabled .mrm-post-page .entry-header,
+  html.mrm-ui-enabled .mrm-post-page #mrm-post-actions,
+  html.mrm-ui-enabled .mrm-post-page .entry-content > :not(div:has(> img.img-myreadingmanga)),
+  html.mrm-ui-enabled .mrm-post-page #comments,
+  html.mrm-ui-enabled .mrm-post-page .entry-comments { width: calc(100% - 24px) !important; }
+}

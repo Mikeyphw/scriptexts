@@ -2,14 +2,15 @@
 
 ## Archive workspace
 
-- Responsive cover grid with desktop, tablet, and mobile column settings.
+- Persistent Comfortable (4-column), Balanced (5-column default), Compact (6-column), and advanced Custom density modes.
 - Adjustable gap and cover ratio.
 - Live local search across title and taxonomy data.
 - Hide-read and English-only filters.
 - Default, A–Z, Z–A, and English-first display ordering.
-- Persistent local read history and bulk “mark visible read”.
-- Metadata chips and card-level Reader actions. Post pages also receive metadata chips and a comment-count-aware action row.
-- MutationObserver and PageTual insert-event reprocessing.
+- Persistent local read history, reversible mark-read/unread controls, saved page progress, reader resume, completion-on-last-page, and bulk “mark visible read”.
+- Cover-first cards with language/progress/read badges, two-line titles, artist/group bylines, responsive metadata chips, a full Reader/Continue action, original-post action, and reversible read controls. Post pages also receive metadata chips and a comment-count-aware action row.
+- Idempotent MutationObserver reconciliation that ignores userscript-owned card moves and reaches quiescence after each insert.
+- PageTual next-page ingestion through postMessage and custom events, including hidden source roots, duplicate URL rejection, active-filter preservation, delayed settlement, and visible/restyled PageTual controls.
 
 ## Facets
 
@@ -35,8 +36,15 @@
 
 ## Site UI
 
-- Dark responsive makeover with configurable accent and component border policies.
+- Dark responsive makeover with host-independent 16px typography, accessible minimum text sizes, configurable accent, and component border policies.
 - Left/right control-panel docking.
 - Independent makeover toggle with recovery button.
 - Reader remains available when the site makeover is disabled.
 - Reduced-motion support, accessible names, dialog semantics, focus trapping, and live result announcements.
+
+## Reimagined site shell
+
+- Unified responsive header combining brand, native navigation, and site search.
+- Sticky archive command bar with title, loaded/visible and in-progress counts, full-width local search, English/hide-read quick filters, sorting, density controls, active-filter summary, and a direct filters entry point.
+- Image-first cards with readable titles, compact metadata, a secondary Reader action, and configurable contain/cover artwork fitting.
+- Larger accessible archive pagination and a condensed responsive footer with expandable long lists.
