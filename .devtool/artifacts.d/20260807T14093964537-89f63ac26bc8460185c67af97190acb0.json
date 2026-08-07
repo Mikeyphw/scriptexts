@@ -1,0 +1,17 @@
+{
+  "applied_at": "2026-08-07T14:09:39.645378Z",
+  "artifact": "/home/mike/Downloads/scriptexts_myreadingmanga_reimagined_phase2_filter_experience_r10_overlay.zip",
+  "artifact_name": "scriptexts_myreadingmanga_reimagined_phase2_filter_experience_r10_overlay.zip",
+  "type": "overlay",
+  "sha256": "42fd6fb9a215982bb21f8c64d55e6291cac6c8ed9f5c6bf107bd4e41c345b284",
+  "status": "ok",
+  "validation_status": "ok",
+  "commit_message": "",
+  "commit_hash": "",
+  "file_count": 10,
+  "change_counts": {
+    "unchanged": 10
+  },
+  "manifest": {},
+  "history_id": "89f63ac26bc8460185c67af97190acb0"
+}

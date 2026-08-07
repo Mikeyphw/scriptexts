@@ -1,0 +1,17 @@
+{
+  "applied_at": "2026-08-07T15:18:56.117187Z",
+  "artifact": "/home/mike/Downloads/scriptexts_myreadingmanga_reimagined_phase5_6_completion_r14_overlay.zip",
+  "artifact_name": "scriptexts_myreadingmanga_reimagined_phase5_6_completion_r14_overlay.zip",
+  "type": "overlay",
+  "sha256": "b818cd91611b7144eb9be40801f507bf1a2d336d255f213de8fb2adafca75910",
+  "status": "ok",
+  "validation_status": "ok",
+  "commit_message": "",
+  "commit_hash": "",
+  "file_count": 18,
+  "change_counts": {
+    "modify": 18
+  },
+  "manifest": {},
+  "history_id": "af88b40318224d45bd796fe00178051e"
+}

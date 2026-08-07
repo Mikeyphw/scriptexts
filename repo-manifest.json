@@ -213,7 +213,7 @@
     {
       "path": "userscripts/builders/myreadingmanga-reimagined",
       "type": "userscript-builder",
-      "version": "6.2.0",
+      "version": "6.7.0",
       "source_model": "clean-room-modular-builder",
       "builder": "build.mjs",
       "source": "src/",
@@ -226,9 +226,9 @@
         "myreadingmanga.info"
       ],
       "legacy_coexistence": "independent namespace and storage prefix; legacy multi-site builder remains unchanged",
-      "visual_shell": "unified responsive header, archive overview, host-independent readable typography, larger metadata chips, modern pagination, and condensed footer",
+      "visual_shell": "adaptive hide-on-down/show-on-up header with active navigation and More menu, archive-local search, compact three-section footer, host-independent readable typography, and responsive card grid",
       "compatibility": {
-        "pagetual": "direct insert events, postMessage hook, scoped mutation ingestion, and delayed reconciliation without self-observer loops"
+        "pagetual": "direct insert events, postMessage hook, scoped mutation ingestion, delayed reconciliation, stable page boundaries, loading feedback, and duplicate suppression without self-observer loops"
       },
       "phase_1_ui_contract": {
         "density_modes": [
@@ -241,6 +241,37 @@
         "archive_toolbar": "sticky search, quick filters, sorting, density, active filters",
         "card_hierarchy": "cover badges, two-line title, creator line, compact metadata, reader/original/read controls",
         "read_state": "read badge, dimmed cover, mark unread, persisted reader progress and resume"
+      },
+      "phase_2_ui_contract": {
+        "filter_views": "built-in and up to 12 user-saved views",
+        "facet_language": "readable Include and Exclude controls",
+        "responsive_workspace": "desktop side drawer and mobile bottom sheet",
+        "metadata_overflow": "stable grouped popover attached to the invoking card"
+      },
+      "phase_3_ui_contract": {
+        "page_boundaries": "PageTual batches receive stable Page N separators with batch counts in default archive order",
+        "load_feedback": "near-bottom and PageTual loading signals expose loading, slow-load fallback, and next-page retry states",
+        "scroll_position": "observer-driven transient current/visible archive position indicator",
+        "long_page_performance": "content-visibility and intrinsic card sizing keep large appended archives cheap to render"
+      },
+      "phase_4_ui_contract": {
+        "adaptive_header": "active navigation, compact More menu, archive-local search ownership, and hide-on-scroll/show-on-up behavior",
+        "compact_footer": "Recent comments, Browse, and Site links sections with desktop expansion and mobile accordions",
+        "reader_continuity": "visible percent progress, resume announcement, back-to-archive return target, and adjacent post titles",
+        "reader_mobile": "reachable bottom controls, paged swipe navigation, double-tap zoom, and distraction-free focus mode"
+      },
+      "phase_5_ui_contract": {
+        "personal_library": "saved-for-later state on archive cards, posts, and the reader with a Saved filter/view",
+        "continue_shelf": "compact continue-reading shelf backed by persisted reader progress",
+        "device_reader_profiles": "mobile and desktop reader controls persist independently while inheriting legacy reader defaults",
+        "network_policy": "paged mode hydrates only the active page neighborhood and disables adjacent-post/image thumbnail prefetch on constrained or data-saver connections"
+      },
+      "phase_6_ui_contract": {
+        "keyboard_access": "skip-to-content link plus high-visibility focus rings across injected UI",
+        "modal_lock": "mobile workspace, facet dialogs, and metadata sheets prevent background scrolling and overscroll",
+        "state_semantics": "saved/read/progress state is exposed with visible text and ARIA state, not color alone",
+        "target_policy": "primary commands use touch-friendly target floors while dense metadata controls remain compact",
+        "release_gate": "builder, browser smoke, portable npm registry checks, root metadata normalization, and byte-stable payload verification"
       }
     },
     {

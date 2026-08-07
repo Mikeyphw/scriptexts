@@ -1392,6 +1392,109 @@
       },
       "manifest": {},
       "history_id": "e372fa8b9df74e1386f26453c3edb1f4"
+    },
+    {
+      "applied_at": "2026-08-07T13:13:56.952225Z",
+      "artifact": "/home/mike/Downloads/scriptexts_myreadingmanga_reimagined_phase2_filter_experience_r11_termux_npm_overlay.zip",
+      "artifact_name": "scriptexts_myreadingmanga_reimagined_phase2_filter_experience_r11_termux_npm_overlay.zip",
+      "type": "overlay",
+      "sha256": "5c51ed99823ddd19ca0fb5b61c788383f60baace161d7da9ec8d48d68d8aca6e",
+      "status": "ok",
+      "validation_status": "ok",
+      "commit_message": "",
+      "commit_hash": "",
+      "file_count": 12,
+      "change_counts": {
+        "modify": 12
+      },
+      "manifest": {},
+      "history_id": "0a55c2e1a3d440a280417bc0ecfe120a"
+    },
+    {
+      "applied_at": "2026-08-07T14:09:39.645378Z",
+      "artifact": "/home/mike/Downloads/scriptexts_myreadingmanga_reimagined_phase2_filter_experience_r10_overlay.zip",
+      "artifact_name": "scriptexts_myreadingmanga_reimagined_phase2_filter_experience_r10_overlay.zip",
+      "type": "overlay",
+      "sha256": "42fd6fb9a215982bb21f8c64d55e6291cac6c8ed9f5c6bf107bd4e41c345b284",
+      "status": "ok",
+      "validation_status": "ok",
+      "commit_message": "",
+      "commit_hash": "",
+      "file_count": 10,
+      "change_counts": {
+        "unchanged": 10
+      },
+      "manifest": {},
+      "history_id": "89f63ac26bc8460185c67af97190acb0"
+    },
+    {
+      "applied_at": "2026-08-07T14:09:58.610977Z",
+      "artifact": "/home/mike/Downloads/scriptexts_myreadingmanga_reimagined_phase2_filter_experience_r11_termux_npm_overlay.zip",
+      "artifact_name": "scriptexts_myreadingmanga_reimagined_phase2_filter_experience_r11_termux_npm_overlay.zip",
+      "type": "overlay",
+      "sha256": "5c51ed99823ddd19ca0fb5b61c788383f60baace161d7da9ec8d48d68d8aca6e",
+      "status": "ok",
+      "validation_status": "ok",
+      "commit_message": "",
+      "commit_hash": "",
+      "file_count": 12,
+      "change_counts": {
+        "unchanged": 12
+      },
+      "manifest": {},
+      "history_id": "21ec8976d735466a97530f9218dc0ffd"
+    },
+    {
+      "applied_at": "2026-08-07T14:33:46.946550Z",
+      "artifact": "/home/mike/Downloads/scriptexts_myreadingmanga_reimagined_phase3_long_archive_r12_overlay.zip",
+      "artifact_name": "scriptexts_myreadingmanga_reimagined_phase3_long_archive_r12_overlay.zip",
+      "type": "overlay",
+      "sha256": "df92357cbe32974dcd2afd167eae1298c871a6bacdabc564e608100c6968ac73",
+      "status": "ok",
+      "validation_status": "ok",
+      "commit_message": "",
+      "commit_hash": "",
+      "file_count": 14,
+      "change_counts": {
+        "modify": 9,
+        "unchanged": 5
+      },
+      "manifest": {},
+      "history_id": "15992c52637845fd948f36624a5313b3"
+    },
+    {
+      "applied_at": "2026-08-07T14:56:30.611775Z",
+      "artifact": "/home/mike/Downloads/scriptexts_myreadingmanga_reimagined_phase4_shell_reader_r13_overlay.zip",
+      "artifact_name": "scriptexts_myreadingmanga_reimagined_phase4_shell_reader_r13_overlay.zip",
+      "type": "overlay",
+      "sha256": "0fd25716b84a7f3cdc24f9c352ea71ef2178cbfbc7d236f2b50b76ffb0259436",
+      "status": "ok",
+      "validation_status": "ok",
+      "commit_message": "",
+      "commit_hash": "",
+      "file_count": 14,
+      "change_counts": {
+        "modify": 14
+      },
+      "manifest": {},
+      "history_id": "6825a37b780547d1a731c1f6ed524f07"
+    },
+    {
+      "applied_at": "2026-08-07T15:18:56.117187Z",
+      "artifact": "/home/mike/Downloads/scriptexts_myreadingmanga_reimagined_phase5_6_completion_r14_overlay.zip",
+      "artifact_name": "scriptexts_myreadingmanga_reimagined_phase5_6_completion_r14_overlay.zip",
+      "type": "overlay",
+      "sha256": "b818cd91611b7144eb9be40801f507bf1a2d336d255f213de8fb2adafca75910",
+      "status": "ok",
+      "validation_status": "ok",
+      "commit_message": "",
+      "commit_hash": "",
+      "file_count": 18,
+      "change_counts": {
+        "modify": 18
+      },
+      "manifest": {},
+      "history_id": "af88b40318224d45bd796fe00178051e"
     }
   ]
 }

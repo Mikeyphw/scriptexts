@@ -48,3 +48,35 @@
 - Sticky archive command bar with title, loaded/visible and in-progress counts, full-width local search, English/hide-read quick filters, sorting, density controls, active-filter summary, and a direct filters entry point.
 - Image-first cards with readable titles, compact metadata, a secondary Reader action, and configurable contain/cover artwork fitting.
 - Larger accessible archive pagination and a condensed responsive footer with expandable long lists.
+
+## Phase 4 adaptive shell and reader continuity
+
+- Header hides on downward scroll and returns on upward intent, without leaving a sticky-toolbar gap.
+- Archive/search pages use the archive command bar as the sole search surface; post pages retain global site search.
+- Main navigation exposes active-section state and a compact More menu for secondary links.
+- Compact footer groups Recent comments, Browse, and Site links; mobile uses closed accordions by default.
+- Reader shows page count plus percentage progress and announces restored progress when resuming.
+- Reader opened from an archive card exposes Back to archive and restores the invoking card/scroll context.
+- Adjacent-post controls show titles when the archive sequence or post navigation supplies them.
+- Mobile paged mode provides visible bottom controls, horizontal swipe navigation, and double-tap zoom.
+- Focus mode (`D`) removes reader chrome while keeping an explicit Exit focus control.
+
+
+## Phase 5 personal library and adaptive reader
+
+- Saved-for-later state is available on archive cards, post pages, and the reader, with reversible controls and a Saved-only archive filter/view.
+- Saved records are bounded local state and retain title/cover metadata for future library evolution.
+- A compact Continue reading shelf surfaces unfinished loaded titles with page and percentage progress.
+- Reader view, width, fit, direction, and thumbnail choices inherit legacy defaults but persist independently for mobile and desktop after a device-specific change.
+- Paged mode hydrates a small active-page neighborhood instead of assigning every image source immediately.
+- Data Saver, 2G, and slow-2G connections use a tighter hydration radius, text-only thumbnails, and suppress adjacent-post prefetch.
+- The `S` reader shortcut toggles saved state without interfering with existing navigation shortcuts.
+
+## Phase 6 accessibility and completion seal
+
+- Skip-to-content navigation is injected ahead of the custom header and targets the main content region.
+- All primary injected controls receive high-visibility `:focus-visible` treatment; read, saved, filter, and progress states include text/ARIA semantics.
+- Mobile workspace, facet modal, and metadata sheet prevent background scrolling and overscroll while open.
+- Touch targets are raised to practical mobile floors without inflating dense taxonomy chips unnecessarily.
+- `prefers-contrast: more` and `prefers-reduced-motion: reduce` receive explicit UI treatment.
+- Release validation preserves the public npm registry contract, read-only generated-artifact verification, Chromium fixture interactions, PageTual insertion behavior, repository metadata normalization, and byte-stable overlay payloads.

@@ -42,7 +42,7 @@ def runtime_source() -> str:
     )
 
 
-def install(page: Page, html: str, source: str, preferences: dict | None = None) -> list[str]:
+def install(page: Page, html: str, source: str, preferences: dict | None = None, storage: dict | None = None, constrained: bool = False) -> list[str]:
     errors: list[str] = []
     page.on("pageerror", lambda error: errors.append(str(error)))
     page.set_content(html, wait_until="domcontentloaded")
@@ -52,6 +52,12 @@ def install(page: Page, html: str, source: str, preferences: dict | None = None)
         page.evaluate(
             "prefs => localStorage.setItem('mrm-reimagined-v1:preferences', JSON.stringify(prefs))",
             preferences,
+        )
+    for key, value in (storage or {}).items():
+        page.evaluate("([key, value]) => localStorage.setItem(key, JSON.stringify(value))", [key, value])
+    if constrained:
+        page.evaluate(
+            """() => Object.defineProperty(navigator, 'connection', { configurable: true, value: { saveData: true, effectiveType: '2g' } })"""
         )
     page.add_script_tag(content=source)
     return errors
@@ -101,8 +107,8 @@ def archive_smoke(browser, source: str) -> None:
           const pagination = document.querySelector('.archive-pagination a');
           const overviewCopy = document.querySelector('.mrm-overview-result-summary');
           const navLink = document.querySelector('.mrm-site-menu a');
-          const footerComment = document.querySelector('.before-footer #recentcomments > li');
-          const footerChip = document.querySelector('.footer-widgets .tagcloud > a, .footer-widgets .menu a');
+          const footerComment = document.querySelector('.mrm-compact-comments > li');
+          const footerChip = document.querySelector('.mrm-compact-link-cloud > a, .mrm-compact-site-links > a');
           const cardRect = card.getBoundingClientRect();
           const readerRect = reader.getBoundingClientRect();
           const pageRect = pagination?.getBoundingClientRect();
@@ -136,18 +142,36 @@ def archive_smoke(browser, source: str) -> None:
     assert visual["chipSize"] >= 12 and visual["chipHeight"] >= 30, visual
     assert visual["readerSize"] >= 13, visual
     assert visual["overviewSize"] >= 12 and visual["navSize"] >= 13, visual
-    assert visual["footerCommentSize"] >= 14 and visual["footerChipSize"] >= 12, visual
+    assert visual["footerCommentSize"] >= 12 and visual["footerChipSize"] >= 11, visual
     assert visual["chips"] <= 3 and visual["chipsFit"], visual
     assert visual["readerRatio"] < 0.8, visual
     assert visual["readerBackground"] != visual["accent"], visual
     assert visual["objectFit"] == "contain", visual
     assert visual["pageWidth"] >= 44 and visual["pageHeight"] >= 44, visual
-    assert page.locator(".mrm-footer-more").count() >= 2
+    assert page.locator("#mrm-compact-footer .mrm-compact-footer-section").count() >= 3
+    assert page.locator(".mrm-site-search").count() == 0
+    assert page.locator(".mrm-site-more").count() == 1
+    assert page.locator(".before-footer").evaluate("node => getComputedStyle(node).display") == "none"
+    assert page.locator(".footer-widgets").evaluate("node => getComputedStyle(node).display") == "none"
     controller = page.locator("#pagetual-sideController")
     if controller.count():
         assert controller.is_visible()
     assert page.evaluate("document.documentElement.scrollWidth <= innerWidth + 1")
     assert page.locator("#mrm-panel-launcher").is_hidden()
+    skip_link = page.locator(".mrm-skip-link")
+    assert skip_link.count() == 1
+    skip_link.focus()
+    assert skip_link.evaluate("node => getComputedStyle(node).position") == "fixed"
+    assert skip_link.get_attribute("href") == "#mrm-main-content"
+
+    # The adaptive header yields space while scrolling down and returns on upward intent.
+    page.evaluate("window.scrollTo(0, Math.min(document.documentElement.scrollHeight - innerHeight, 1800))")
+    page.wait_for_timeout(180)
+    assert "mrm-site-toolbar-hidden" in (page.locator("#mrm-site-toolbar").get_attribute("class") or "")
+    assert page.locator("html").evaluate("node => node.classList.contains('mrm-header-hidden')")
+    page.evaluate("window.scrollBy(0, -320)")
+    page.wait_for_timeout(180)
+    assert "mrm-site-toolbar-hidden" not in (page.locator("#mrm-site-toolbar").get_attribute("class") or "")
 
     # Density presets are persistent and switch the live grid without rebuilding cards.
     page.locator("[data-overview-density='comfortable']").click()
@@ -172,6 +196,24 @@ def archive_smoke(browser, source: str) -> None:
     read_toggle.click()
     page.wait_for_timeout(80)
     assert "mrm-is-read" not in (first_visible.get_attribute("class") or "")
+
+    # Saved-for-later state is explicit, reversible, and filterable from the archive toolbar.
+    save_toggle = first_visible.locator(".mrm-card-save-toggle")
+    save_toggle.click()
+    page.wait_for_timeout(80)
+    assert save_toggle.get_attribute("aria-pressed") == "true"
+    assert "mrm-is-saved" in (first_visible.get_attribute("class") or "")
+    saved_quick = page.locator("[data-overview-toggle='onlySaved']")
+    saved_quick.click()
+    page.wait_for_timeout(100)
+    saved_visible = page.locator(".mrm-card:not([hidden])").count()
+    assert 1 <= saved_visible < total, saved_visible
+    assert saved_quick.get_attribute("aria-pressed") == "true"
+    saved_quick.click()
+    page.wait_for_timeout(80)
+    save_toggle.click()
+    page.wait_for_timeout(80)
+    assert save_toggle.get_attribute("aria-pressed") == "false"
 
     english_quick = page.locator("[data-overview-toggle='onlyEnglish']")
     english_quick.click()
@@ -252,6 +294,10 @@ def pagetual_smoke(browser, source: str) -> None:
     page.wait_for_timeout(180)
     assert page.locator(".mrm-card:not([hidden])").count() == 0
 
+    page.evaluate("window.postMessage({ command: 'pagetual', action: 'loading' }, '*')")
+    page.wait_for_function("() => document.querySelector('#mrm-page-load-status')?.textContent.includes('Loading the next page')")
+    assert page.locator("#mrm-page-load-status").is_visible()
+
     page.evaluate(
         """() => {
           const cleanClone = (suffix, title) => {
@@ -283,6 +329,9 @@ def pagetual_smoke(browser, source: str) -> None:
     page.wait_for_function("initial => document.querySelectorAll('.mrm-card').length === initial + 2", arg=initial)
     assert page.locator("#pagetual-hidden-source article.post.entry").count() == 0
     assert page.locator(".mrm-card:not([hidden])").count() == 0
+    assert page.locator(".mrm-page-separator").count() == 1
+    assert page.locator(".mrm-page-separator").is_hidden()
+    assert "Page 2 loaded" in page.locator("#mrm-page-load-status").inner_text()
     page_bar = page.locator("#pagetual_pageBar_smoke")
     assert page_bar.is_visible()
     bar_geometry = page_bar.evaluate(
@@ -293,6 +342,16 @@ def pagetual_smoke(browser, source: str) -> None:
     page.locator(".mrm-overview-clear").click()
     page.wait_for_timeout(160)
     assert page.locator(".mrm-card:not([hidden])").count() == initial + 2
+    separator = page.locator(".mrm-page-separator")
+    assert separator.is_visible()
+    assert "Page 2" in separator.inner_text() and "2 more releases" in separator.inner_text()
+    card_visibility = page.locator(".mrm-card").first.evaluate("node => getComputedStyle(node).contentVisibility")
+    assert card_visibility == "auto", card_visibility
+
+    page.evaluate("window.scrollTo(0, document.documentElement.scrollHeight * .55)")
+    page.wait_for_timeout(120)
+    page.wait_for_function("() => !document.querySelector('#mrm-scroll-position')?.hidden")
+    assert " of " in page.locator("#mrm-scroll-position").inner_text()
 
     # Reinsert one canonical URL through the custom-event path. It must be removed as a duplicate.
     page.evaluate(
@@ -319,6 +378,30 @@ def pagetual_smoke(browser, source: str) -> None:
     page.close()
 
 
+def personal_library_smoke(browser, source: str) -> None:
+    page = browser.new_page(viewport={"width": 1180, "height": 820})
+    url = "https://myreadingmanga.info/benfanbox-mi-compan%cc%83ero-de-cuarto-es-heterosexual-olas-spa/"
+    storage = {
+        "mrm-reimagined-v1:reader-progress": {
+            url: {"title": "Continue Smoke", "pageIndex": 3, "pageCount": 12, "percent": 33, "completed": False, "updatedAt": 2000}
+        },
+        "mrm-reimagined-v1:saved-posts": {
+            url: {"title": "Continue Smoke", "image": "", "savedAt": 1000, "updatedAt": 1000}
+        },
+    }
+    errors = install(page, (FIXTURES / "mrm-home.html").read_text(encoding="utf-8"), source, storage=storage)
+    page.wait_for_selector("#mrm-continue-shelf:not([hidden])")
+    assert page.locator("#mrm-continue-shelf .mrm-continue-item").count() >= 1
+    assert "Page 4 of 12" in page.locator("#mrm-continue-shelf").inner_text()
+    assert "33%" in page.locator("#mrm-continue-shelf").inner_text()
+    assert page.locator("#mrm-overview-saved-count").inner_text().startswith("1 saved")
+    saved_card = page.locator(f".mrm-card[data-mrm-url='{url}']")
+    assert saved_card.count() == 1
+    assert "mrm-is-saved" in (saved_card.get_attribute("class") or "")
+    assert not errors, errors
+    page.close()
+
+
 def mobile_layout_smoke(browser, source: str) -> None:
     page = browser.new_page(viewport={"width": 390, "height": 900})
     errors = install(page, (FIXTURES / "mrm-home.html").read_text(encoding="utf-8"), source)
@@ -337,6 +420,26 @@ def mobile_layout_smoke(browser, source: str) -> None:
     assert min(card["width"] for card in geometry["cards"]) >= 160, geometry
     assert len({card["x"] for card in geometry["cards"]}) >= 2, geometry
     assert geometry["scrollWidth"] <= geometry["viewport"] + 1, geometry
+    assert page.locator("#mrm-compact-footer .mrm-compact-footer-section").count() >= 3
+    assert page.locator("#mrm-compact-footer .mrm-compact-footer-section[open]").count() == 0
+    assert page.locator(".mrm-site-search").count() == 0
+    page.locator(".mrm-overview-filter-button").click()
+    page.wait_for_selector("#mrm-control-panel:not([hidden])")
+    assert page.locator("html").evaluate("node => node.classList.contains('mrm-panel-open')")
+    assert page.locator("body").evaluate("node => getComputedStyle(node).overflow") == "hidden"
+    page.locator("[data-panel-action='close']").click()
+    page.wait_for_timeout(60)
+    assert not page.locator("html").evaluate("node => node.classList.contains('mrm-panel-open')")
+    overflow = page.locator(".mrm-card:not([hidden]) .mrm-taxonomy-more:visible").first
+    assert overflow.count() == 1
+    overflow.click()
+    page.wait_for_selector("#mrm-metadata-popover")
+    assert page.locator("#mrm-metadata-popover").get_attribute("aria-modal") == "true"
+    assert page.locator("html").evaluate("node => node.classList.contains('mrm-metadata-open')")
+    assert page.locator("body").evaluate("node => getComputedStyle(node).overflow") == "hidden"
+    page.locator("#mrm-metadata-popover header button").click()
+    page.wait_for_timeout(50)
+    assert not page.locator("html").evaluate("node => node.classList.contains('mrm-metadata-open')")
     page.close()
 
     post = browser.new_page(viewport={"width": 390, "height": 900})
@@ -373,12 +476,13 @@ def search_smoke(browser, source: str) -> None:
 
 def reader_smoke(browser, source: str) -> None:
     page = browser.new_page(viewport={"width": 390, "height": 900})
+    page.set_default_timeout(5000)
     preferences = {
         "uiEnabled": False,
         "filters": {"query": "", "hideRead": False, "onlyEnglish": False, "sort": "default", "include": {}, "exclude": {}},
         "reader": {"view": "paged", "width": "comfort", "fit": "width", "direction": "ltr", "thumbnails": True, "autoHideToolbar": True},
     }
-    errors = install(page, (FIXTURES / "mrm-post.html").read_text(encoding="utf-8"), source, preferences)
+    errors = install(page, (FIXTURES / "mrm-post.html").read_text(encoding="utf-8"), source, preferences, constrained=True)
     page.evaluate(
         "pixel => document.querySelectorAll('.img-myreadingmanga').forEach((img, index) => { img.src = `${pixel}#${index + 1}`; })",
         PIXEL,
@@ -391,13 +495,30 @@ def reader_smoke(browser, source: str) -> None:
     page.wait_for_selector(".mrm-reader-modal:not([hidden]) .mrm-reader-page")
     page_count = page.locator(".mrm-reader-page").count()
     assert page_count >= 20, page_count
-    assert page.locator("[data-reader-action='previous-page']").first.is_disabled()
-    assert not page.locator("[data-reader-action='next-page']").first.is_disabled()
-    assert page.locator(".mrm-reader-mobile-zones").is_visible()
+    assert page.locator(".mrm-reader-mobile-controls [data-reader-action='previous-page']").is_disabled()
+    assert not page.locator(".mrm-reader-mobile-controls [data-reader-action='next-page']").is_disabled()
+    assert page.locator(".mrm-reader-mobile-zones").is_hidden()
+    assert page.locator(".mrm-reader-mobile-controls").is_visible()
+    assert page.locator("#mrm-reader-progress-meter").is_visible()
+    assert "Page 1 of" in page.locator("#mrm-reader-progress-label").inner_text()
+    assert page.locator(".mrm-reader-thumbnail img").count() == 0
+    hydrated = page.locator(".mrm-reader-page img[src]").count()
+    assert 1 <= hydrated <= 3, hydrated
 
-    page.locator("[data-reader-action='next-page']").first.click()
+    reader_save = page.locator(".mrm-reader-modal [data-reader-action='save']")
+    reader_save.click()
+    page.wait_for_timeout(60)
+    assert reader_save.get_attribute("aria-pressed") == "true"
+    saved = page.evaluate("JSON.parse(localStorage.getItem('mrm-reimagined-v1:saved-posts'))")
+    assert saved and len(saved) == 1, saved
+    page.keyboard.press("s")
+    page.wait_for_timeout(60)
+    assert reader_save.get_attribute("aria-pressed") == "false"
+
+    page.locator(".mrm-reader-mobile-controls [data-reader-action='next-page']").click()
     page.wait_for_timeout(120)
     assert (page.locator("#mrm-reader-page-count").inner_text() or "").startswith("2 /")
+    assert page.locator("#mrm-reader-progress-meter").get_attribute("value") not in (None, "0")
     progress = page.evaluate("JSON.parse(localStorage.getItem('mrm-reimagined-v1:reader-progress'))")
     assert progress and next(iter(progress.values()))["pageIndex"] == 1, progress
     page.keyboard.press("Escape")
@@ -407,14 +528,41 @@ def reader_smoke(browser, source: str) -> None:
     page.wait_for_timeout(120)
     assert (page.locator("#mrm-reader-page-count").inner_text() or "").startswith("2 /")
 
+    # Paged mobile reader accepts a horizontal touch swipe and double-tap zoom.
+    page.locator(".mrm-reader-stage").evaluate("""stage => {
+      stage.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, pointerType: 'touch', clientX: 310, clientY: 420 }));
+      stage.dispatchEvent(new PointerEvent('pointerup', { bubbles: true, pointerType: 'touch', clientX: 110, clientY: 430 }));
+    }""")
+    page.wait_for_timeout(100)
+    assert (page.locator("#mrm-reader-page-count").inner_text() or "").startswith("3 /")
+    current_image = page.locator(".mrm-reader-page:not([hidden]) img").first
+    current_image.dblclick()
+    assert "is-image-zoomed" in (page.locator(".mrm-reader-modal").get_attribute("class") or "")
+    current_image.dblclick()
+    assert "is-image-zoomed" not in (page.locator(".mrm-reader-modal").get_attribute("class") or "")
+
     page.locator(".mrm-reader-modal [data-reader-action=\"comments\"]").click()
     assert page.locator(".mrm-reader-comments").is_visible()
     page.locator(".mrm-reader-modal [data-reader-action=\"comments\"]").click()
 
+    page.keyboard.press("d")
+    assert "is-focus-mode" in (page.locator(".mrm-reader-modal").get_attribute("class") or "")
+    assert page.locator(".mrm-reader-focus-exit").is_visible()
+    page.keyboard.press("d")
+    assert "is-focus-mode" not in (page.locator(".mrm-reader-modal").get_attribute("class") or "")
+
     page.keyboard.press("c")
     assert page.locator(".mrm-reader-modal").get_attribute("data-view") == "strip"
+    assert page.locator(".mrm-reader-mobile-zones").is_visible()
     page.keyboard.press("w")
     assert page.locator(".mrm-reader-modal").get_attribute("data-width") == "wide"
+    stored_preferences = page.evaluate("JSON.parse(localStorage.getItem('mrm-reimagined-v1:preferences'))")
+    assert stored_preferences["readerProfiles"]["mobile"]["width"] == "wide", stored_preferences
+    assert stored_preferences["reader"]["width"] == "comfort", stored_preferences
+    page.set_viewport_size({"width": 1000, "height": 900})
+    page.wait_for_timeout(120)
+    assert page.locator(".mrm-reader-modal").get_attribute("data-width") == "comfort"
+    assert page.locator(".mrm-reader-modal").get_attribute("data-view") == "paged"
     page.keyboard.press("Escape")
     assert page.locator(".mrm-reader-modal").is_hidden()
     assert not errors, errors
@@ -435,12 +583,13 @@ def main() -> None:
         try:
             archive_smoke(browser, source)
             pagetual_smoke(browser, source)
+            personal_library_smoke(browser, source)
             mobile_layout_smoke(browser, source)
             search_smoke(browser, source)
             reader_smoke(browser, source)
         finally:
             browser.close()
-    print("MRM Chromium smoke passed: unified shell, archive hierarchy, readable cards, compact metadata/actions, pagination/footer, mobile geometry, native facets, stable dynamic inserts, PageTual hidden-source/duplicate/filter reconciliation, unclipped chips, disabled-UI reader, comments, mobile zones, and keyboard controls.")
+    print("MRM Chromium smoke passed: adaptive header, personal library, saved filters, accessible shell, modal scroll lock, PageTual long-page continuity, mobile geometry, connection-aware reader hydration, device-specific reader preferences, resume/progress, focus mode, comments, and keyboard controls.")
 
 
 if __name__ == "__main__":

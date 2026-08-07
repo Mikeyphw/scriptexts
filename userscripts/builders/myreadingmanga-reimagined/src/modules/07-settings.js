@@ -21,6 +21,7 @@ MRM.settings = (() => {
       <div class="mrm-panel-scroll">
         <section data-panel-section="filters">
           <label class="mrm-field"><span>Search visible archive</span><input id="mrm-live-search" type="search" autocomplete="off" placeholder="Title, artist, tags…"></label>
+          <section class="mrm-view-section" aria-labelledby="mrm-view-title"><div class="mrm-section-heading"><strong id="mrm-view-title">Filter views</strong><button type="button" data-panel-action="save-view">Save current</button></div><div id="mrm-filter-views" class="mrm-filter-views"></div></section>
           <div id="mrm-filter-toggles"></div>
           <label class="mrm-field"><span>Display order</span><select id="mrm-sort"><option value="default">Newest first</option><option value="title-asc">Title A–Z</option><option value="title-desc">Title Z–A</option><option value="english-first">English first</option></select></label>
           <div id="mrm-native-search-controls"></div>
@@ -42,6 +43,7 @@ MRM.settings = (() => {
     sort.value = MRM.storage.preferences.filters.sort;
     sort.addEventListener("change", () => updateFilters({ sort: sort.value }));
     renderNativeSearchControls();
+    renderFilterViews();
     renderFilterToggles();
     renderGridSettings();
     renderThemeSettings();
@@ -63,11 +65,36 @@ MRM.settings = (() => {
     const apply = MRM.util.create("button", { text: "Apply filters on site", attrs: { type: "button", "data-panel-action": "apply-native" } });
     host.append(field, apply);
   };
+  const builtinViews = () => [
+    { id: "builtin-unread", name: "Unread", filters: { ...MRM.storage.preferences.filters, query: "", hideRead: true } },
+    { id: "builtin-english-unread", name: "English unread", filters: { ...MRM.storage.preferences.filters, query: "", hideRead: true, onlyEnglish: true } },
+    { id: "builtin-english", name: "English only", filters: { ...MRM.storage.preferences.filters, query: "", hideRead: false, onlyEnglish: true } },
+    { id: "builtin-saved", name: "Saved for later", filters: { ...MRM.storage.preferences.filters, query: "", hideRead: false, onlySaved: true } },
+    { id: "builtin-defaults", name: "Default exclusions", filters: structuredClone(MRM.storage.defaults.filters) },
+  ];
+  const renderFilterViews = () => {
+    const host = panel?.querySelector("#mrm-filter-views");
+    if (!host) return;
+    host.replaceChildren();
+    for (const view of [...builtinViews(), ...(MRM.storage.preferences.savedViews || [])]) {
+      const item = MRM.util.create("div", { className: "mrm-filter-view" });
+      const apply = MRM.util.create("button", { text: view.name, attrs: { type: "button", title: `Apply ${view.name}` } });
+      apply.addEventListener("click", () => MRM.storage.applyView(view));
+      item.append(apply);
+      if (!view.id.startsWith("builtin-")) {
+        const remove = MRM.util.create("button", { text: "×", className: "mrm-filter-view-remove", attrs: { type: "button", "aria-label": `Delete saved view ${view.name}` } });
+        remove.addEventListener("click", () => MRM.storage.deleteView(view.id));
+        item.append(remove);
+      }
+      host.append(item);
+    }
+  };
   const renderFilterToggles = () => {
     const host = panel.querySelector("#mrm-filter-toggles");
     host.replaceChildren(
       makeToggle("Hide read", MRM.storage.preferences.filters.hideRead, (value) => updateFilters({ hideRead: value })),
       makeToggle("Only English", MRM.storage.preferences.filters.onlyEnglish, (value) => updateFilters({ onlyEnglish: value })),
+      makeToggle("Saved for later only", MRM.storage.preferences.filters.onlySaved, (value) => updateFilters({ onlySaved: value })),
     );
   };
   const rangeField = (label, key, value, min, max, step, onInput) => {
@@ -142,16 +169,21 @@ MRM.settings = (() => {
     const borders = MRM.util.create("fieldset", { className: "mrm-border-grid" });
     borders.append(MRM.util.create("legend", { text: "Borders" }));
     for (const [name, enabled] of Object.entries(prefs.border)) borders.append(makeToggle(MRM.util.slugLabel(name), enabled, (value) => MRM.storage.update({ border: { ...MRM.storage.preferences.border, [name]: value } })));
+    const readerProfile = MRM.util.create("p", { className: "mrm-settings-note", text: `Reader controls are remembered separately for ${MRM.storage.readerDevice()} and ${MRM.storage.readerDevice() === "mobile" ? "desktop" : "mobile"}.` });
     const clearRead = MRM.util.create("button", { text: "Clear read history", attrs: { type: "button" } });
     clearRead.addEventListener("click", () => { if (confirm("Clear all locally stored read history?")) MRM.storage.clearRead(); });
-    host.replaceChildren(ui, dock, accent, borders, clearRead);
+    const clearSaved = MRM.util.create("button", { text: "Clear saved posts", attrs: { type: "button" } });
+    clearSaved.addEventListener("click", () => { if (confirm("Remove every locally saved post?")) MRM.storage.clearSaved(); });
+    const dataActions = MRM.util.create("div", { className: "mrm-inline-actions" });
+    dataActions.append(clearRead, clearSaved);
+    host.replaceChildren(ui, dock, accent, borders, readerProfile, dataActions);
   };
   const termRow = (type, term) => {
     const row = MRM.util.create("div", { className: "mrm-facet-term" });
     const label = MRM.util.create("span", { text: term.name });
     const count = MRM.util.create("small", { text: term.count ? String(term.count) : "" });
-    const include = MRM.util.create("button", { text: "IN", attrs: { type: "button", "aria-pressed": MRM.facets.activeFor("include", type).includes(term.slug) } });
-    const exclude = MRM.util.create("button", { text: "OUT", attrs: { type: "button", "aria-pressed": MRM.facets.activeFor("exclude", type).includes(term.slug) } });
+    const include = MRM.util.create("button", { text: "Include", attrs: { type: "button", "aria-pressed": MRM.facets.activeFor("include", type).includes(term.slug) } });
+    const exclude = MRM.util.create("button", { text: "Exclude", attrs: { type: "button", "aria-pressed": MRM.facets.activeFor("exclude", type).includes(term.slug) } });
     include.addEventListener("click", () => MRM.facets.toggle("include", type, term.slug));
     exclude.addEventListener("click", () => MRM.facets.toggle("exclude", type, term.slug));
     row.append(label, count, include, exclude);
@@ -208,10 +240,54 @@ MRM.settings = (() => {
     previous.addEventListener("click", () => { page -= 1; render(); });
     next.addEventListener("click", () => { page += 1; render(); });
     input.addEventListener("input", () => { page = 0; render(); });
-    modal.querySelector("[data-modal-close]").addEventListener("click", () => modal.remove());
-    modal.addEventListener("click", (event) => { if (event.target === modal) modal.remove(); });
-    modal.addEventListener("keydown", (event) => { if (event.key === "Escape") modal.remove(); else MRM.util.trapFocus(event, modal); });
+    MRM.runtime.facetModalOpen = true;
+    document.documentElement.classList.add("mrm-modal-open");
+    const closeModal = () => { MRM.runtime.facetModalOpen = false; document.documentElement.classList.remove("mrm-modal-open"); modal.remove(); };
+    modal.querySelector("[data-modal-close]").addEventListener("click", closeModal);
+    modal.addEventListener("click", (event) => { if (event.target === modal) closeModal(); });
+    modal.addEventListener("keydown", (event) => { if (event.key === "Escape") closeModal(); else MRM.util.trapFocus(event, modal); });
     render(); input.focus();
+  };
+  const openMetadataPopover = (button, card, values) => {
+    MRM.util.q("#mrm-metadata-popover")?.remove();
+    document.documentElement.classList.remove("mrm-metadata-open");
+    const mobile = matchMedia("(max-width: 680px)").matches;
+    const popover = MRM.util.create("section", { attrs: { id: "mrm-metadata-popover", role: "dialog", "aria-modal": String(mobile), "aria-labelledby": "mrm-metadata-title" }, className: "mrm-metadata-popover" });
+    const header = MRM.util.create("header");
+    header.append(MRM.util.create("strong", { id: "mrm-metadata-title", text: card.title }), MRM.util.create("button", { text: "×", attrs: { type: "button", "aria-label": "Close metadata" } }));
+    const body = MRM.util.create("div", { className: "mrm-metadata-groups" });
+    const grouped = new Map();
+    for (const item of values) { if (!grouped.has(item.type)) grouped.set(item.type, []); grouped.get(item.type).push(item); }
+    for (const [type, items] of grouped) {
+      const group = MRM.util.create("section", { className: "mrm-metadata-group" });
+      group.append(MRM.util.create("h3", { text: MRM.site.facetPrefixes[type] || MRM.util.slugLabel(type) }));
+      const chips = MRM.util.create("div", { className: "mrm-metadata-group-chips" });
+      for (const item of items) {
+        const chip = MRM.util.create("button", { text: MRM.util.slugLabel(item.slug), attrs: { type: "button", title: `Include ${MRM.util.slugLabel(item.slug)}` } });
+        chip.addEventListener("click", () => { MRM.facets.toggle("include", item.type, item.slug); close(); });
+        chips.append(chip);
+      }
+      group.append(chips); body.append(group);
+    }
+    let outside = null;
+    const close = () => {
+      document.documentElement.classList.remove("mrm-metadata-open");
+      popover.remove();
+      if (outside) document.removeEventListener("pointerdown", outside, true);
+    };
+    popover.append(header, body); document.body.append(popover);
+    if (mobile) document.documentElement.classList.add("mrm-metadata-open");
+    const rect = button.getBoundingClientRect();
+    const popoverRect = popover.getBoundingClientRect();
+    const below = rect.bottom + 8;
+    const top = below + popoverRect.height <= innerHeight - 12 ? below : Math.max(12, rect.top - popoverRect.height - 8);
+    popover.style.setProperty("--mrm-popover-left", `${Math.max(12, Math.min(innerWidth - Math.min(360, innerWidth - 24) - 12, rect.left))}px`);
+    popover.style.setProperty("--mrm-popover-top", `${top}px`);
+    header.querySelector("button").addEventListener("click", close);
+    outside = (event) => { if (!popover.contains(event.target) && event.target !== button) close(); };
+    setTimeout(() => document.addEventListener("pointerdown", outside, true), 0);
+    popover.addEventListener("keydown", (event) => { if (event.key === "Escape") { close(); button.focus(); } else MRM.util.trapFocus(event, popover); });
+    popover.querySelector("button").focus();
   };
   const selectTab = (section = "filters") => {
     renderPanel();
@@ -225,6 +301,7 @@ MRM.settings = (() => {
     const open = force ?? panel.hidden;
     panel.hidden = !open;
     MRM.runtime.panelOpen = open;
+    document.documentElement.classList.toggle("mrm-panel-open", open && matchMedia("(max-width: 760px)").matches);
     const launcher = MRM.util.q("#mrm-panel-launcher");
     launcher.setAttribute("aria-expanded", String(open));
     if (open) panel.querySelector("[data-panel-action='close']").focus();
@@ -241,6 +318,7 @@ MRM.settings = (() => {
     const action = event.target.closest("[data-panel-action]")?.dataset.panelAction;
     if (action === "close") togglePanel(false);
     if (action === "mark-read") MRM.archive.markVisibleRead();
+    if (action === "save-view") { const name = prompt("Name this filter view"); if (name) MRM.storage.saveView(name); }
     if (action === "apply-native") MRM.facets.applyNative(panel.querySelector("#mrm-native-sort")?.value || MRM.facets.nativeSortValue());
     if (action === "clear-filters") {
       MRM.archive.clearFilters();
@@ -268,6 +346,7 @@ MRM.settings = (() => {
     panel.querySelector("#mrm-sort").value = MRM.storage.preferences.filters.sort;
     panel.querySelectorAll(".mrm-density-option").forEach((button) => button.setAttribute("aria-checked", String(button.dataset.density === MRM.storage.preferences.grid.density)));
     refreshFacets();
+    renderFilterViews();
   });
-  return { init, open, togglePanel, refreshFacets, openFacetModal, installRecoveryButton };
+  return { init, open, togglePanel, refreshFacets, openFacetModal, openMetadataPopover, installRecoveryButton };
 })();

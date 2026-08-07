@@ -7,11 +7,39 @@ MRM.archive = (() => {
   const handledPageTualEvents = new WeakSet();
   let overview = null;
   let scanTimer = 0;
+  let pageSequence = 1;
+  let pageLoadTimer = 0;
+  let pageLoadStatus = null;
+  let positionIndicator = null;
+  let positionHideTimer = 0;
+  let positionFrame = 0;
+  const intersectingCards = new Set();
 
   const activeFilterCount = (filters = MRM.storage.preferences.filters) => {
-    let count = Number(Boolean(filters.query)) + Number(Boolean(filters.hideRead)) + Number(Boolean(filters.onlyEnglish));
+    let count = Number(Boolean(filters.query)) + Number(Boolean(filters.hideRead)) + Number(Boolean(filters.onlyEnglish)) + Number(Boolean(filters.onlySaved));
     for (const mode of ["include", "exclude"]) for (const values of Object.values(filters[mode] || {})) count += values.length;
     return count;
+  };
+
+  const renderContinueShelf = () => {
+    const shelf = MRM.util.q("#mrm-continue-shelf");
+    const host = MRM.util.q(".mrm-continue-items", shelf || document);
+    if (!shelf || !host) return;
+    const active = MRM.runtime.cards.map((card) => ({ card, progress: MRM.storage.getReaderProgress(card.url) }))
+      .filter(({ card, progress }) => progress && !progress.completed && !MRM.storage.isRead(card.url))
+      .sort((a, b) => (b.progress.updatedAt || 0) - (a.progress.updatedAt || 0))
+      .slice(0, 6);
+    host.replaceChildren();
+    for (const { card, progress } of active) {
+      const button = MRM.util.create("button", { className: "mrm-continue-item", attrs: { type: "button", "aria-label": `Continue ${card.title} at page ${progress.pageIndex + 1}` } });
+      if (card.image) button.append(MRM.util.create("img", { attrs: { src: MRM.util.imageSource(card.image), alt: "", loading: "lazy", decoding: "async" } }));
+      const copy = MRM.util.create("span", { className: "mrm-continue-copy" });
+      copy.append(MRM.util.create("strong", { text: card.title }), MRM.util.create("small", { text: `Page ${progress.pageIndex + 1} of ${progress.pageCount} · ${progress.percent}%` }));
+      button.append(copy);
+      button.addEventListener("click", () => MRM.reader.open(card.url, { sequence: visibleCards().map((item) => item.url), trigger: button }));
+      host.append(button);
+    }
+    shelf.hidden = active.length === 0;
   };
 
   const updateResultUI = (visible, total) => {
@@ -24,6 +52,13 @@ MRM.archive = (() => {
       progressLabel.textContent = inProgress ? `${inProgress} in progress` : "Nothing in progress";
       progressLabel.hidden = inProgress === 0;
     }
+    const savedCount = Object.keys(MRM.storage.savedPosts).length;
+    const savedLabel = MRM.util.q("#mrm-overview-saved-count");
+    if (savedLabel) {
+      savedLabel.textContent = savedCount ? `${savedCount} saved` : "Nothing saved";
+      savedLabel.hidden = savedCount === 0;
+    }
+    renderContinueShelf();
     const badge = MRM.util.q("#mrm-launcher-count");
     if (badge) {
       const active = activeFilterCount();
@@ -77,13 +112,19 @@ MRM.archive = (() => {
           <strong id="mrm-overview-count">0</strong>
           <span id="mrm-overview-loaded">Loading archive…</span>
           <span id="mrm-overview-progress-count" hidden></span>
+          <span id="mrm-overview-saved-count" hidden></span>
         </div>
       </div>
+      <section id="mrm-continue-shelf" class="mrm-continue-shelf" hidden aria-labelledby="mrm-continue-title">
+        <div class="mrm-continue-heading"><strong id="mrm-continue-title">Continue reading</strong><span>Resume where you left off</span></div>
+        <div class="mrm-continue-items"></div>
+      </section>
       <label class="mrm-overview-search"><span class="mrm-sr-only">Filter this archive</span><span aria-hidden="true">⌕</span><input id="mrm-overview-search" type="search" autocomplete="off" placeholder="Search titles, artists, groups, tags…"></label>
       <div class="mrm-overview-command-row">
         <div class="mrm-overview-quick-filters" aria-label="Quick filters">
           <button type="button" data-overview-toggle="onlyEnglish" aria-pressed="false">English</button>
           <button type="button" data-overview-toggle="hideRead" aria-pressed="false">Hide read</button>
+          <button type="button" data-overview-toggle="onlySaved" aria-pressed="false">Saved</button>
         </div>
         <label class="mrm-overview-sort"><span>Sort</span><select id="mrm-overview-sort"><option value="default">Newest first</option><option value="title-asc">Title A–Z</option><option value="title-desc">Title Z–A</option><option value="english-first">English first</option></select></label>
         <div class="mrm-overview-density" role="radiogroup" aria-label="Archive density">
@@ -114,6 +155,128 @@ MRM.archive = (() => {
     MRM.util.q("#mrm-panel-launcher")?.classList.add("mrm-launcher-suppressed");
     syncOverviewControls();
     return overview;
+  };
+
+  const nextPageUrl = () => MRM.util.q(".archive-pagination .pagination-next a, .pagination .next, a.next.page-numbers")?.href || "";
+
+  const ensureLongPageUI = () => {
+    if (!pageLoadStatus?.isConnected) {
+      const archive = MRM.util.q(".content-archive, .archive-content, .entries");
+      if (archive) {
+        pageLoadStatus = MRM.util.create("div", { className: "mrm-page-load-status", attrs: { id: "mrm-page-load-status", hidden: true, role: "status", "aria-live": "polite" } });
+        pageLoadStatus.innerHTML = `<span class="mrm-page-load-spinner" aria-hidden="true"></span><span class="mrm-page-load-copy"></span><a class="mrm-page-load-retry" hidden>Open next page</a>`;
+        archive.append(pageLoadStatus);
+      }
+    }
+    if (!positionIndicator?.isConnected) {
+      positionIndicator = MRM.util.create("div", { className: "mrm-scroll-position", attrs: { id: "mrm-scroll-position", hidden: true, "aria-hidden": "true" } });
+      document.body.append(positionIndicator);
+    }
+    return pageLoadStatus;
+  };
+
+  const setPageLoadStatus = (message, { busy = false, retry = false, autoHide = 0 } = {}) => {
+    const host = ensureLongPageUI();
+    if (!host) return;
+    host.hidden = false;
+    host.classList.toggle("is-busy", busy);
+    MRM.util.q(".mrm-page-load-copy", host).textContent = message;
+    const retryLink = MRM.util.q(".mrm-page-load-retry", host);
+    const href = nextPageUrl();
+    retryLink.hidden = !retry || !href;
+    if (href) retryLink.href = href;
+    window.clearTimeout(pageLoadTimer);
+    if (autoHide) pageLoadTimer = window.setTimeout(() => { if (host) host.hidden = true; }, autoHide);
+  };
+
+  const beginPageLoadFeedback = () => {
+    const href = nextPageUrl();
+    if (!href && !MRM.util.q(".pagetual_pageBar, .autopagerize_page_info, [id^='pagetual_pageBar']")) return;
+    if (pageLoadStatus && !pageLoadStatus.hidden && pageLoadStatus.classList.contains("is-busy")) return;
+    setPageLoadStatus("Loading the next page…", { busy: true });
+    window.clearTimeout(pageLoadTimer);
+    pageLoadTimer = window.setTimeout(() => setPageLoadStatus("The next page is taking longer than expected.", { retry: true }), 12000);
+  };
+
+  const installLongPageFeedback = () => {
+    ensureLongPageUI();
+    let ticking = false;
+    window.addEventListener("scroll", () => {
+      if (!ticking) {
+        ticking = true;
+        requestAnimationFrame(() => {
+          ticking = false;
+          const remaining = document.documentElement.scrollHeight - (window.scrollY + window.innerHeight);
+          if (remaining < Math.max(900, window.innerHeight * 1.2)) beginPageLoadFeedback();
+          schedulePositionUpdate();
+        });
+      }
+    }, { passive: true });
+  };
+
+  const ensurePositionObserver = () => {
+    if (MRM.runtime.archivePositionObserver || typeof IntersectionObserver !== "function") return MRM.runtime.archivePositionObserver;
+    MRM.runtime.archivePositionObserver = new IntersectionObserver((entries) => {
+      for (const entry of entries) {
+        const card = MRM.runtime.cards.find((item) => item.article === entry.target);
+        if (!card) continue;
+        if (entry.isIntersecting && !card.article.hidden) intersectingCards.add(card);
+        else intersectingCards.delete(card);
+      }
+    }, { rootMargin: "-10% 0px -78% 0px", threshold: [0, 0.01] });
+    return MRM.runtime.archivePositionObserver;
+  };
+
+  const observeCardPosition = (card) => ensurePositionObserver()?.observe(card.article);
+
+  const schedulePositionUpdate = () => {
+    if (positionFrame) return;
+    positionFrame = requestAnimationFrame(() => {
+      positionFrame = 0;
+      const visible = visibleCards();
+      if (!visible.length) return;
+      let current = [...intersectingCards].filter((card) => !card.article.hidden).sort((a, b) => a.article.getBoundingClientRect().top - b.article.getBoundingClientRect().top)[0];
+      if (!current) current = visible.find((card) => card.article.getBoundingClientRect().bottom > 0) || visible.at(-1);
+      const index = Math.max(0, visible.indexOf(current));
+      ensureLongPageUI();
+      if (!positionIndicator) return;
+      positionIndicator.textContent = `${index + 1} of ${visible.length}`;
+      positionIndicator.hidden = false;
+      window.clearTimeout(positionHideTimer);
+      positionHideTimer = window.setTimeout(() => { if (positionIndicator) positionIndicator.hidden = true; }, 1200);
+    });
+  };
+
+  const addPageSeparator = (firstOrder, added) => {
+    if (!added || firstOrder < 1) return null;
+    const root = findGridRoot();
+    const firstCard = MRM.runtime.cards.find((card) => card.order === firstOrder);
+    if (!root || !firstCard) return null;
+    const page = ++pageSequence;
+    const separator = MRM.util.create("div", {
+      className: "mrm-page-separator",
+      attrs: { role: "separator", "aria-label": `Page ${page}, ${added} more releases` },
+      dataset: { mrmBeforeOrder: String(firstOrder), mrmPage: String(page) },
+    });
+    separator.innerHTML = `<span>Page ${page}</span><small>${added} more releases</small>`;
+    root.insertBefore(separator, firstCard.article);
+    return separator;
+  };
+
+  const syncPageSeparators = (filters) => {
+    const root = findGridRoot();
+    if (!root) return;
+    const defaultOrder = filters.sort === "default";
+    const separators = MRM.util.qa(":scope > .mrm-page-separator", root).sort((a, b) => Number(a.dataset.mrmBeforeOrder) - Number(b.dataset.mrmBeforeOrder));
+    separators.forEach((separator, index) => {
+      const order = Number(separator.dataset.mrmBeforeOrder);
+      const nextOrder = Number(separators[index + 1]?.dataset.mrmBeforeOrder ?? Number.POSITIVE_INFINITY);
+      const hasVisibleBatchCard = MRM.runtime.cards.some((item) => item.order >= order && item.order < nextOrder && !item.article.hidden);
+      separator.hidden = !defaultOrder || !hasVisibleBatchCard;
+      if (!defaultOrder) return;
+      const card = MRM.runtime.cards.find((item) => item.order === order);
+      if (card?.article?.parentElement === root && card.article.previousElementSibling !== separator) root.insertBefore(separator, card.article);
+    });
   };
 
   const findGridRoot = () => MRM.util.q(".mrm-card-grid");
@@ -194,6 +357,14 @@ MRM.archive = (() => {
       toggle.textContent = read ? "Mark unread" : "Mark read";
       toggle.setAttribute("aria-label", `${read ? "Mark unread" : "Mark read"}: ${card.title}`);
     }
+    const saved = MRM.storage.isSaved(card.url);
+    card.article.classList.toggle("mrm-is-saved", saved);
+    const saveToggle = MRM.util.q(".mrm-card-save-toggle", card.article);
+    if (saveToggle) {
+      saveToggle.textContent = saved ? "★ Saved" : "☆ Save";
+      saveToggle.setAttribute("aria-pressed", String(saved));
+      saveToggle.setAttribute("aria-label", `${saved ? "Remove from saved" : "Save for later"}: ${card.title}`);
+    }
   };
 
   const filterAndSort = () => {
@@ -205,6 +376,7 @@ MRM.archive = (() => {
       if (query && !card.haystack.includes(query)) return false;
       if (filters.hideRead && MRM.storage.isRead(card.url)) return false;
       if (filters.onlyEnglish && !card.isEnglish) return false;
+      if (filters.onlySaved && !MRM.storage.isSaved(card.url)) return false;
       return MRM.facets.matches(card, filters);
     });
     const visibleSet = new Set(visible.map((card) => card.url));
@@ -213,6 +385,8 @@ MRM.archive = (() => {
       updateCardState(card);
     }
     syncGridOrder(ordered);
+    syncPageSeparators(filters);
+    intersectingCards.forEach((card) => { if (card.article.hidden) intersectingCards.delete(card); });
     updateResultUI(visible.length, MRM.runtime.cards.length);
     syncOverviewControls();
     MRM.util.announce(`${visible.length} results visible`);
@@ -236,6 +410,7 @@ MRM.archive = (() => {
     if (filters.query) descriptors.push({ label: `Search: ${filters.query}`, remove: () => MRM.storage.replaceFilters({ ...filters, query: "" }) });
     if (filters.hideRead) descriptors.push({ label: "Hide read", remove: () => MRM.storage.replaceFilters({ ...filters, hideRead: false }) });
     if (filters.onlyEnglish) descriptors.push({ label: "English only", remove: () => MRM.storage.replaceFilters({ ...filters, onlyEnglish: false }) });
+    if (filters.onlySaved) descriptors.push({ label: "Saved", remove: () => MRM.storage.replaceFilters({ ...filters, onlySaved: false }) });
     for (const mode of ["include", "exclude"]) for (const [type, values] of Object.entries(filters[mode] || {})) for (const value of values) {
       descriptors.push({ label: `${mode === "include" ? "IN" : "OUT"} · ${MRM.site.facetPrefixes[type]} · ${MRM.util.slugLabel(value)}`, remove: () => MRM.facets.toggle(mode, type, value) });
     }
@@ -277,7 +452,7 @@ MRM.archive = (() => {
     button.addEventListener("click", (event) => {
       event.preventDefault();
       event.stopPropagation();
-      MRM.settings.openFacetModal(null, values.map((item) => ({ ...item, name: MRM.util.slugLabel(item.slug), count: 0 })), `${card.title} metadata`);
+      MRM.settings.openMetadataPopover(button, card, values);
     });
     return button;
   };
@@ -302,6 +477,7 @@ MRM.archive = (() => {
     card.article.classList.add("mrm-card");
     card.article.setAttribute("role", "listitem");
     card.article.dataset.mrmUrl = card.url;
+    card.article.dataset.mrmOrder = String(card.order);
     const content = MRM.util.q(".entry-content", card.article) || card.article;
     const imageLink = MRM.util.q(".entry-image-link", card.article);
     if (imageLink) imageLink.removeAttribute("aria-hidden");
@@ -335,19 +511,26 @@ MRM.archive = (() => {
     });
     const original = MRM.util.create("a", { className: "mrm-card-original", text: "↗", attrs: { href: card.url, target: "_blank", rel: "noopener", "aria-label": `Open original post: ${card.title}`, title: "Open original post" } });
     original.addEventListener("click", () => MRM.storage.markRead(card.url, card.title), { passive: true });
+    const saveToggle = MRM.util.create("button", { className: "mrm-card-save-toggle", attrs: { type: "button", "aria-pressed": "false" } });
+    saveToggle.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      MRM.storage.toggleSaved(card.url, card.title, MRM.util.imageSource(card.image));
+    });
     const readToggle = MRM.util.create("button", { className: "mrm-card-read-toggle", attrs: { type: "button" } });
     readToggle.addEventListener("click", (event) => {
       event.preventDefault();
       if (MRM.storage.isRead(card.url)) MRM.storage.unmarkRead(card.url);
       else MRM.storage.markRead(card.url, card.title);
     });
-    actions.append(reader, original, readToggle);
+    actions.append(reader, saveToggle, original, readToggle);
     footer.replaceChildren(metadataChips(card), progress, actions);
     card.link.addEventListener("click", () => MRM.storage.markRead(card.url, card.title), { passive: true });
     content.classList.add("mrm-card-cover");
     const root = ensureGridRoot(card.article);
     if (root && card.article.parentElement !== root) root.append(card.article);
     updateCardState(card);
+    observeCardPosition(card);
     return true;
   };
 
@@ -356,7 +539,7 @@ MRM.archive = (() => {
     for (const card of visibleCards()) MRM.storage.markRead(card.url, card.title);
     filterAndSort();
   };
-  const clearFilters = () => MRM.storage.replaceFilters({ ...MRM.storage.preferences.filters, query: "", hideRead: false, onlyEnglish: false, include: {}, exclude: {} });
+  const clearFilters = () => MRM.storage.replaceFilters({ ...MRM.storage.preferences.filters, query: "", hideRead: false, onlyEnglish: false, onlySaved: false, include: {}, exclude: {} });
 
   const removeDuplicateCandidate = (article) => {
     if (!article?.isConnected || article.hasAttribute(enhancedAttr)) return;
@@ -436,8 +619,14 @@ MRM.archive = (() => {
     if (event && typeof event === "object" && handledPageTualEvents.has(event)) return;
     if (event && typeof event === "object") handledPageTualEvents.add(event);
     const root = event?.detail?.root instanceof Element ? event.detail.root : document;
+    const firstOrder = MRM.runtime.cards.length;
     markPageTualCandidates(root);
-    ingest(root);
+    const added = ingest(root);
+    if (added) {
+      addPageSeparator(firstOrder, added);
+      setPageLoadStatus(`Page ${pageSequence} loaded · ${added} new releases`, { autoHide: 3200 });
+      syncPageSeparators(MRM.storage.preferences.filters);
+    }
     queueScan(document, 90);
     window.setTimeout(() => queueScan(document, 90), 500);
   };
@@ -450,7 +639,10 @@ MRM.archive = (() => {
     MRM.runtime.archiveObserver.observe(document.body, { childList: true, subtree: true });
     window.addEventListener("message", (event) => {
       const data = event?.data;
-      if (data && typeof data === "object" && data.command === "pagetual" && data.action === "insert") handlePageTualInsert(event);
+      if (data && typeof data === "object" && data.command === "pagetual") {
+        if (data.action === "insert") handlePageTualInsert(event);
+        else if (["load", "loading", "request"].includes(data.action)) beginPageLoadFeedback();
+      }
     });
     window.addEventListener("pagetual:insert", handlePageTualInsert);
     document.addEventListener("pagetual:insert", handlePageTualInsert);
@@ -462,10 +654,12 @@ MRM.archive = (() => {
     ensureOverview();
     scan(document);
     observe();
+    installLongPageFeedback();
   };
 
   MRM.events.addEventListener("preferences", filterAndSort);
   MRM.events.addEventListener("read-history", filterAndSort);
   MRM.events.addEventListener("reader-progress", filterAndSort);
-  return { init, scan, filterAndSort, visibleCards, markVisibleRead, clearFilters, renderActiveChips, activeFilterCount };
+  MRM.events.addEventListener("saved-posts", filterAndSort);
+  return { init, scan, filterAndSort, visibleCards, markVisibleRead, clearFilters, renderActiveChips, activeFilterCount, handlePageTualInsert, beginPageLoadFeedback };
 })();

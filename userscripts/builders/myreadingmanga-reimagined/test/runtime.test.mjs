@@ -28,7 +28,7 @@ test("fixtures cover every supported page type", async () => {
 test("generated userscript is a clean modular build", async () => {
   const script = await output();
   assert.match(script, /@name\s+MyReadingManga Reimagined/);
-  assert.match(script, /@version\s+6\.2\.0/);
+  assert.match(script, /@version\s+6\.7\.0/);
   assert.match(script, /module: 00-core\.js/);
   assert.match(script, /module: 08-app\.js/);
   assert.doesNotMatch(script, /src\/original\/myreadingmanga-modern-reader/);
@@ -107,9 +107,9 @@ test("desktop visual hierarchy and site shell are sealed", async () => {
     "grid: { density: \"balanced\", desktop: 5", "coverFit: \"contain\"",
   ];
   for (const marker of markers) assert.ok(script.includes(marker), `missing visual-shell marker: ${marker}`);
-  assert.match(script, /menu\.querySelector\("\.menu-item-home"\)\?\.remove\(\)/);
-  assert.match(script, /collapseOverflow\(cloud, ":scope > a", 18/);
-  assert.match(script, /collapseOverflow\(comments, ":scope > li", 8/);
+  assert.match(script, /collectNavigationLinks/);
+  assert.match(script, /mrm-compact-footer/);
+  assert.match(script, /appendOverflow\(links, browseLinks, 14/);
 });
 
 
@@ -184,4 +184,67 @@ test("repository root build verifies MRM dist instead of rewriting it", async ()
     repositoryPackage.scripts["build:mrm-reimagined:write"],
     "npm --prefix userscripts/builders/myreadingmanga-reimagined run build",
   );
+});
+
+
+test("phase 2 saved views and grouped metadata contracts are sealed", async () => {
+  const generated = await output();
+  assert.match(generated, /savedViews:\s*\[\]/);
+  assert.match(generated, /const saveView =/);
+  assert.match(generated, /English unread/);
+  assert.match(generated, /text: "Include"/);
+  assert.match(generated, /text: "Exclude"/);
+  assert.match(generated, /openMetadataPopover/);
+  assert.match(generated, /mrm-metadata-group-chips/);
+  assert.match(generated, /height: min\(92dvh, 860px\)/);
+});
+
+
+test("phase 3 PageTual continuity and long-archive performance contracts are sealed", async () => {
+  const generated = await output();
+  for (const marker of [
+    "mrm-page-separator", "mrm-page-load-status", "Loading the next page…",
+    "taking longer than expected", "mrm-scroll-position", "schedulePositionUpdate",
+    "archivePositionObserver", "addPageSeparator", "syncPageSeparators",
+    "content-visibility: auto", "contain-intrinsic-size", "12000",
+    "Page ${pageSequence} loaded · ${added} new releases"
+  ]) assert.ok(generated.includes(marker), `missing phase 3 marker: ${marker}`);
+});
+
+test("phase 4 adaptive chrome and reader continuity contracts are sealed", async () => {
+  const generated = await output();
+  for (const marker of [
+    "mrm-site-toolbar-hidden", "installToolbarMotion", "mrm-site-toolbar-no-search",
+    "mrm-site-more-menu", "aria-current", "Recent comments", "Browse", "Site links",
+    "mrm-compact-footer-grid", "mrm-reader-progress-meter", "mrm-reader-progress-label",
+    "Back to archive", "sequenceInfo", "Resuming ${state.title}", "mrm-reader-mobile-controls",
+    "toggleFocus", "is-focus-mode", "onPointerDown", "onPointerUp", "onDoubleClick",
+    "is-image-zoomed", "d: toggleFocus",
+  ]) assert.ok(generated.includes(marker), `missing phase 4 marker: ${marker}`);
+  assert.match(generated, /archiveOwnsSearch = MRM\.runtime\.page === "archive" \|\| MRM\.runtime\.page === "search"/);
+  assert.match(generated, /html\.mrm-ui-disabled \.mrm-compact-footer \{ display: none !important; \}/);
+});
+
+
+
+test("phase 5 personal library and adaptive reader contracts are sealed", async () => {
+  const generated = await output();
+  for (const marker of [
+    "saved-posts", "onlySaved", "Saved for later", "mrm-card-save-toggle",
+    "mrm-continue-shelf", "Continue reading", "readerProfiles", "readerDevice",
+    "readerPreferences", "updateReaderPreferences", "constrainedConnection",
+    "pagedPrefetchRadius", "hydratePagedWindow", "data-mrm-src", "Save for later (S)",
+  ]) assert.ok(generated.includes(marker), `missing phase 5 marker: ${marker}`);
+  assert.match(generated, /if \(constrainedConnection\(\)\) return;/);
+  assert.match(generated, /matchMedia\("\(max-width: 760px\)"\)/);
+});
+
+test("phase 6 accessibility and release-hardening contracts are sealed", async () => {
+  const generated = await output();
+  for (const marker of [
+    "mrm-skip-link", "Skip to content", "--mrm-focus-ring", ":focus-visible",
+    "mrm-panel-open", "mrm-modal-open", "mrm-metadata-open", "prefers-contrast: more",
+    "aria-pressed", "Clear saved posts", "Reader controls are remembered separately",
+  ]) assert.ok(generated.includes(marker), `missing phase 6 marker: ${marker}`);
+  assert.match(generated, /\.mrm-reader-toolbar button, \.mrm-reader-footer button \{ min-height: 44px; \}/);
 });

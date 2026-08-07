@@ -2,6 +2,7 @@ MRM.storage = (() => {
   const key = `${MRM.config.storagePrefix}:preferences`;
   const readKey = `${MRM.config.storagePrefix}:read-posts`;
   const progressKey = `${MRM.config.storagePrefix}:reader-progress`;
+  const savedKey = `${MRM.config.storagePrefix}:saved-posts`;
   const facetCacheKey = `${MRM.config.storagePrefix}:facet-directory`;
   const readerCachePrefix = `${MRM.config.storagePrefix}:reader-pages:`;
   const defaults = Object.freeze({
@@ -10,8 +11,10 @@ MRM.storage = (() => {
     accent: "#9b7cff",
     border: { header: false, cards: true, pagination: false, reader: false, panel: true, chips: true },
     grid: { density: "balanced", desktop: 5, tablet: 4, mobile: 2, gap: 18, ratio: 0.714, coverFit: "contain" },
-    filters: { query: "", hideRead: false, onlyEnglish: false, sort: "default", include: {}, exclude: { tag: ["cuntboy", "ai", "shota"] } },
+    filters: { query: "", hideRead: false, onlyEnglish: false, onlySaved: false, sort: "default", include: {}, exclude: { tag: ["cuntboy", "ai", "shota"] } },
     reader: { view: "strip", width: "comfort", fit: "width", direction: "ltr", thumbnails: true, autoHideToolbar: true },
+    readerProfiles: { desktop: {}, mobile: {} },
+    savedViews: [],
   });
   const clone = (value) => JSON.parse(JSON.stringify(value));
   const merge = (base, incoming) => {
@@ -29,9 +32,11 @@ MRM.storage = (() => {
   let preferences = merge(clone(defaults), parse(localStorage.getItem(key), {}));
   let readPosts = parse(localStorage.getItem(readKey), {});
   let readerProgress = parse(localStorage.getItem(progressKey), {});
+  let savedPosts = parse(localStorage.getItem(savedKey), {});
   const persist = () => localStorage.setItem(key, JSON.stringify(preferences));
   const persistRead = () => localStorage.setItem(readKey, JSON.stringify(readPosts));
   const persistProgress = () => localStorage.setItem(progressKey, JSON.stringify(readerProgress));
+  const persistSaved = () => localStorage.setItem(savedKey, JSON.stringify(savedPosts));
   const trimEntries = (records, limit) => Object.fromEntries(Object.entries(records)
     .sort((a, b) => (b[1].updatedAt || b[1].readAt || 0) - (a[1].updatedAt || a[1].readAt || 0))
     .slice(0, limit));
@@ -66,6 +71,35 @@ MRM.storage = (() => {
     MRM.events.dispatchEvent(new CustomEvent("reader-progress", { detail: { url: normalized, progress: null } }));
   };
   const isRead = (url) => Boolean(readPosts[MRM.util.canonicalUrl(url)]);
+  const isSaved = (url) => Boolean(savedPosts[MRM.util.canonicalUrl(url)]);
+  const savePost = (url, title = "", image = "") => {
+    const normalized = MRM.util.canonicalUrl(url);
+    if (!normalized) return null;
+    savedPosts[normalized] = { title: MRM.util.text(title), image: String(image || ""), savedAt: Date.now(), updatedAt: Date.now() };
+    savedPosts = trimEntries(savedPosts, 2000);
+    persistSaved();
+    MRM.events.dispatchEvent(new CustomEvent("saved-posts", { detail: { url: normalized, saved: true } }));
+    return savedPosts[normalized];
+  };
+  const unsavePost = (url) => {
+    const normalized = MRM.util.canonicalUrl(url);
+    if (!normalized || !savedPosts[normalized]) return;
+    delete savedPosts[normalized];
+    persistSaved();
+    MRM.events.dispatchEvent(new CustomEvent("saved-posts", { detail: { url: normalized, saved: false } }));
+  };
+  const toggleSaved = (url, title = "", image = "") => isSaved(url) ? (unsavePost(url), false) : Boolean(savePost(url, title, image));
+  const readerDevice = () => matchMedia("(max-width: 760px)").matches ? "mobile" : "desktop";
+  const readerPreferences = () => ({ ...preferences.reader, ...(preferences.readerProfiles?.[readerDevice()] || {}) });
+  const updateReaderPreferences = (patch) => {
+    const device = readerDevice();
+    const profiles = preferences.readerProfiles || { desktop: {}, mobile: {} };
+    const nextProfile = { ...(profiles[device] || {}), ...patch };
+    preferences = { ...preferences, readerProfiles: { ...profiles, [device]: nextProfile } };
+    persist();
+    MRM.events.dispatchEvent(new CustomEvent("preferences", { detail: preferences }));
+    return readerPreferences();
+  };
   const getReaderProgress = (url) => readerProgress[MRM.util.canonicalUrl(url)] || null;
   const setReaderProgress = (url, title, pageIndex, pageCount) => {
     const normalized = MRM.util.canonicalUrl(url);
@@ -90,6 +124,21 @@ MRM.storage = (() => {
     MRM.events.dispatchEvent(new CustomEvent("reader-progress", { detail: { url: normalized, progress } }));
     return progress;
   };
+  const saveView = (name, filters = preferences.filters) => {
+    const cleanName = MRM.util.text(name).slice(0, 48);
+    if (!cleanName) return null;
+    const view = { id: `view-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`, name: cleanName, filters: clone(filters) };
+    preferences = { ...preferences, savedViews: [...(preferences.savedViews || []).filter((item) => item.name !== cleanName), view].slice(-12) };
+    persist();
+    MRM.events.dispatchEvent(new CustomEvent("preferences", { detail: preferences }));
+    return view;
+  };
+  const deleteView = (id) => {
+    preferences = { ...preferences, savedViews: (preferences.savedViews || []).filter((item) => item.id !== id) };
+    persist();
+    MRM.events.dispatchEvent(new CustomEvent("preferences", { detail: preferences }));
+  };
+  const applyView = (view) => view?.filters && replaceFilters(clone(view.filters));
   const clearRead = () => {
     readPosts = {};
     readerProgress = {};
@@ -97,6 +146,11 @@ MRM.storage = (() => {
     localStorage.removeItem(progressKey);
     MRM.events.dispatchEvent(new Event("read-history"));
     MRM.events.dispatchEvent(new Event("reader-progress"));
+  };
+  const clearSaved = () => {
+    savedPosts = {};
+    localStorage.removeItem(savedKey);
+    MRM.events.dispatchEvent(new Event("saved-posts"));
   };
   const getFacetCache = () => {
     const cached = parse(localStorage.getItem(facetCacheKey), null);
@@ -123,14 +177,26 @@ MRM.storage = (() => {
     get preferences() { return preferences; },
     get readPosts() { return readPosts; },
     get readerProgress() { return readerProgress; },
+    get savedPosts() { return savedPosts; },
     update,
     replaceFilters,
     markRead,
     unmarkRead,
     isRead,
+    isSaved,
+    savePost,
+    unsavePost,
+    toggleSaved,
+    readerDevice,
+    readerPreferences,
+    updateReaderPreferences,
     getReaderProgress,
     setReaderProgress,
+    saveView,
+    deleteView,
+    applyView,
     clearRead,
+    clearSaved,
     getFacetCache,
     setFacetCache,
     getReaderCache,

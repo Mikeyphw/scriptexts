@@ -1,0 +1,17 @@
+{
+  "applied_at": "2026-08-07T14:56:30.611775Z",
+  "artifact": "/home/mike/Downloads/scriptexts_myreadingmanga_reimagined_phase4_shell_reader_r13_overlay.zip",
+  "artifact_name": "scriptexts_myreadingmanga_reimagined_phase4_shell_reader_r13_overlay.zip",
+  "type": "overlay",
+  "sha256": "0fd25716b84a7f3cdc24f9c352ea71ef2178cbfbc7d236f2b50b76ffb0259436",
+  "status": "ok",
+  "validation_status": "ok",
+  "commit_message": "",
+  "commit_hash": "",
+  "file_count": 14,
+  "change_counts": {
+    "modify": 14
+  },
+  "manifest": {},
+  "history_id": "6825a37b780547d1a731c1f6ed524f07"
+}
