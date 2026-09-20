@@ -1,11 +1,14 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 
+const ROOT = dirname(fileURLToPath(import.meta.url));
 const RAW_BASE = "https://raw.githubusercontent.com/Mikeyphw/scriptexts/main";
 const HOME_BASE = "https://github.com/Mikeyphw/scriptexts/tree/main";
 const projectPath = "userscripts/builders/manga-reader-modernizer";
+const checkMode = process.argv.includes("--check");
 
 const builds = [
-  { entry: "src/original/myreadingmanga-modern-reader.user.js", outfile: "dist/myreadingmanga-modern-reader.user.js" },
   { entry: "src/original/yaoimangaonline-modern-reader.user.js", outfile: "dist/yaoimangaonline-modern-reader.user.js" },
   { entry: "src/original/baramangaonline-modern-reader.user.js", outfile: "dist/baramangaonline-modern-reader.user.js" }
 ];
@@ -39,12 +42,12 @@ function buildMetadata(raw, cfg) {
   const ordered = [
     ["name", getOne("name", "Userscript")],
     ["namespace", `https://github.com/Mikeyphw/scriptexts/userscripts/${slug}`],
-    ["version", getOne("version", "1.0.0")],
-    ["description", getOne("description", "Built userscript")],
     ["homepageURL", `${HOME_BASE}/${projectPath}`],
     ["supportURL", "https://github.com/Mikeyphw/scriptexts/issues"],
     ["updateURL", `${RAW_BASE}/${downloadPath.replace(/\.user\.js$/, ".meta.js")}`],
     ["downloadURL", `${RAW_BASE}/${downloadPath}`],
+    ["version", getOne("version", "1.0.0")],
+    ["description", getOne("description", "Built userscript")],
     ["run-at", getOne("run-at", "document-idle")],
   ];
   const matches = getAll("match");
@@ -67,14 +70,29 @@ function metaFromUserscript(raw) {
   return `${match[0].trim()}\n`;
 }
 
-await mkdir("dist", { recursive: true });
+async function verifyOrWrite(relativePath, expected) {
+  const target = join(ROOT, relativePath);
+  if (checkMode) {
+    let current;
+    try { current = await readFile(target, "utf8"); }
+    catch { throw new Error(`Missing generated artifact: ${relativePath}`); }
+    if (current !== expected) throw new Error(`Generated artifact is stale: ${relativePath}`);
+    return;
+  }
+  await writeFile(target, expected, "utf8");
+}
+
+await mkdir(join(ROOT, "dist"), { recursive: true });
 
 for (const cfg of builds) {
-  const raw = await readFile(cfg.entry, "utf8");
+  const raw = await readFile(join(ROOT, cfg.entry), "utf8");
   const metadata = buildMetadata(raw, cfg);
   const cleaned = stripMetadata(raw);
   const built = `${metadata}\n\n${cleaned}`;
-  await writeFile(cfg.outfile, built, "utf8");
-  await writeFile(cfg.outfile.replace(/\.user\.js$/, ".meta.js"), metaFromUserscript(built), "utf8");
-  console.log(`built ${cfg.outfile}`);
+  const meta = metaFromUserscript(built);
+  await verifyOrWrite(cfg.outfile, built);
+  await verifyOrWrite(cfg.outfile.replace(/\.user\.js$/, ".meta.js"), meta);
+  console.log(`${checkMode ? "verified" : "built"} ${cfg.outfile}`);
 }
+
+console.log(`${checkMode ? "verified" : "built"} ${builds.length} supported manga reader targets; legacy MyReadingManga is retired.`);

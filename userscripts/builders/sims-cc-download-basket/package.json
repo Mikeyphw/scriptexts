@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "build": "node build.mjs",
-    "check": "node --check dist/modthesims-download-basket.user.js && node --check dist/simblrcc-download-basket.user.js && node --check dist/thesimsresource-download-basket.user.js"
+    "check": "node --check dist/sims-basket-modthesims.user.js && node --check dist/sims-basket-simblrcc.user.js && node --check dist/sims-basket-thesimsresource.user.js"
   },
   "devDependencies": {}
 }

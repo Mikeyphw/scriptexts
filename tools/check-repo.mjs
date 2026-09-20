@@ -94,7 +94,7 @@ for (const path of files.filter((item) => item.endsWith('.user.js'))) {
   catch (error) { errors.push(`${rel}: JavaScript syntax check failed\n${error.stderr?.toString() || error.message}`); }
 }
 
-for (const path of files.filter((item) => item.endsWith('.js') && !item.endsWith('.user.js') && !item.endsWith('.meta.js') && !item.endsWith('.min.js'))) {
+for (const path of files.filter((item) => item.endsWith('.js') && !item.endsWith('.user.js') && !item.endsWith('.meta.js') && !item.endsWith('.min.js') && !item.endsWith('.part.js'))) {
   const rel = relative(root, path);
   try { execFileSync(process.execPath, ['--check', path], { stdio: 'pipe' }); }
   catch (error) { errors.push(`${rel}: JavaScript syntax check failed\n${error.stderr?.toString() || error.message}`); }
@@ -195,6 +195,20 @@ for (const project of manifest.projects.filter((item) => item.type === 'firefox-
   if (project.firefox_extension_id !== expected) errors.push(`${project.path}: manifest record expected ${expected}, got ${project.firefox_extension_id || 'missing'}`);
 }
 
+const myReadingMangaOwners = [];
+for (const path of files.filter((item) => item.endsWith('.user.js'))) {
+  const rel = relative(root, path).replaceAll('\\', '/');
+  const text = await readFile(path, 'utf8');
+  const fields = fieldsFromUserscript(text);
+  if (!fields) continue;
+  const matches = fields.get('match') || [];
+  if (matches.some((value) => /myreadingmanga\.info/i.test(value))) myReadingMangaOwners.push(rel);
+}
+const canonicalMrm = 'userscripts/builders/myreadingmanga-reimagined/dist/myreadingmanga-reimagined.user.js';
+if (myReadingMangaOwners.length !== 1 || myReadingMangaOwners[0] !== canonicalMrm) {
+  errors.push(`MyReadingManga route must be owned only by ${canonicalMrm}; found: ${myReadingMangaOwners.join(', ') || 'none'}`);
+}
+
 const forbiddenPaths = [
   'userscripts/standalone/menofporn-modern-ui',
   'extensions/mrm-suite-downloader',
@@ -203,7 +217,11 @@ const forbiddenPaths = [
   'userscripts/standalone/100-search-engines-clean-dark-ui',
   'userscripts/standalone/lpsg-video-unlocker-improved-gallery',
   'userscripts/standalone/poast-nitter-reset-timeline-metadata',
-  'userscripts/standalone/telegram-media-downloader-userscript'
+  'userscripts/standalone/telegram-media-downloader-userscript',
+  'userscripts/builders/manga-reader-modernizer/src/original/myreadingmanga-modern-reader.user.js',
+  'userscripts/builders/manga-reader-modernizer/src/original/myreadingmanga-modern-reader.meta.js',
+  'userscripts/builders/manga-reader-modernizer/dist/myreadingmanga-modern-reader.user.js',
+  'userscripts/builders/manga-reader-modernizer/dist/myreadingmanga-modern-reader.meta.js'
 ];
 for (const forbidden of forbiddenPaths) {
   if (await hasTrackedFilesOrRuntimeArtifacts(join(root, forbidden))) errors.push(`obsolete path still present: ${forbidden}`);

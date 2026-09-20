@@ -10,7 +10,7 @@
   ],
   "scripts": {
     "build": "npm run build:userscripts && npm run build:extensions && npm run userscripts:metadata",
-    "build:userscripts": "npm run build:content-sites && npm run build:manga && npm run build:mrm-reimagined && npm run build:sims",
+    "build:userscripts": "npm run build:content-sites && npm run build:manga && npm run build:mrm-reimagined && npm run build:sims && npm run build:lpsg",
     "build:content-sites": "npm --prefix userscripts/builders/content-site-modernizer run build",
     "build:manga": "npm --prefix userscripts/builders/manga-reader-modernizer run build",
     "build:sims": "npm --prefix userscripts/builders/sims-cc-download-basket run build",
@@ -19,7 +19,7 @@
     "build:extension:stardew": "python3 extensions/stardew-nexus-download-queue/build.py",
     "build:extension:telegram": "python3 extensions/telegram-media-downloader/build.py",
     "userscripts:metadata": "node tools/generate-userscript-meta.mjs",
-    "check": "node tools/check-repo.mjs",
+    "check": "npm run check:userscripts",
     "inventory": "node tools/inventory.mjs",
     "builder": "bash tools/run-builder.sh",
     "smoke:content-sites": "python3 tools/smoke/run-content-site-smoke.py --builder content-site-modernizer",
@@ -68,8 +68,16 @@
     "build:mrm-reimagined:write": "npm --prefix userscripts/builders/myreadingmanga-reimagined run build",
     "check:mrm-reimagined": "npm --prefix userscripts/builders/myreadingmanga-reimagined run check",
     "smoke:mrm-reimagined": "npm --prefix userscripts/builders/myreadingmanga-reimagined run smoke",
+    "build:lpsg": "npm --prefix userscripts/builders/lpsg-media-gallery-unlocker run build",
+    "check:lpsg": "npm --prefix userscripts/builders/lpsg-media-gallery-unlocker run build:check",
+    "test:lpsg": "npm --prefix userscripts/builders/lpsg-media-gallery-unlocker test",
+    "seal:lpsg": "node userscripts/builders/lpsg-media-gallery-unlocker/release-seal.mjs",
+    "seal:lpsg:json": "node userscripts/builders/lpsg-media-gallery-unlocker/release-seal.mjs --json",
     "content-sites:bleedingcool:seal": "npm --prefix userscripts/builders/content-site-modernizer run seal:bleedingcool",
-    "content-sites:bleedingcool:seal:json": "npm --prefix userscripts/builders/content-site-modernizer run seal:bleedingcool:json"
+    "content-sites:bleedingcool:seal:json": "npm --prefix userscripts/builders/content-site-modernizer run seal:bleedingcool:json",
+    "check:repo:static": "node tools/check-repo.mjs",
+    "test:userscripts:validation": "node --test tools/tests/userscript-validation.test.mjs",
+    "check:userscripts": "node tools/check-userscripts.mjs"
   },
   "engines": {
     "node": ">=20"

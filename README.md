@@ -13,14 +13,14 @@ tools/                         Validation, metadata, and inventory helpers
 
 ## MyReadingManga Reimagined
 
-The repository now contains a second, MRM-only builder at `userscripts/builders/myreadingmanga-reimagined`. It is a clean-room modular rewrite built against captured home, genre, search, and post HTML fixtures. It deliberately coexists with the legacy three-site manga builder while the other manga sites remain on their current implementations.
+`userscripts/builders/myreadingmanga-reimagined` is the canonical MyReadingManga implementation. It is a clean-room modular rewrite built against captured home, genre, search, and post HTML fixtures. The legacy `myreadingmanga-modern-reader` output has been retired; the older manga builder now serves only YaoiMangaOnline and BaraMangaOnline.
 
 ```bash
 npm run build:mrm-reimagined
 npm run check:mrm-reimagined
 ```
 
-Install `userscripts/builders/myreadingmanga-reimagined/dist/myreadingmanga-reimagined.user.js`. Its independent namespace and storage keys permit side-by-side installation, though only one MRM UI script should be enabled during behavioral testing.
+Install `userscripts/builders/myreadingmanga-reimagined/dist/myreadingmanga-reimagined.user.js`. It is the only supported userscript in this repository that owns the `myreadingmanga.info` route.
 
 
 ## Build
@@ -33,10 +33,12 @@ npm run check
 
 `npm run build` regenerates shared content-site userscripts, Manga reader scripts, Sims basket scripts, extension XPIs, and userscript `.meta.js` update files.
 
+`npm run check` is the authoritative userscript validation gate: it runs every supported userscript builder's own check/test suite and then the repository-wide static/metadata checks. Use `npm run check:repo:static` only when you intentionally want the lightweight static layer.
+
 ## Userscript source models
 
 - `userscripts/builders/content-site-modernizer` builds MenOfPorn Modern UI, Putinho Modern UI, Gayteam Modern UI, JustTheGays Modern UI, STR8UPGAYPORN Modern UI, Bleeding Cool Modern Reader, and AIPT Comics Modern Reader.
-- `userscripts/builders/manga-reader-modernizer` builds the manga reader scripts.
+- `userscripts/builders/manga-reader-modernizer` builds the supported YaoiMangaOnline and BaraMangaOnline reader scripts; its legacy MyReadingManga target is retired.
 - `userscripts/builders/sims-cc-download-basket` builds the Sims CC basket scripts.
 - `userscripts/standalone` contains direct scripts that do not have project-specific builders.
 

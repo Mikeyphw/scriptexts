@@ -1,47 +1,55 @@
 {
   "schema_version": 2,
   "type": "overlay",
-  "name": "Bleeding Cool regression release seal OV04",
-  "description": "Adds a dedicated browser-free Bleeding Cool release seal with executable article-classification policy tests, long-article no-truncation regression coverage, safe-area/navigation checks, cleanup/media association coverage, large-feed/mobile contracts, feature-preservation checks, deterministic generated-output verification, and machine-readable seal evidence.",
+  "name": "Scriptexts validation convergence and legacy MRM retirement OV01",
+  "description": "Converges userscript validation across all supported builders, repairs stale Manga/Sims checks and Content Site PageTual validator drift, retires the legacy MyReadingManga target in favor of MyReadingManga Reimagined, adds regression guards against route/build resurrection, and carries forward the pending Bleeding Cool release seal so the new roadmap starts from one coherent baseline.",
   "repository": {
     "name": "scriptexts",
     "remote": "git@github.com:Mikeyphw/scriptexts.git",
     "branch": "main"
   },
   "workspace": {
-    "name": "content-site-modernizer",
-    "root": "userscripts/builders/content-site-modernizer"
+    "name": "root",
+    "root": "."
   },
-  "target": "content-site-modernizer",
+  "target": "root",
   "inventory": {
     "format": 1,
     "entries": [
       {
-        "path": ".devtool-artifact/validate-bleedingcool-ov04.sh",
-        "action": "add",
-        "sha256": "320884f3cce25f56079743d31e1fbed6c90425fbec239b2481cdcab744c23dc7",
-        "size": 338
+        "path": ".devtool-artifact/validate.sh",
+        "action": "modify",
+        "sha256": "5b988469e2122bcdd8ff0c06e0e33efb3429d286df49bea12d1eba7189baea23",
+        "size": 575,
+        "source_sha256": "35be0525eed6aa6c2612a20afcf75949dbabedf621a42be7154ebf302dc45e77"
       },
       {
         "path": "README.md",
         "action": "modify",
-        "sha256": "76839c84c7a8789c76ed34e3f8de44e352abbffad607bd3e1cb98d26df0bdbb5",
-        "size": 12871,
+        "sha256": "b9f2f842bb8d7f9764aa5b3ebf21ec0908a47784d1a8811dd54b341300082aea",
+        "size": 13180,
         "source_sha256": "74038212f95b17904286b4a64e431774a4200c6747cb28cffadeea1ed5239795"
       },
       {
         "path": "package.json",
         "action": "modify",
-        "sha256": "d5bf7fc7a3a408eb3260bab606513d7020d4d7410fb6cbc19ae495dd5675d2dd",
-        "size": 7760,
-        "source_sha256": "214e29e1c6478f1ed80e20d7bbb09d98aa62c23cf042a2f4a3b07e40fa500d17"
+        "sha256": "d297af93cbc7787c8b71eecc12ab0f7b193d4b2f4fe4fc47c11a7e36819b2c7a",
+        "size": 8463,
+        "source_sha256": "a50016f02857d5007640c255b2709eba10f782da6e94bef94af11542657280cb"
       },
       {
         "path": "repo-manifest.json",
         "action": "modify",
-        "sha256": "e5845c93b7255c2dfea2aa635f98e0a7bb1251907868325c0575d586d15ba439",
-        "size": 22317,
+        "sha256": "40fa28a79346ac607a8de994afcf294abad4b9f3a4ca3b545737777b298aa1a4",
+        "size": 22642,
         "source_sha256": "2d8265ec45486c992b9e100ee9fa704d58e4c86106a952fbe62a485f54ed032f"
+      },
+      {
+        "path": "tools/check-repo.mjs",
+        "action": "modify",
+        "sha256": "3635547b7b8c3fbaae8ee6268be594f29ce696abeba6ad89be9dfe8dffef1f9b",
+        "size": 12233,
+        "source_sha256": "873413220874b99739d442c3e9e2510e3986544e110424a7c328c82e988d9013"
       },
       {
         "path": "userscripts/builders/content-site-modernizer/README.md",
@@ -114,12 +122,6 @@
         "source_sha256": "4a9ca0724eaf5bb09612d7dbc0d98f3ece56dbdbc279c04fc52392b4240b16b5"
       },
       {
-        "path": "userscripts/builders/content-site-modernizer/src/core/article-detection.runtime.js",
-        "action": "add",
-        "sha256": "3b9afbbcf41267c0bda31571839921532e012a4184631452dd1abf6ec04ffc43",
-        "size": 365
-      },
-      {
         "path": "userscripts/builders/content-site-modernizer/src/core/runtime.mjs",
         "action": "modify",
         "sha256": "51a2cbbc4f95c6b6bb06fb69f7c31680cb09d68945f151f1cd89e631d7a4b0c3",
@@ -148,6 +150,84 @@
         "source_sha256": "a54b5a787d8697e9794ae537ff16eb7674ea41c589c6820e7ce5b263b29740df"
       },
       {
+        "path": "userscripts/builders/content-site-modernizer/test/profile-schema.test.mjs",
+        "action": "modify",
+        "sha256": "c017fd852b5b1bfb65c271cbbec87d114773dbdc371a4169f6f183d66cedccf1",
+        "size": 5743,
+        "source_sha256": "8c556f3b57af39ac169fb4e7cffb7b8f96f9cc35c90c6de0b5442e57ab4a6a1a"
+      },
+      {
+        "path": "userscripts/builders/lpsg-media-gallery-unlocker/package.json",
+        "action": "modify",
+        "sha256": "14475ad50c6c9f48425ef795445e2c0bb503c3f2b91b93a865d9ae7e165e678f",
+        "size": 267,
+        "source_sha256": "f49edc1f41d971ac0067c6e62ffd6cd22358ea7e760abd4704f98483f660b718"
+      },
+      {
+        "path": "userscripts/builders/manga-reader-modernizer/README.md",
+        "action": "modify",
+        "sha256": "81e273bb0c583c01f72128ee94dc0976d80c928cd841f85c8f99911e833df058",
+        "size": 1302,
+        "source_sha256": "098aad7325aab18409c5d95d80c397e382f0d881fb066311ed9c3b210f33a0e8"
+      },
+      {
+        "path": "userscripts/builders/manga-reader-modernizer/build.mjs",
+        "action": "modify",
+        "sha256": "42aeb2a63b7e4ec91376099a66b0d6416c9c91800ee9e3a7be16cc0f1ea92654",
+        "size": 4109,
+        "source_sha256": "e0aafb38b871de5371fdc72b866f6acfc9ae0d58934827f21a80ad9b3144a483"
+      },
+      {
+        "path": "userscripts/builders/manga-reader-modernizer/package.json",
+        "action": "modify",
+        "sha256": "cb4cb7baee61b5fa0881fafb4f272d3ac36b2905e648e0909d972a80a04eca93",
+        "size": 455,
+        "source_sha256": "9e0173e66e03fa8be02a51e04bdb845034e49145807c45847934ce35a0968c1e"
+      },
+      {
+        "path": "userscripts/builders/sims-cc-download-basket/package.json",
+        "action": "modify",
+        "sha256": "3e772f7004431f01f9191e004c865eda306116d3884ea6d48a7c9e77583ed5de",
+        "size": 338,
+        "source_sha256": "5694d260d16d820a4c118ef64625e39ef6f8bf29b49e996aedd071c2af97714d"
+      },
+      {
+        "path": ".devtool-artifact/validate-bleedingcool-ov04.sh",
+        "action": "add",
+        "sha256": "320884f3cce25f56079743d31e1fbed6c90425fbec239b2481cdcab744c23dc7",
+        "size": 338
+      },
+      {
+        "path": ".devtool-artifact/validate-scriptexts-roadmap-ov01.sh",
+        "action": "add",
+        "sha256": "f2d1dc7e0b11233c052735d925f69742b44ca70c285e90308b9ad5d847888ad9",
+        "size": 593
+      },
+      {
+        "path": "docs/MRM_LEGACY_RETIREMENT.md",
+        "action": "add",
+        "sha256": "c6b49d3f6a53cb970795b58c1ed7d84aea36b0bf06c5b97b213b6347df8a1db8",
+        "size": 965
+      },
+      {
+        "path": "tools/check-userscripts.mjs",
+        "action": "add",
+        "sha256": "a732111e7324074476372d2bf3a5d08f0b01c080adf5e801994ae80941c72a33",
+        "size": 1619
+      },
+      {
+        "path": "tools/tests/userscript-validation.test.mjs",
+        "action": "add",
+        "sha256": "37d93f5378d28b8bcebba9f475ec90ca2f819396fc37c7a169ca96b4eb289df6",
+        "size": 3321
+      },
+      {
+        "path": "userscripts/builders/content-site-modernizer/src/core/article-detection.runtime.js",
+        "action": "add",
+        "sha256": "3b9afbbcf41267c0bda31571839921532e012a4184631452dd1abf6ec04ffc43",
+        "size": 365
+      },
+      {
         "path": "userscripts/builders/content-site-modernizer/test/bleeding-cool-release-seal.test.mjs",
         "action": "add",
         "sha256": "745a201c32a2cc76dd2125a94fb2acfdce13ee8ddde5b69af1ee787010c6ff68",
@@ -166,17 +246,36 @@
         "size": 5573
       },
       {
-        "path": "userscripts/builders/content-site-modernizer/test/profile-schema.test.mjs",
-        "action": "modify",
-        "sha256": "c017fd852b5b1bfb65c271cbbec87d114773dbdc371a4169f6f183d66cedccf1",
-        "size": 5743,
-        "source_sha256": "8c556f3b57af39ac169fb4e7cffb7b8f96f9cc35c90c6de0b5442e57ab4a6a1a"
-      },
-      {
         "path": "userscripts/builders/content-site-modernizer/tools/bleeding-cool-release-seal.mjs",
         "action": "add",
         "sha256": "d740b4f2d345109c7516f6f8eca484fd600fd7ce71e07f0210183c9487939aa1",
         "size": 2041
+      },
+      {
+        "path": "userscripts/builders/manga-reader-modernizer/test/retirement.test.mjs",
+        "action": "add",
+        "sha256": "2079188bccd3c9b05fa00b8beeec93e33bfe565081be3ab97f43fa922159d86d",
+        "size": 2067
+      },
+      {
+        "path": "userscripts/builders/manga-reader-modernizer/dist/myreadingmanga-modern-reader.meta.js",
+        "action": "delete",
+        "source_sha256": "eeac33440f6d319601e33c869878e4faf374ee2ede86a0cd367911ad2f3b9c17"
+      },
+      {
+        "path": "userscripts/builders/manga-reader-modernizer/dist/myreadingmanga-modern-reader.user.js",
+        "action": "delete",
+        "source_sha256": "9d076371d91d1f89f0255cc18fdc1854975fac50dd9d1398221381df9c1b67a9"
+      },
+      {
+        "path": "userscripts/builders/manga-reader-modernizer/src/original/myreadingmanga-modern-reader.meta.js",
+        "action": "delete",
+        "source_sha256": "622b9268b306b9e7b2c87b76f4aefaeaa5d7ed62befff1f5dc6b44af08ae5733"
+      },
+      {
+        "path": "userscripts/builders/manga-reader-modernizer/src/original/myreadingmanga-modern-reader.user.js",
+        "action": "delete",
+        "source_sha256": "b329798795da23021fc51fd2758a6f03f906e0d19852e3484b537754fb38f540"
       }
     ]
   },
@@ -188,7 +287,7 @@
     "commit": {
       "enabled": true,
       "strategy": "single",
-      "message": "test(bleedingcool): seal reader regression coverage"
+      "message": "chore(scriptexts): converge validation and retire legacy MRM"
     }
   },
   "validation": {
@@ -198,10 +297,10 @@
     "test": true,
     "rollback_on_failure": true,
     "script": {
-      "path": ".devtool-artifact/validate-bleedingcool-ov04.sh",
+      "path": ".devtool-artifact/validate-scriptexts-roadmap-ov01.sh",
       "runner": "bash",
-      "sha256": "320884f3cce25f56079743d31e1fbed6c90425fbec239b2481cdcab744c23dc7",
-      "timeout_seconds": 600
+      "sha256": "f2d1dc7e0b11233c052735d925f69742b44ca70c285e90308b9ad5d847888ad9",
+      "timeout_seconds": 900
     },
     "expected": {
       "build": "pass",
@@ -210,12 +309,12 @@
     }
   },
   "notes": [
-    "Overlay 4 of 4; final Bleeding Cool convergence/release seal.",
-    "Reconstructed from the exact OV03 post-apply state.",
-    "Adds executable article decision policy coverage rather than relying only on source-string assertions.",
-    "Long-article fixture contains post-image and end-of-article sentinels to lock the screenshot truncation regression closed.",
-    "Large-feed fixture covers 80 cards and verifies one featured card plus stable standard-card behavior.",
-    "Dedicated seal verifies generated-output freshness, syntax, Bleeding Cool regression tests, profile schema validity, and emits the install artifact SHA-256.",
-    "Bleeding Cool profile advances to 0.1.7."
+    "Overlay 1 of 6 in the remaining-userscripts modernization roadmap.",
+    "Built from the latest confirmed repository state: all six LPSG overlays plus Bleeding Cool OV01-OV03.",
+    "This overlay supersedes the previously generated but unconfirmed bleedingcool_regression_release_seal_ov04_v1.zip by carrying its release-seal changes forward on top of the LPSG-aware baseline; do not apply that older OV04 after this overlay.",
+    "Root npm run check now executes regression tests plus checks for content-site-modernizer, manga-reader-modernizer, MyReadingManga Reimagined, Sims CC Basket, LPSG, and repository-wide static/metadata contracts.",
+    "Legacy myreadingmanga-modern-reader source and dist artifacts are deleted; repository validation fails if they return or if another userscript claims the myreadingmanga.info route.",
+    "MyReadingManga Reimagined is the canonical MyReadingManga implementation.",
+    "Normal validation remains browser-free; .devtool-artifact/validate.sh restores the optional PLAYWRIGHT_SMOKE/PAGETUAL_SCRIPT managed PageTual gate required by the content-site final seal."
   ]
 }

@@ -204,17 +204,25 @@
       "builder": "build.mjs",
       "source": "src/original/",
       "install_artifacts": [
-        "dist/myreadingmanga-modern-reader.user.js",
-        "dist/myreadingmanga-modern-reader.meta.js",
         "dist/yaoimangaonline-modern-reader.user.js",
         "dist/yaoimangaonline-modern-reader.meta.js",
         "dist/baramangaonline-modern-reader.user.js",
         "dist/baramangaonline-modern-reader.meta.js"
       ],
       "versions": {
-        "myreadingmanga": "5.2.43",
         "yaoimangaonline": "5.2.47",
         "baramangaonline": "1.5.5"
+      },
+      "scope": [
+        "yaoimangaonline.com",
+        "baramangaonline.com"
+      ],
+      "retired": {
+        "myreadingmanga-modern-reader": {
+          "status": "retired",
+          "replacement": "userscripts/builders/myreadingmanga-reimagined/dist/myreadingmanga-reimagined.user.js",
+          "reason": "MyReadingManga Reimagined is the canonical MyReadingManga implementation."
+        }
       }
     },
     {
@@ -232,7 +240,7 @@
       "scope": [
         "myreadingmanga.info"
       ],
-      "legacy_coexistence": "independent namespace and storage prefix; legacy multi-site builder remains unchanged",
+      "legacy_coexistence": "canonical MyReadingManga implementation; legacy myreadingmanga-modern-reader is retired from active build, check, release, and install artifacts",
       "visual_shell": "adaptive hide-on-down/show-on-up header with active navigation and More menu, archive-local search, compact three-section footer, host-independent readable typography, and responsive card grid",
       "compatibility": {
         "pagetual": "direct insert events, postMessage hook, scoped mutation ingestion, delayed reconciliation, stable page boundaries, loading feedback, and duplicate suppression without self-observer loops"

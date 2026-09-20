@@ -4,7 +4,9 @@
   "type": "module",
   "scripts": {
     "build": "node build.mjs",
-    "check": "node --check dist/mrm.user.js && node --check dist/ymo.user.js && node --check dist/bara.user.js"
+    "build:check": "node build.mjs --check",
+    "test": "node --test test/*.test.mjs",
+    "check": "node build.mjs --check && npm run test && node --check dist/yaoimangaonline-modern-reader.user.js && node --check dist/baramangaonline-modern-reader.user.js"
   },
   "devDependencies": {
     "esbuild": "^0.25.5"
