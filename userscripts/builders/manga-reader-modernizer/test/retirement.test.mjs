@@ -22,8 +22,12 @@ test("legacy MyReadingManga artifacts remain retired", async () => {
   for (const path of legacy) assert.equal(await exists(join(builder, path)), false, `${path} must stay retired`);
   const build = await readFile(join(builder, "build.mjs"), "utf8");
   assert.doesNotMatch(build, /myreadingmanga-modern-reader/);
-  assert.match(build, /yaoimangaonline-modern-reader/);
-  assert.match(build, /baramangaonline-modern-reader/);
+  assert.match(build, /yaoiProfile/);
+  assert.match(build, /baraProfile/);
+  const yaoiProfile = await readFile(join(builder, "src/sites/yaoimangaonline/profile.mjs"), "utf8");
+  const baraProfile = await readFile(join(builder, "src/sites/baramangaonline/profile.mjs"), "utf8");
+  assert.match(yaoiProfile, /yaoimangaonline-modern-reader/);
+  assert.match(baraProfile, /baramangaonline-modern-reader/);
 });
 
 test("MyReadingManga Reimagined is the only active MyReadingManga route", async () => {

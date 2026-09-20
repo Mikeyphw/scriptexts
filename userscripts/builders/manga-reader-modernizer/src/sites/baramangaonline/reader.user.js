@@ -3,8 +3,8 @@
 // @namespace    https://github.com/Mikeyphw/scriptexts/userscripts/baramangaonline-modern-reader
 // @homepageURL  https://github.com/Mikeyphw/scriptexts/tree/main/userscripts/builders/manga-reader-modernizer
 // @supportURL   https://github.com/Mikeyphw/scriptexts/issues
-// @updateURL    https://raw.githubusercontent.com/Mikeyphw/scriptexts/main/userscripts/builders/manga-reader-modernizer/src/original/baramangaonline-modern-reader.meta.js
-// @downloadURL  https://raw.githubusercontent.com/Mikeyphw/scriptexts/main/userscripts/builders/manga-reader-modernizer/src/original/baramangaonline-modern-reader.user.js
+// @updateURL    https://raw.githubusercontent.com/Mikeyphw/scriptexts/main/userscripts/builders/manga-reader-modernizer/dist/baramangaonline-modern-reader.meta.js
+// @downloadURL  https://raw.githubusercontent.com/Mikeyphw/scriptexts/main/userscripts/builders/manga-reader-modernizer/dist/baramangaonline-modern-reader.user.js
 // @version      1.5.5
 // @description  Force an MRM-style archive/post theme on BaraMangaOnline with dropdown-backed local filters, compact facet panel, and an MRM-grade mobile-first reader popup with fit/width/view/direction controls, thumbnails, tap zones, scrubber, comments, fullscreen, and adjacent post navigation.
 // @match        https://baramangaonline.com/*
@@ -14,6 +14,35 @@
 
 (() => {
   "use strict";
+
+
+  function isWideMobileDevice() {
+    const coarse = window.matchMedia?.("(any-pointer: coarse)").matches === true;
+    const android = /Android/i.test(navigator.userAgent || "");
+    const touchPoints = Number(navigator.maxTouchPoints || 0);
+    return android || (coarse && touchPoints > 0 && window.innerWidth < 1400);
+  }
+  function installReaderImageRetry(img, sourceUrl, label = "page") {
+    let attempts = 0;
+    const retry = () => {
+      attempts += 1;
+      img.dataset.readerRetryState = "loading";
+      const separator = sourceUrl.includes("?") ? "&" : "?";
+      img.src = `${sourceUrl}${separator}mrm_retry=${attempts}`;
+    };
+    img.addEventListener("load", () => {
+      img.dataset.readerRetryState = "loaded";
+      img.removeAttribute("aria-invalid");
+    });
+    img.addEventListener("error", () => {
+      img.dataset.readerRetryState = "failed";
+      img.setAttribute("aria-invalid", "true");
+      img.title = `Failed to load ${label}. Tap image to retry.`;
+    });
+    img.addEventListener("click", () => {
+      if (img.dataset.readerRetryState === "failed") retry();
+    });
+  }
 
   if (!location.hostname.includes("baramangaonline.com")) return;
 
@@ -557,7 +586,7 @@ function getFacetRowsMarkup(key, items) {
   }
 
   function isMobileView() {
-    return window.innerWidth <= MOBILE_BREAKPOINT;
+    return window.innerWidth <= MOBILE_BREAKPOINT || isWideMobileDevice();
   }
 
   function indexArchiveCards() {
@@ -2200,6 +2229,7 @@ if (frame instanceof HTMLIFrameElement) {
       img.loading = index < 3 ? "eager" : "lazy";
       img.decoding = "async";
       img.referrerPolicy = "same-origin";
+      installReaderImageRetry(img, image.src, `page ${index + 1}`);
 
       const caption = document.createElement("figcaption");
       caption.className = "bmo-mrm-reader-page__caption";

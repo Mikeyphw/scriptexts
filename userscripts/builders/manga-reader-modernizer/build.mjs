@@ -1,6 +1,8 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import yaoiProfile from "./src/sites/yaoimangaonline/profile.mjs";
+import baraProfile from "./src/sites/baramangaonline/profile.mjs";
 
 const ROOT = dirname(fileURLToPath(import.meta.url));
 const RAW_BASE = "https://raw.githubusercontent.com/Mikeyphw/scriptexts/main";
@@ -8,10 +10,7 @@ const HOME_BASE = "https://github.com/Mikeyphw/scriptexts/tree/main";
 const projectPath = "userscripts/builders/manga-reader-modernizer";
 const checkMode = process.argv.includes("--check");
 
-const builds = [
-  { entry: "src/original/yaoimangaonline-modern-reader.user.js", outfile: "dist/yaoimangaonline-modern-reader.user.js" },
-  { entry: "src/original/baramangaonline-modern-reader.user.js", outfile: "dist/baramangaonline-modern-reader.user.js" }
-];
+const builds = [yaoiProfile, baraProfile];
 
 function parseMetadataBlock(raw) {
   const match = raw.match(/\/\/\s*==UserScript==[\s\S]*?\/\/\s*==\/UserScript==/m);

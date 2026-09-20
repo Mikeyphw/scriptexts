@@ -3,8 +3,8 @@
 // @namespace    https://github.com/Mikeyphw/scriptexts/userscripts/yaoimangaonline-modern-reader
 // @homepageURL  https://github.com/Mikeyphw/scriptexts/tree/main/userscripts/builders/manga-reader-modernizer
 // @supportURL   https://github.com/Mikeyphw/scriptexts/issues
-// @updateURL    https://raw.githubusercontent.com/Mikeyphw/scriptexts/main/userscripts/builders/manga-reader-modernizer/src/original/yaoimangaonline-modern-reader.meta.js
-// @downloadURL  https://raw.githubusercontent.com/Mikeyphw/scriptexts/main/userscripts/builders/manga-reader-modernizer/src/original/yaoimangaonline-modern-reader.user.js
+// @updateURL    https://raw.githubusercontent.com/Mikeyphw/scriptexts/main/userscripts/builders/manga-reader-modernizer/dist/yaoimangaonline-modern-reader.meta.js
+// @downloadURL  https://raw.githubusercontent.com/Mikeyphw/scriptexts/main/userscripts/builders/manga-reader-modernizer/dist/yaoimangaonline-modern-reader.user.js
 // @version      5.2.47
 // @description  YMO-only userscript: archive panel, YMO metadata-aware filtering with IN/OUT modes, mobile-friendly UI, grid config, Komikku-style reader popup/page, and single-post UI for Yaoi Manga Online.
 // @run-at       document-idle
@@ -14,6 +14,35 @@
 
 (() => {
   "use strict";
+
+
+  function isWideMobileDevice() {
+    const coarse = window.matchMedia?.("(any-pointer: coarse)").matches === true;
+    const android = /Android/i.test(navigator.userAgent || "");
+    const touchPoints = Number(navigator.maxTouchPoints || 0);
+    return android || (coarse && touchPoints > 0 && window.innerWidth < 1400);
+  }
+  function installReaderImageRetry(img, sourceUrl, label = "page") {
+    let attempts = 0;
+    const retry = () => {
+      attempts += 1;
+      img.dataset.readerRetryState = "loading";
+      const separator = sourceUrl.includes("?") ? "&" : "?";
+      img.src = `${sourceUrl}${separator}mrm_retry=${attempts}`;
+    };
+    img.addEventListener("load", () => {
+      img.dataset.readerRetryState = "loaded";
+      img.removeAttribute("aria-invalid");
+    });
+    img.addEventListener("error", () => {
+      img.dataset.readerRetryState = "failed";
+      img.setAttribute("aria-invalid", "true");
+      img.title = `Failed to load ${label}. Tap image to retry.`;
+    });
+    img.addEventListener("click", () => {
+      if (img.dataset.readerRetryState === "failed") retry();
+    });
+  }
 
   if (!['yaoimangaonline.com'].includes(location.hostname)) return;
 
@@ -167,7 +196,7 @@ function getDebouncedFacetRenderer(cacheKey, fn, delay = 120) {
 
 
   function isMobileViewport() {
-    return window.matchMedia?.(MOBILE_MEDIA_QUERY).matches ?? window.innerWidth <= 920;
+    return (window.matchMedia?.(MOBILE_MEDIA_QUERY).matches ?? window.innerWidth <= 920) || isWideMobileDevice();
   }
 
   function isSmallMobileViewport() {
@@ -2489,6 +2518,7 @@ function renderReaderPage(root, context) {
     img.loading = index < 3 ? "eager" : "lazy";
     img.decoding = "async";
     img.referrerPolicy = "same-origin";
+    installReaderImageRetry(img, image.src, `page ${index + 1}`);
     if (image.width > 0) img.width = image.width;
     if (image.height > 0) img.height = image.height;
 
@@ -3263,7 +3293,7 @@ function initReaderPage() {
   }
 
   function isMobileView() {
-    return window.innerWidth <= MOBILE_BREAKPOINT;
+    return window.innerWidth <= MOBILE_BREAKPOINT || isWideMobileDevice();
   }
 
   function getChipLimit() {

@@ -6,7 +6,8 @@
     "build": "node build.mjs",
     "build:check": "node build.mjs --check",
     "test": "node --test test/*.test.mjs",
-    "check": "node build.mjs --check && npm run test && node --check dist/yaoimangaonline-modern-reader.user.js && node --check dist/baramangaonline-modern-reader.user.js"
+    "check": "node build.mjs --check && npm run test && node --check dist/yaoimangaonline-modern-reader.user.js && node --check dist/baramangaonline-modern-reader.user.js",
+    "seal": "node release-seal.mjs"
   },
   "devDependencies": {
     "esbuild": "^0.25.5"

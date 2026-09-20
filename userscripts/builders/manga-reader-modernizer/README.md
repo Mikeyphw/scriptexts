@@ -1,6 +1,6 @@
 # Manga Reader Modernizer builder
 
-Independent builder for the supported **YaoiMangaOnline** and **BaraMangaOnline** modern-reader userscripts. Source-of-truth files live under `src/original/`; `build.mjs` normalizes userscript metadata and writes installable files to `dist/`.
+Independent builder for the supported **YaoiMangaOnline** and **BaraMangaOnline** modern-reader userscripts. Source-of-truth files are split by supported site under `src/sites/<site>/`, with a site profile and reader source for each target; `build.mjs` normalizes userscript metadata and writes installable files to `dist/`.
 
 ## MyReadingManga retirement
 
@@ -26,3 +26,7 @@ Install only the generated files:
 Each generated userscript also receives a `.meta.js` file for userscript-manager update checks. `npm run build:check` verifies that committed dist artifacts are byte-for-byte current without rewriting them.
 
 This builder is unrelated to the Sims CC Basket builder. They share the repository but not a build system or source format.
+
+## Release seal
+
+`npm run seal` verifies deterministic generated output, all supported-site fixtures/regressions, both generated userscript syntax checks, and prints output SHA-256 evidence. Long-chapter fixtures and reader image failure/retry contracts are permanent regression gates.
