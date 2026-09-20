@@ -890,3 +890,30 @@ html.csm-article-mode.csm-site-bleeding-cool-modern-reader .csm-article :is(.td-
 html.csm-article-mode.csm-site-bleeding-cool-modern-reader .csm-article :is(.td-post-content,.td-article-content,.entry-content,.post-content) :is(.td-adspot-title,.td-adspot-title:empty,.td-a-rec:empty,p:empty,div:empty) {
   min-height: 0 !important;
 }
+
+/* Bleeding Cool article cleanup: remove tail chrome without disturbing editorial copy. */
+html.csm-article-mode.csm-site-bleeding-cool-modern-reader .csm-article .csm-article-media-group {
+  display: block !important;
+  position: relative !important;
+  max-width: 100% !important;
+  max-height: none !important;
+  overflow: visible !important;
+  contain: none !important;
+  break-inside: avoid !important;
+  background: transparent !important;
+}
+html.csm-article-mode.csm-site-bleeding-cool-modern-reader .csm-article .csm-article-media-group :is(img,picture,source) {
+  max-width: 100% !important;
+}
+html.csm-article-mode.csm-site-bleeding-cool-modern-reader .csm-article .csm-article-media-caption {
+  display: block !important;
+  max-height: none !important;
+  overflow: visible !important;
+  white-space: normal !important;
+  text-overflow: clip !important;
+  -webkit-line-clamp: unset !important;
+  line-clamp: unset !important;
+}
+html.csm-article-mode.csm-site-bleeding-cool-modern-reader .csm-article .csm-mismatched-media-caption {
+  display: none !important;
+}

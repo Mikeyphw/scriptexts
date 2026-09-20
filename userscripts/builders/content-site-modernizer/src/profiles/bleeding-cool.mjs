@@ -46,7 +46,46 @@ export default {
       "minCardTextLength": 24
     },
     "articleCleanup": {
-      "removeOrphanSeparators": true
+      "removeOrphanSeparators": true,
+      "contentRootSelector": ".td-post-content,.td-article-content,.entry-content,.post-content",
+      "hideSelectors": [
+        ".td-post-sharing",
+        ".td-post-sharing-top",
+        ".td-post-sharing-bottom",
+        ".td-social-sharing",
+        ".td-social-style",
+        ".td-social-icon-wrap",
+        ".td-social-box",
+        ".td-social-handler",
+        ".tdb-social-item",
+        ".sharedaddy",
+        ".sd-sharing-enabled",
+        ".addtoany_share_save_container",
+        ".sharethis-inline-share-buttons",
+        ".heateor_sss_sharing_container",
+        ".sfsi_widget",
+        ".sfsi_wDiv",
+        ".td-author-box-wrap"
+      ],
+      "sharePromptText": "Enjoyed this? Please share on social media!",
+      "socialLinkSelector": "a[href*='facebook.com/share'],a[href*='twitter.com/share'],a[href*='x.com/intent'],a[href*='pinterest.com/pin'],a[href*='reddit.com/submit'],a:has(img[src*='social-1_square']),a:has(img[src*='social_facebook']),a:has(img[src*='social_twitter'])",
+      "googleNewsLinkSelector": "a[href*='news.google.com'],a:has(img[src*='Google_News_icon']),a:has(img[src*='google_preferred_source_badge'])",
+      "googleNewsPromoText": "Stay up-to-date and support the site by following Bleeding Cool on Google News today!",
+      "googleNewsContainerSelector": "p,figure,aside,.google-news,.google-news-promo,.follow-google-news",
+      "authorContainerSelector": ".td-author-box-wrap,.author-box,.author-bio",
+      "authorStopTextPrefixes": [
+        "Comments will load",
+        "Latest by ",
+        "Latest in "
+      ],
+      "maxSocialContainerText": 220,
+      "maxShareSiblingScan": 8,
+      "maxAuthorSiblingScan": 12,
+      "mediaGroupSelector": "figure,.wp-caption,.wp-block-image,.gallery-item,.td-image-wrap",
+      "captionSelector": "figcaption,.wp-caption-text,.caption,[class*='caption']",
+      "productLabelSelector": "h2,h3,h4,.product-title,.solicit-title,p,strong",
+      "maxProductLabelScan": 3,
+      "maxProductLabelLength": 180
     },
     "performance": {
       "lowResource": true,

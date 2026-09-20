@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "type": "overlay",
-  "name": "Bleeding Cool article reader correctness OV01",
-  "description": "Fixes article classification, guarantees unclamped article prose including text after images, adds safe-area bottom-nav clearance, normalizes article subtitle readability, removes orphan separators, and adds dedicated regression fixtures/tests.",
+  "name": "Bleeding Cool article content cleanup OV02",
+  "description": "Removes Bleeding Cool article-tail share/Google News/author chrome safely, preserves editorial references, keeps article media groups local, suppresses only strongly mismatched product captions, and adds regression coverage.",
   "repository": {
     "name": "scriptexts",
     "remote": "git@github.com:Mikeyphw/scriptexts.git",
@@ -17,106 +17,105 @@
     "format": 1,
     "entries": [
       {
-        "path": ".devtool-artifact/validate-bleedingcool-ov01.sh",
+        "path": ".devtool-artifact/validate-bleedingcool-ov02.sh",
         "action": "add",
-        "sha256": "b90c158d38f4f42d87a955d47dc4286c0c6df8095f999dad3474bb1c0af76f61",
-        "size": 378
+        "sha256": "3f741fab2acb5ee02ea001d01389419daf5aacc13f5e2f38ee6b94c8daac7b29",
+        "size": 479
       },
       {
-        "path": "repo-manifest.json",
+        "path": "userscripts/builders/content-site-modernizer/src/core/article-cleanup.runtime.js",
+        "action": "add",
+        "sha256": "059936a34605e3b3ac78c2d81faabe634375fded576de4e4d4ce312d0c1c6a65",
+        "size": 2069
+      },
+      {
+        "path": "userscripts/builders/content-site-modernizer/src/core/runtime.mjs",
         "action": "modify",
-        "sha256": "da852660178bc7c9e5ebc08d605058e569ee6a5eb5079fe5fa48f5c7e650b045",
-        "size": 21808,
-        "source_sha256": "1b0847141f86d91d6cda3490503357f58dfe74ca8135a2419bfc432bb2d8707c"
+        "sha256": "9857e1c0e16e38b2a5de21a4af68b30c1364b5d1518da10d6853afdf51b9dfce",
+        "size": 423,
+        "source_sha256": "ed18d0c41bf04ef0515c687deb5a62542e49bea6cffb3423f17a291a1108d739"
       },
       {
         "path": "userscripts/builders/content-site-modernizer/src/core/runtime.template.js",
         "action": "modify",
-        "sha256": "1127873354bd0db6ecaa775af08f6e83c26cde21223d3426f161722737a9224c",
-        "size": 46343,
-        "source_sha256": "d1abe6c8d7f54e83e3def17411c0485da9861b2aba6ecd8d161ea434ffc61dc0"
+        "sha256": "087718eaf88b77b7d4f4e5e7bee47a271b20621e65aafa4a08a47bc013a6ce6c",
+        "size": 53369,
+        "source_sha256": "1127873354bd0db6ecaa775af08f6e83c26cde21223d3426f161722737a9224c"
       },
       {
         "path": "userscripts/builders/content-site-modernizer/src/core/styles.css",
         "action": "modify",
-        "sha256": "7a4e02cce00907c63baa01379f2f64c89a91d5aed554cc14ea06626712e3a943",
-        "size": 31008,
-        "source_sha256": "29219f0fe9988cd28db8ca11b1fdc0f898de10faa5d367993b256327ddc92c0c"
+        "sha256": "63df84e76a79cc639beda2cbba57c19095b7029d3e44e1d7c14a0cd0d62ec234",
+        "size": 32080,
+        "source_sha256": "7a4e02cce00907c63baa01379f2f64c89a91d5aed554cc14ea06626712e3a943"
       },
       {
         "path": "userscripts/builders/content-site-modernizer/src/profiles/bleeding-cool.mjs",
         "action": "modify",
-        "sha256": "48b155f31f34621922b1962a2cd68e0d4adcff0be1864a08b64f1c739f376e3c",
-        "size": 6770,
-        "source_sha256": "7c98e2be1889df8ec96a2022a678264ceb168595b21615e1c81b0469205bf6c6"
+        "sha256": "d9620e9bffdcfb638ba522c1c081ee405b33d7b822819f8dc1675af96c4239de",
+        "size": 8775,
+        "source_sha256": "48b155f31f34621922b1962a2cd68e0d4adcff0be1864a08b64f1c739f376e3c"
       },
       {
-        "path": "userscripts/builders/content-site-modernizer/test/bleeding-cool-article-correctness.test.mjs",
+        "path": "userscripts/builders/content-site-modernizer/test/bleeding-cool-article-cleanup.test.mjs",
         "action": "add",
-        "sha256": "a54b5a787d8697e9794ae537ff16eb7674ea41c589c6820e7ce5b263b29740df",
-        "size": 3814
+        "sha256": "e5f02e4124d8e842c3e4413ac85c85d3b003ed092d11c4128ba04116a657c4aa",
+        "size": 6071
       },
       {
-        "path": "userscripts/builders/content-site-modernizer/test/fixtures/bleeding-cool-article-regression.html",
+        "path": "userscripts/builders/content-site-modernizer/test/fixtures/bleeding-cool-article-cleanup-regression.html",
         "action": "add",
-        "sha256": "f50b2e341d14befd0945f0df2e046fcd0b970989edcf024463c5a64167ccd8c1",
-        "size": 982
-      },
-      {
-        "path": "userscripts/builders/content-site-modernizer/dist/bleeding-cool-modern-reader.meta.js",
-        "action": "modify",
-        "sha256": "3c347863c6ff309de0920294a0c0b261eb66d1372227763287144b92e6ee8623",
-        "size": 1090,
-        "source_sha256": "e393e29b17f3a699fe53f98691a58dedcabdc4612a9d2ec380eb1133166ed384"
+        "sha256": "cf789d04f98959ccf3a405d84c912855143563b348d1b8a30e3eaedd4e791f49",
+        "size": 2345
       },
       {
         "path": "userscripts/builders/content-site-modernizer/dist/aipt-comics-modern-reader.user.js",
         "action": "modify",
-        "sha256": "32104cd7ee110c7b03028ca241cbea4751f812924de67cde9f2a00fb967c4e35",
-        "size": 84795,
-        "source_sha256": "6a2c7580dc00b8b0e44b8fe61caa67a0b9898616f242e5514394a17b6e710b56"
+        "sha256": "f193a899196681d3a77b9562c9587c0915d2ff56ad459b170c80d8423d7a984f",
+        "size": 95011,
+        "source_sha256": "32104cd7ee110c7b03028ca241cbea4751f812924de67cde9f2a00fb967c4e35"
       },
       {
         "path": "userscripts/builders/content-site-modernizer/dist/bleeding-cool-modern-reader.user.js",
         "action": "modify",
-        "sha256": "7eb57c0368210211be169875437e6a46e229da6f83fdb6c389ef0c9eca0194d7",
-        "size": 85806,
-        "source_sha256": "be41cb8959b9109675f3e7e304db4a9e1ad61dd568264e410f67d7552ab17fe2"
+        "sha256": "6716fa29cb2274c7bb35a7dced9f876e37e9bce081fe0f4074a08c3c688367e2",
+        "size": 97949,
+        "source_sha256": "7eb57c0368210211be169875437e6a46e229da6f83fdb6c389ef0c9eca0194d7"
       },
       {
         "path": "userscripts/builders/content-site-modernizer/dist/menofporn-modern-ui.user.js",
         "action": "modify",
-        "sha256": "e4497d42c0fe283d3a61825ea5ddb98633c240e9a5f4107c951f0e56cf58fae1",
-        "size": 84797,
-        "source_sha256": "118d1604583124457da633e3d6967617215503d6041c60dbd488e8ea7e0bcd13"
+        "sha256": "1cb06c0049d1ef5c6206130a0e9db55131d443462dcef5e543c9a7fea8126f65",
+        "size": 95013,
+        "source_sha256": "e4497d42c0fe283d3a61825ea5ddb98633c240e9a5f4107c951f0e56cf58fae1"
       },
       {
         "path": "userscripts/builders/content-site-modernizer/dist/putinho-modern-ui.user.js",
         "action": "modify",
-        "sha256": "7bdefb78e520d8b64266f2465b7e49cf16104649045a852835bfef2a9f6bcdbe",
-        "size": 84877,
-        "source_sha256": "285e0ef9d41dc2b6b02b97f4091b0761459a990d5d6fcfbabf2ff1a9227eaa3d"
+        "sha256": "999ed9e766ea8a9d56913806de032f362a29581478b122f7d0c62b360dc9ac62",
+        "size": 95093,
+        "source_sha256": "7bdefb78e520d8b64266f2465b7e49cf16104649045a852835bfef2a9f6bcdbe"
       },
       {
         "path": "userscripts/builders/content-site-modernizer/dist/gayteam-modern-ui.user.js",
         "action": "modify",
-        "sha256": "0ce1f194f75c742ea4ca36cfd87e441a9a64bb02d755b28c3b2b8969932dbc66",
-        "size": 84320,
-        "source_sha256": "05664d62845f9b2b4e050e8b4ac5d1f3b263ee968716664b4b7b98966f648a3f"
+        "sha256": "a7107c0971f008d169207ba19c02bd923fd4c5ed54296c9b3828b8fc906bc48a",
+        "size": 94536,
+        "source_sha256": "0ce1f194f75c742ea4ca36cfd87e441a9a64bb02d755b28c3b2b8969932dbc66"
       },
       {
         "path": "userscripts/builders/content-site-modernizer/dist/justthegays-modern-ui.user.js",
         "action": "modify",
-        "sha256": "26e1b9b6b8501e9262d76fd7a1e94e7d516d6bb091880ae729b423b326c54685",
-        "size": 83946,
-        "source_sha256": "548513b31fb699e197ac233e62d9a70ed7cd10e9dc2b592503e36f6061e8fead"
+        "sha256": "113295246c90da77e17b35b6dea9e4eee4cab625d5f3f4fac03b152162e57d44",
+        "size": 94162,
+        "source_sha256": "26e1b9b6b8501e9262d76fd7a1e94e7d516d6bb091880ae729b423b326c54685"
       },
       {
         "path": "userscripts/builders/content-site-modernizer/dist/str8upgayporn-modern-ui.user.js",
         "action": "modify",
-        "sha256": "fec65c359a88caed5631ad06079d64c15ece3ab55767070d6a1a9e6d5575529d",
-        "size": 84604,
-        "source_sha256": "8f7f41b854cf7b841e316afb8dc9094164e3c09f784cc59b392920dfed185330"
+        "sha256": "46b2911ca72a560203ba8326ce8ef946d565d338dfc2edcab3ae27586aba56de",
+        "size": 94820,
+        "source_sha256": "fec65c359a88caed5631ad06079d64c15ece3ab55767070d6a1a9e6d5575529d"
       }
     ]
   },
@@ -128,7 +127,7 @@
     "commit": {
       "enabled": true,
       "strategy": "single",
-      "message": "fix(bleedingcool): make article reader content complete"
+      "message": "fix(bleedingcool): clean article chrome and media labels"
     }
   },
   "validation": {
@@ -138,9 +137,9 @@
     "test": true,
     "rollback_on_failure": true,
     "script": {
-      "path": ".devtool-artifact/validate-bleedingcool-ov01.sh",
+      "path": ".devtool-artifact/validate-bleedingcool-ov02.sh",
       "runner": "bash",
-      "sha256": "b90c158d38f4f42d87a955d47dc4286c0c6df8095f999dad3474bb1c0af76f61",
+      "sha256": "3f741fab2acb5ee02ea001d01389419daf5aacc13f5e2f38ee6b94c8daac7b29",
       "timeout_seconds": 600
     },
     "expected": {
@@ -150,8 +149,9 @@
     }
   },
   "notes": [
-    "Overlay 1 of 4.",
-    "Validation is deliberately scoped to Bleeding Cool article correctness plus deterministic builder/profile checks.",
-    "Regression fixture locks the reported text-after-image truncation bug."
+    "Overlay 2 of 4.",
+    "Reconstructed from the exact OV01 post-apply state.",
+    "Validation is Bleeding-Cool-focused plus deterministic builder/profile checks because unrelated pre-existing repository seal tests are already failing in the OV01 baseline.",
+    "Regression tests protect legitimate editorial mentions of Google News/Facebook/Twitter and the screenshot-observed wrong-product caption case."
   ]
 }

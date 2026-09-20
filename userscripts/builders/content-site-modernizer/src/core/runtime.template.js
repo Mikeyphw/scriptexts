@@ -871,10 +871,151 @@ function installContentSiteModernizer(profile, cssText) {
     else if (feedState.mode === 'saved') reconcileFeed({ reason: 'save-toggle' });
   }
 
+  function articleCleanupRoot(root) {
+    const selector = profile.articleCleanup?.contentRootSelector || '.td-post-content,.td-article-content,.entry-content,.post-content';
+    return first(selector, root) || root;
+  }
+
+  function safeHideArticleNode(node, root) {
+    if (!(node instanceof Element) || node === root || !root.contains(node)) return false;
+    if (node.matches?.('.csm-topbar,.csm-drawer,.csm-bottomnav,.csm-progress')) return false;
+    node.classList.add('csm-source-hidden');
+    return true;
+  }
+
+  function cleanupArticleChrome(root) {
+    const cleanup = profile.articleCleanup || {};
+    const content = articleCleanupRoot(root);
+    hideNodes(cleanup.hideSelectors || [], content);
+
+    const socialLinkSelector = cleanup.socialLinkSelector || [
+      'a[href*="facebook.com/share"]',
+      'a[href*="twitter.com/share"]',
+      'a[href*="x.com/intent"]',
+      'a[href*="pinterest.com/pin"]',
+      'a[href*="reddit.com/submit"]',
+      'a:has(img[src*="social-1_square"])',
+      'a:has(img[src*="social_facebook"])',
+      'a:has(img[src*="social_twitter"])'
+    ].join(',');
+    const googleNewsSelector = cleanup.googleNewsLinkSelector || 'a[href*="news.google.com"]';
+    const sharePrompt = csmNormalizeCleanupText(cleanup.sharePromptText || 'Enjoyed this? Please share on social media!');
+    const tailMarkers = [];
+
+    const isSocialOnly = (node) => {
+      if (!(node instanceof Element)) return false;
+      const links = $$('a[href]', node);
+      const socialImages = $$('img[src*="social_"],img[src*="social-1_square"],img[src*="facebook"],img[src*="twitter"]', node);
+      const socialLinks = links.filter((link) => {
+        try { return link.matches(socialLinkSelector); } catch { return false; }
+      });
+      if (links.length && socialLinks.length !== links.length) return false;
+      if (!links.length && !socialImages.length) return false;
+      const text = csmNormalizeCleanupText(node.textContent);
+      return text.length <= Number(cleanup.maxSocialContainerText || 220);
+    };
+
+    for (const node of $$('p,div,strong,h2,h3,h4', content)) {
+      if (csmNormalizeCleanupText(node.textContent) !== sharePrompt) continue;
+      tailMarkers.push(node);
+      safeHideArticleNode(node, content);
+      let sibling = node.nextElementSibling;
+      let steps = 0;
+      while (sibling && steps < Number(cleanup.maxShareSiblingScan || 8)) {
+        if (!isSocialOnly(sibling)) break;
+        const next = sibling.nextElementSibling;
+        safeHideArticleNode(sibling, content);
+        sibling = next;
+        steps += 1;
+      }
+    }
+
+    const googlePromoText = csmNormalizeCleanupText(cleanup.googleNewsPromoText || 'Stay up-to-date and support the site by following Bleeding Cool on Google News today!').toLowerCase();
+    for (const link of $$(googleNewsSelector, content)) {
+      const linkText = csmNormalizeCleanupText(link.textContent).toLowerCase();
+      const hasPromoBadge = !!link.querySelector?.('img[src*="Google_News"],img[src*="google_preferred_source_badge"]');
+      if (!hasPromoBadge && linkText !== googlePromoText) continue;
+      tailMarkers.push(link);
+      const box = link.closest(cleanup.googleNewsContainerSelector || 'p,figure,aside,.google-news,.google-news-promo,.follow-google-news');
+      if (box && box !== content && content.contains(box)) safeHideArticleNode(box, content);
+      else safeHideArticleNode(link, content);
+    }
+
+    const followsTailMarker = (node) => tailMarkers.some((marker) =>
+      marker !== node && !!(marker.compareDocumentPosition(node) & Node.DOCUMENT_POSITION_FOLLOWING));
+    const stopPrefixes = (cleanup.authorStopTextPrefixes || ['Comments will load', 'Latest by ', 'Latest in '])
+      .map((value) => csmNormalizeCleanupText(value).toLowerCase());
+    const isAuthorBoundary = (node) => {
+      if (!(node instanceof Element)) return true;
+      if (node.matches?.(profile.selectors?.article?.comments || '#comments,.comments-area')) return true;
+      const text = csmNormalizeCleanupText(node.textContent).toLowerCase();
+      return stopPrefixes.some((prefix) => text.startsWith(prefix));
+    };
+
+    if (tailMarkers.length) {
+      for (const heading of $$('h2,h3,h4', content)) {
+        const text = csmNormalizeCleanupText(heading.textContent);
+        if (!/^About\s+/i.test(text) || !followsTailMarker(heading)) continue;
+        const authorBox = heading.closest(cleanup.authorContainerSelector || '.td-author-box-wrap,.author-box,.author-bio');
+        if (authorBox && authorBox !== content && content.contains(authorBox)) {
+          safeHideArticleNode(authorBox, content);
+          continue;
+        }
+        let sibling = heading;
+        let steps = 0;
+        while (sibling && steps < Number(cleanup.maxAuthorSiblingScan || 12)) {
+          if (sibling !== heading && isAuthorBoundary(sibling)) break;
+          const next = sibling.nextElementSibling;
+          safeHideArticleNode(sibling, content);
+          sibling = next;
+          steps += 1;
+        }
+      }
+    }
+  }
+
+  function normalizeArticleMediaGroups(root) {
+    const cleanup = profile.articleCleanup || {};
+    const content = articleCleanupRoot(root);
+    const groupSelector = cleanup.mediaGroupSelector || 'figure,.wp-caption,.wp-block-image,.gallery-item,.td-image-wrap';
+    const captionSelector = cleanup.captionSelector || 'figcaption,.wp-caption-text,.caption,[class*="caption"]';
+    const productLabelSelector = cleanup.productLabelSelector || 'h2,h3,h4,.product-title,.solicit-title,p,strong';
+
+    const nextProductLabel = (group) => {
+      let node = group.nextElementSibling;
+      let steps = 0;
+      while (node && steps < Number(cleanup.maxProductLabelScan || 3)) {
+        const candidate = node.matches?.(productLabelSelector) ? node : first(productLabelSelector, node);
+        const text = csmNormalizeCleanupText(candidate?.textContent);
+        if (text && text.length <= Number(cleanup.maxProductLabelLength || 180) && !/^View Product Page$/i.test(text)) return text;
+        node = node.nextElementSibling;
+        steps += 1;
+      }
+      return '';
+    };
+
+    for (const group of $$(groupSelector, content)) {
+      if (!(group instanceof HTMLElement)) continue;
+      group.classList.add('csm-article-media-group');
+      const image = first('img', group);
+      const caption = first(captionSelector, group);
+      if (caption instanceof HTMLElement) caption.classList.add('csm-article-media-caption');
+      if (!(image instanceof HTMLImageElement) || !(caption instanceof HTMLElement)) continue;
+      const mediaLabel = image.getAttribute('alt') || image.getAttribute('title') || '';
+      const followingTitle = nextProductLabel(group);
+      if (csmShouldHideMismatchedCaption({ mediaLabel, caption: caption.textContent, followingTitle })) {
+        caption.classList.add('csm-source-hidden', 'csm-mismatched-media-caption');
+        group.dataset.csmCaptionMismatch = 'true';
+      }
+    }
+  }
+
   function enhanceArticle() {
     const root = first(profile.selectors?.article?.root || 'article,main');
     if (!root) return;
     root.classList.add('csm-article');
+    cleanupArticleChrome(root);
+    normalizeArticleMediaGroups(root);
     if (profile.articleCleanup?.removeOrphanSeparators) {
       for (const node of $$('p,div,span', root)) {
         if (node.children.length || node.querySelector?.('a,img,video,iframe')) continue;
