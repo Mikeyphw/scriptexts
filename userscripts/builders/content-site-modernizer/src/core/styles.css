@@ -431,10 +431,10 @@ html.csm-modernized.csm-site-bleeding-cool-modern-reader .csm-feed-grid {
 .csm-feed-grid {
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
 }
-html.csm-site-bleeding-cool-modern-reader .csm-feed-grid .csm-card:first-child {
+html.csm-site-bleeding-cool-modern-reader .csm-feed-grid .csm-card-featured {
   grid-column: span 2;
 }
-html.csm-site-bleeding-cool-modern-reader .csm-card:first-child :is(h1,h2,h3,.entry-title,.post-title,.title) {
+html.csm-site-bleeding-cool-modern-reader .csm-card-featured :is(h1,h2,h3,.entry-title,.post-title,.title) {
   font-size: clamp(1.25rem, 2.7vw, 2rem) !important;
 }
 html.csm-site-bleeding-cool-modern-reader .csm-article {
@@ -475,10 +475,10 @@ html.csm-feed-mode.csm-site-bleeding-cool-modern-reader .csm-card-media {
 html.csm-feed-mode.csm-site-bleeding-cool-modern-reader .csm-card img {
   object-fit: contain !important;
 }
-html.csm-feed-mode.csm-site-bleeding-cool-modern-reader .csm-card:first-child {
+html.csm-feed-mode.csm-site-bleeding-cool-modern-reader .csm-card-featured {
   grid-column: span 2;
 }
-html.csm-feed-mode.csm-site-bleeding-cool-modern-reader .csm-card:first-child .csm-card-title {
+html.csm-feed-mode.csm-site-bleeding-cool-modern-reader .csm-card-featured .csm-card-title {
   font-size: clamp(1.12rem, 2.2vw, 1.58rem) !important;
 }
 html.csm-feed-mode.csm-site-bleeding-cool-modern-reader .csm-card[data-csm-no-image="true"] {
@@ -529,7 +529,7 @@ html.csm-article-mode.csm-site-bleeding-cool-modern-reader :is(.td-main-sidebar,
 }
 @media (max-width: 760px) {
   .csm-layout { width: min(100% - .9rem, var(--csm-max, 1360px)) !important; }
-  html.csm-site-bleeding-cool-modern-reader .csm-feed-grid .csm-card:first-child { grid-column: auto; }
+  html.csm-site-bleeding-cool-modern-reader .csm-feed-grid .csm-card-featured { grid-column: auto; }
 }
 @media (max-width: 520px) {
   .csm-actions .csm-btn[data-desktop] { display:none; }
@@ -849,7 +849,7 @@ html.csm-site-menofporn-modern-ui .csm-card-title {
 
 /* Bleeding Cool article correctness: article prose must never inherit feed truncation. */
 html.csm-article-mode.csm-site-bleeding-cool-modern-reader {
-  --csm-bottomnav-clearance: calc(6.75rem + env(safe-area-inset-bottom, 0px));
+  --csm-bottomnav-clearance: calc(4.75rem + env(safe-area-inset-bottom, 0px));
 }
 html.csm-article-mode.csm-site-bleeding-cool-modern-reader body {
   padding-bottom: var(--csm-bottomnav-clearance) !important;
@@ -916,4 +916,163 @@ html.csm-article-mode.csm-site-bleeding-cool-modern-reader .csm-article .csm-art
 }
 html.csm-article-mode.csm-site-bleeding-cool-modern-reader .csm-article .csm-mismatched-media-caption {
   display: none !important;
+}
+
+
+/* Bleeding Cool feed mobile convergence: intentional featured/standard cards, compact navigation, and wide-mobile parity. */
+html.csm-feed-mode.csm-site-bleeding-cool-modern-reader .csm-card img {
+  object-fit: cover !important;
+  object-position: center center !important;
+  background: #10151d !important;
+}
+html.csm-feed-mode.csm-site-bleeding-cool-modern-reader .csm-card-featured {
+  display: flex !important;
+  flex-direction: column !important;
+}
+html.csm-feed-mode.csm-site-bleeding-cool-modern-reader .csm-card-featured .csm-card-media {
+  aspect-ratio: 16 / 9 !important;
+}
+html.csm-feed-mode.csm-site-bleeding-cool-modern-reader .csm-card-standard .csm-card-summary,
+html.csm-feed-mode.csm-site-bleeding-cool-modern-reader .csm-card-featured .csm-card-summary {
+  display: -webkit-box !important;
+  -webkit-box-orient: vertical !important;
+  overflow: hidden !important;
+}
+html.csm-feed-mode.csm-site-bleeding-cool-modern-reader .csm-card-standard .csm-card-summary {
+  -webkit-line-clamp: 2 !important;
+  line-clamp: 2 !important;
+}
+html.csm-feed-mode.csm-site-bleeding-cool-modern-reader .csm-card-featured .csm-card-summary {
+  -webkit-line-clamp: 2 !important;
+  line-clamp: 2 !important;
+}
+html.csm-feed-mode.csm-site-bleeding-cool-modern-reader .csm-card-body {
+  gap: .36rem !important;
+  padding: .68rem .78rem .76rem !important;
+}
+
+html.csm-site-bleeding-cool-modern-reader .csm-news-ticker {
+  position: relative !important;
+  z-index: 2147480998 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: .65rem !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  padding: .38rem clamp(.75rem, 3vw, 1.2rem) !important;
+  border-bottom: 1px solid rgba(255,255,255,.06) !important;
+  background: #11151b !important;
+  color: var(--csm-muted) !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  white-space: nowrap !important;
+  scrollbar-width: none !important;
+  overscroll-behavior-inline: contain !important;
+  -webkit-overflow-scrolling: touch !important;
+}
+html.csm-site-bleeding-cool-modern-reader .csm-news-ticker::-webkit-scrollbar { display: none !important; }
+html.csm-site-bleeding-cool-modern-reader .csm-news-ticker-label {
+  flex: 0 0 auto !important;
+  color: var(--csm-text) !important;
+  font-size: .78rem !important;
+  line-height: 1 !important;
+  font-weight: 850 !important;
+}
+html.csm-site-bleeding-cool-modern-reader .csm-news-ticker-item {
+  flex: 0 0 auto !important;
+  display: block !important;
+  max-width: min(78vw, 44rem) !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  color: var(--csm-muted) !important;
+  text-decoration: none !important;
+  font-size: .82rem !important;
+  line-height: 1.25 !important;
+}
+
+html.csm-site-bleeding-cool-modern-reader .csm-bottomnav {
+  inset: auto .72rem calc(.55rem + env(safe-area-inset-bottom)) .72rem !important;
+  gap: .12rem !important;
+  padding: .22rem !important;
+  border-radius: 20px !important;
+  background: rgba(13,16,22,.9) !important;
+}
+html.csm-site-bleeding-cool-modern-reader .csm-bottomnav button {
+  min-height: 44px !important;
+  padding: .3rem .18rem !important;
+  border-radius: 15px !important;
+  font-size: .76rem !important;
+  line-height: 1.05 !important;
+}
+
+html.csm-mobile-profile.csm-site-bleeding-cool-modern-reader .csm-layout {
+  width: min(100% - .9rem, var(--csm-max, 1320px)) !important;
+  padding: .55rem !important;
+}
+html.csm-mobile-profile.csm-site-bleeding-cool-modern-reader .csm-actions .csm-btn[data-desktop] {
+  display: none !important;
+}
+html.csm-mobile-profile.csm-feed-mode.csm-site-bleeding-cool-modern-reader .csm-feed-grid {
+  grid-template-columns: minmax(0, 1fr) !important;
+  gap: .62rem !important;
+}
+html.csm-mobile-profile.csm-feed-mode.csm-site-bleeding-cool-modern-reader .csm-card-featured {
+  border-radius: 20px !important;
+}
+html.csm-mobile-profile.csm-feed-mode.csm-site-bleeding-cool-modern-reader .csm-card-featured .csm-card-title {
+  -webkit-line-clamp: 2 !important;
+  line-clamp: 2 !important;
+}
+html.csm-mobile-profile.csm-feed-mode.csm-site-bleeding-cool-modern-reader .csm-card-standard {
+  display: grid !important;
+  grid-template-columns: minmax(112px, 36%) minmax(0, 1fr) !important;
+  align-items: stretch !important;
+  min-height: 128px !important;
+  border-radius: 18px !important;
+}
+html.csm-mobile-profile.csm-feed-mode.csm-site-bleeding-cool-modern-reader .csm-card-standard .csm-card-media {
+  aspect-ratio: auto !important;
+  min-height: 128px !important;
+  height: 100% !important;
+}
+html.csm-mobile-profile.csm-feed-mode.csm-site-bleeding-cool-modern-reader .csm-card-standard .csm-card-media img {
+  height: 100% !important;
+  min-height: 128px !important;
+}
+html.csm-mobile-profile.csm-feed-mode.csm-site-bleeding-cool-modern-reader .csm-card-standard .csm-card-body {
+  justify-content: center !important;
+  padding: .58rem .66rem !important;
+}
+html.csm-mobile-profile.csm-feed-mode.csm-site-bleeding-cool-modern-reader .csm-card-standard .csm-card-title {
+  font-size: clamp(1rem, 4.2vw, 1.18rem) !important;
+  -webkit-line-clamp: 3 !important;
+  line-clamp: 3 !important;
+}
+html.csm-mobile-profile.csm-feed-mode.csm-site-bleeding-cool-modern-reader .csm-card-standard .csm-card-summary {
+  margin-top: .12rem !important;
+  font-size: .92rem !important;
+  line-height: 1.38 !important;
+  -webkit-line-clamp: 2 !important;
+  line-clamp: 2 !important;
+}
+html.csm-mobile-profile.csm-site-bleeding-cool-modern-reader .csm-section-title {
+  margin: .9rem 0 .55rem !important;
+}
+
+/* Article media remains uncropped even though feed thumbnails now fill their cards. */
+html.csm-article-mode.csm-site-bleeding-cool-modern-reader .csm-article img {
+  object-fit: contain !important;
+}
+
+
+/* Wide coarse-pointer/mobile profiles must not fall back to desktop-only chrome at >760 CSS px. */
+html.csm-mobile-profile.csm-site-bleeding-cool-modern-reader .csm-bottomnav {
+  display: grid !important;
+}
+html.csm-mobile-profile.csm-site-bleeding-cool-modern-reader .csm-layout {
+  margin-bottom: calc(4.75rem + env(safe-area-inset-bottom, 0px)) !important;
+}
+html.csm-mobile-profile.csm-feed-mode.csm-site-bleeding-cool-modern-reader .csm-feed-grid > .csm-card {
+  grid-column: 1 / -1 !important;
 }

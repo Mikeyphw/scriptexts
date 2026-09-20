@@ -1,7 +1,7 @@
 export default {
   "id": "bleeding-cool-modern-reader",
   "name": "Bleeding Cool Modern Reader",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Modern dark mobile-first reader UI for Bleeding Cool.",
   "matches": [
     "https://bleedingcool.com/*",
@@ -34,6 +34,9 @@ export default {
       "desktopMaxWidth": 1320,
       "articleMaxWidth": 820,
       "cardImageRatio": "16 / 9",
+      "cardImageFit": "cover",
+      "mobileBreakpoint": 760,
+      "featuredCardCount": 1,
       "hideSidebars": true,
       "hideOriginalChrome": true,
       "rebuildFeedGrid": true,
@@ -134,7 +137,8 @@ export default {
         ],
         "title": "h1,h2,h3,.entry-title,.post-title,.title",
         "category": ".cat-links,.category,[rel='category tag']",
-        "date": "time,.date,.posted-on"
+        "date": "time,.date,.posted-on",
+        "breaking": ".td-trending-now-wrap,.td-trending-now-display-area,.breaking-news,.breaking-news-ticker,[class*='breaking-news'],[class*='breaking_news']"
       },
       "article": {
         "root": "article,.post,.entry,main",

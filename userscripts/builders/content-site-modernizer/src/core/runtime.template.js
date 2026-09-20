@@ -53,6 +53,45 @@ function installContentSiteModernizer(profile, cssText) {
     return articleEvidenceScore() >= Math.max(1, profile.articleEvidenceMin || 2);
   };
 
+  function currentInteractionProfile() {
+    const mediaMatches = (query) => {
+      try { return typeof matchMedia === 'function' && matchMedia(query).matches; } catch { return false; }
+    };
+    return csmInteractionProfile({
+      userAgent: navigator.userAgent || '',
+      coarsePointer: mediaMatches('(pointer: coarse)'),
+      anyCoarsePointer: mediaMatches('(any-pointer: coarse)'),
+      maxTouchPoints: navigator.maxTouchPoints || 0,
+      width: innerWidth,
+      breakpoint: profile.layout?.mobileBreakpoint || 760
+    });
+  }
+
+  function syncInteractionProfile() {
+    const state = currentInteractionProfile();
+    for (const node of [d.documentElement, d.body]) {
+      node.classList.toggle('csm-mobile-profile', state.mobile);
+      node.classList.toggle('csm-coarse-pointer', state.coarse);
+    }
+  }
+
+  function installInteractionProfile() {
+    syncInteractionProfile();
+    let frame = 0;
+    const schedule = () => {
+      if (frame) cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => { frame = 0; syncInteractionProfile(); });
+    };
+    addEventListener('resize', schedule, { passive: true });
+    addEventListener('orientationchange', schedule, { passive: true });
+    for (const query of ['(pointer: coarse)', '(any-pointer: coarse)']) {
+      try {
+        const media = matchMedia(query);
+        media.addEventListener?.('change', schedule);
+      } catch {}
+    }
+  }
+
   function injectCss(articleMode) {
     const style = d.createElement('style');
     style.id = 'csm-style';
@@ -120,6 +159,43 @@ function installContentSiteModernizer(profile, cssText) {
     if (articleMode) actions.append(makeButton(saved.has(absolutePath(location.href)) ? 'Saved' : 'Save', 'toggle-save', { 'aria-pressed': String(saved.has(absolutePath(location.href))) }));
     actions.append(makeButton('More', 'open-settings', { 'aria-expanded': 'false' }));
     d.body.prepend(bar);
+  }
+
+  function installNewsTicker(articleMode) {
+    if (articleMode) return;
+    const selector = profile.selectors?.feed?.breaking || '';
+    const source = first(selector);
+    if (!(source instanceof HTMLElement)) return;
+    const links = Array.from(source.querySelectorAll('a[href]'))
+      .filter((link) => !link.closest?.('.csm-topbar,.csm-drawer,.csm-bottomnav'))
+      .map((link) => ({ href: link.href, text: (link.textContent || '').replace(/\s+/g, ' ').trim() }))
+      .filter((item) => item.text);
+    const sourceText = (source.textContent || '').replace(/\s+/g, ' ').trim();
+    if (!links.length && !sourceText) return;
+
+    const ticker = d.createElement('nav');
+    ticker.className = 'csm-news-ticker';
+    ticker.setAttribute('aria-label', 'Breaking news');
+    const label = d.createElement('span');
+    label.className = 'csm-news-ticker-label';
+    label.textContent = 'Breaking';
+    ticker.append(label);
+    const seen = new Set();
+    const items = links.length ? links : [{ href: '', text: sourceText.replace(/^Breaking:?\s*/i, '') }];
+    for (const item of items.slice(0, 6)) {
+      const text = item.text.replace(/^Breaking:?\s*/i, '').trim();
+      if (!text || seen.has(text)) continue;
+      seen.add(text);
+      const node = item.href ? d.createElement('a') : d.createElement('span');
+      if (item.href) node.href = item.href;
+      node.className = 'csm-news-ticker-item';
+      node.textContent = text;
+      ticker.append(node);
+    }
+    if (ticker.children.length <= 1) return;
+    source.classList.add('csm-source-hidden');
+    const topbar = first('.csm-topbar');
+    if (topbar) topbar.after(ticker); else d.body.prepend(ticker);
   }
 
   function installProgress(articleMode) {
@@ -656,6 +732,17 @@ function installContentSiteModernizer(profile, cssText) {
   }
 
 
+  function applyFeedCardVariants(grid) {
+    if (!(grid instanceof HTMLElement)) return;
+    const featuredCount = Number(profile.layout?.featuredCardCount || 0);
+    for (const [index, card] of feedCards(grid).entries()) {
+      const variant = csmFeedVariantForIndex(index, featuredCount);
+      card.dataset.csmCardVariant = variant;
+      card.classList.toggle('csm-card-featured', variant === 'featured');
+      card.classList.toggle('csm-card-standard', variant === 'standard');
+    }
+  }
+
   function enhanceFeed() {
     if (profile.layout?.preserveFeedSections) {
       const sections = sectionedFeedCandidates();
@@ -671,7 +758,7 @@ function installContentSiteModernizer(profile, cssText) {
       }
       const { wrap, grids } = ensureSectionedFeed(sections, main);
       for (const item of items) enhanceCard(item);
-      for (const grid of grids) installLoadMore(grid);
+      for (const grid of grids) { applyFeedCardVariants(grid); installLoadMore(grid); }
       installPagination(main, wrap);
       return;
     }
@@ -688,6 +775,7 @@ function installContentSiteModernizer(profile, cssText) {
     }
     const grid = ensureFeedGrid(items, main);
     for (const item of items) enhanceCard(item);
+    applyFeedCardVariants(grid);
     installLoadMore(grid);
     installPagination(main, grid);
   }
@@ -1081,6 +1169,7 @@ function installContentSiteModernizer(profile, cssText) {
         grid.append(item);
         enhanceCard(item);
       }
+      applyFeedCardVariants(grid);
       installLoadMore(grid);
       applyFeedState(grid);
       return items.length;
@@ -1121,9 +1210,11 @@ function installContentSiteModernizer(profile, cssText) {
 
   const articleMode = isArticlePage();
   injectCss(articleMode);
+  installInteractionProfile();
+  installTopbar(articleMode);
+  installNewsTicker(articleMode);
   installSourceCleanup(articleMode);
   hideAds();
-  installTopbar(articleMode);
   installProgress(articleMode);
   installDrawer();
   installBottomNav(articleMode);

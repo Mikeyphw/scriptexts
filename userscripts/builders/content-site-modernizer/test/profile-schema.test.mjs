@@ -91,7 +91,7 @@ test('repo manifest records profile schema policy and current versions', () => {
   assert.equal(project.profile_schema.check_script, 'npm run content-sites:profiles:check');
   assert.equal(project.profile_schema.normalization, 'build-time defaults plus explicit capability map');
   assert.equal(project.versions['aipt-comics-modern-reader'], '0.1.4');
-  assert.equal(project.versions['bleeding-cool-modern-reader'], '0.1.4');
+  assert.equal(project.versions['bleeding-cool-modern-reader'], '0.1.6');
   assert.equal(project.versions['menofporn-modern-ui'], '1.5.2');
   assert.equal(project.versions['putinho-modern-ui'], '1.1.2');
   assert.equal(project.versions['gayteam-modern-ui'], '1.0.5');
