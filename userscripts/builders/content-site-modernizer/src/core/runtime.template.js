@@ -39,11 +39,19 @@ function installContentSiteModernizer(profile, cssText) {
     }
   };
   const idFor = (node) => absolutePath(node.querySelector('a[href]')?.href || location.href);
-  const isArticlePage = () => profile.articleHints?.some((hint) => {
+  const matchesArticleHint = (hint) => {
     if (hint.startsWith('body.')) return d.body.classList.contains(hint.slice(5));
     if (hint.startsWith('path:')) return new RegExp(hint.slice(5)).test(location.pathname);
     return !!d.querySelector(hint);
-  }) || false;
+  };
+  const articleEvidenceScore = () => (profile.articleEvidence || []).reduce((score, selector) =>
+    score + (d.querySelector(selector) ? 1 : 0), 0);
+  const isArticlePage = () => {
+    if (profile.articleHints?.some(matchesArticleHint)) return true;
+    const evidence = profile.articleEvidence || [];
+    if (!evidence.length) return false;
+    return articleEvidenceScore() >= Math.max(1, profile.articleEvidenceMin || 2);
+  };
 
   function injectCss(articleMode) {
     const style = d.createElement('style');
@@ -867,6 +875,14 @@ function installContentSiteModernizer(profile, cssText) {
     const root = first(profile.selectors?.article?.root || 'article,main');
     if (!root) return;
     root.classList.add('csm-article');
+    if (profile.articleCleanup?.removeOrphanSeparators) {
+      for (const node of $$('p,div,span', root)) {
+        if (node.children.length || node.querySelector?.('a,img,video,iframe')) continue;
+        if (/^[\s·.•|–—-]*$/.test(node.textContent || '') && (node.textContent || '').trim()) {
+          node.classList.add('csm-source-hidden');
+        }
+      }
+    }
     const wrapper = root.closest(profile.selectors?.page?.main || 'main,#main,.site-main,.content,.main-content,.site-content');
     if (wrapper instanceof HTMLElement) {
       wrapper.classList.add('csm-article-shell');

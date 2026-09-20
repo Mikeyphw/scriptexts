@@ -845,3 +845,48 @@ html.csm-site-menofporn-modern-ui .csm-card-title {
   -webkit-line-clamp: unset;
   line-clamp: unset;
 }
+
+
+/* Bleeding Cool article correctness: article prose must never inherit feed truncation. */
+html.csm-article-mode.csm-site-bleeding-cool-modern-reader {
+  --csm-bottomnav-clearance: calc(6.75rem + env(safe-area-inset-bottom, 0px));
+}
+html.csm-article-mode.csm-site-bleeding-cool-modern-reader body {
+  padding-bottom: var(--csm-bottomnav-clearance) !important;
+}
+html.csm-article-mode.csm-site-bleeding-cool-modern-reader .csm-article :is(
+  .td-post-content,.td-article-content,.entry-content,.post-content,
+  p,blockquote,figcaption,figure,.wp-caption,.wp-caption-text,
+  .td-post-sub-title,.entry-subtitle,.post-subtitle,.dek,.excerpt
+) {
+  display: block !important;
+  -webkit-box-orient: initial !important;
+  -webkit-line-clamp: unset !important;
+  line-clamp: unset !important;
+  max-height: none !important;
+  max-block-size: none !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  white-space: normal !important;
+}
+html.csm-article-mode.csm-site-bleeding-cool-modern-reader .csm-article li {
+  -webkit-line-clamp: unset !important;
+  line-clamp: unset !important;
+  max-height: none !important;
+  max-block-size: none !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  white-space: normal !important;
+}
+html.csm-article-mode.csm-site-bleeding-cool-modern-reader .csm-article :is(
+  .td-post-sub-title,.entry-subtitle,.post-subtitle,.dek,.excerpt
+) {
+  color: var(--csm-muted) !important;
+  opacity: 1 !important;
+}
+html.csm-article-mode.csm-site-bleeding-cool-modern-reader .csm-article :is(.td-post-content,.td-article-content,.entry-content,.post-content) > :last-child {
+  margin-bottom: 1.5rem !important;
+}
+html.csm-article-mode.csm-site-bleeding-cool-modern-reader .csm-article :is(.td-post-content,.td-article-content,.entry-content,.post-content) :is(.td-adspot-title,.td-adspot-title:empty,.td-a-rec:empty,p:empty,div:empty) {
+  min-height: 0 !important;
+}

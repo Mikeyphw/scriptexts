@@ -1,45 +1,122 @@
 {
   "schema_version": 2,
   "type": "overlay",
-  "name": "LPSG release convergence seal \u2014 overlay 6 of 6",
-  "description": "Final LPSG release seal with Iceraven/wide-mobile regression contracts, large-gallery performance guardrails, deterministic build evidence, and preservation checks for existing feature families.",
+  "name": "Bleeding Cool article reader correctness OV01",
+  "description": "Fixes article classification, guarantees unclamped article prose including text after images, adds safe-area bottom-nav clearance, normalizes article subtitle readability, removes orphan separators, and adds dedicated regression fixtures/tests.",
   "repository": {
     "name": "scriptexts",
+    "remote": "git@github.com:Mikeyphw/scriptexts.git",
     "branch": "main"
   },
   "workspace": {
-    "name": "scriptexts",
-    "root": "."
+    "name": "content-site-modernizer",
+    "root": "userscripts/builders/content-site-modernizer"
   },
-  "target": "root",
+  "target": "content-site-modernizer",
   "inventory": {
     "format": 1,
     "entries": [
       {
-        "path": "package.json",
-        "action": "modify",
-        "sha256": "a50016f02857d5007640c255b2709eba10f782da6e94bef94af11542657280cb",
-        "size": 8001,
-        "source_sha256": "de90878a9c4ca2e4aff128aff11a02fc61c092b79d1397eaf87c8a63e265deb8"
-      },
-      {
-        "path": "userscripts/standalone/lpsg-media-gallery-unlocker/README.md",
-        "action": "modify",
-        "sha256": "c860de78fca854c2fa503f82d8b81a0a3770c4c0a25e69b3c991ea7a1f9d2556",
-        "size": 1696,
-        "source_sha256": "464087d4e3827efd526e07173df2544804d6b8e9a5b71e9ae433961822f250dc"
-      },
-      {
-        "path": "userscripts/builders/lpsg-media-gallery-unlocker/release-seal.mjs",
+        "path": ".devtool-artifact/validate-bleedingcool-ov01.sh",
         "action": "add",
-        "sha256": "724bd05e1194cc5157ccdb1ea546a2105b5d5bb3a9d61e7d34a0feb943520544",
-        "size": 1796
+        "sha256": "b90c158d38f4f42d87a955d47dc4286c0c6df8095f999dad3474bb1c0af76f61",
+        "size": 378
       },
       {
-        "path": "userscripts/builders/lpsg-media-gallery-unlocker/test/release-seal.test.mjs",
+        "path": "repo-manifest.json",
+        "action": "modify",
+        "sha256": "da852660178bc7c9e5ebc08d605058e569ee6a5eb5079fe5fa48f5c7e650b045",
+        "size": 21808,
+        "source_sha256": "1b0847141f86d91d6cda3490503357f58dfe74ca8135a2419bfc432bb2d8707c"
+      },
+      {
+        "path": "userscripts/builders/content-site-modernizer/src/core/runtime.template.js",
+        "action": "modify",
+        "sha256": "1127873354bd0db6ecaa775af08f6e83c26cde21223d3426f161722737a9224c",
+        "size": 46343,
+        "source_sha256": "d1abe6c8d7f54e83e3def17411c0485da9861b2aba6ecd8d161ea434ffc61dc0"
+      },
+      {
+        "path": "userscripts/builders/content-site-modernizer/src/core/styles.css",
+        "action": "modify",
+        "sha256": "7a4e02cce00907c63baa01379f2f64c89a91d5aed554cc14ea06626712e3a943",
+        "size": 31008,
+        "source_sha256": "29219f0fe9988cd28db8ca11b1fdc0f898de10faa5d367993b256327ddc92c0c"
+      },
+      {
+        "path": "userscripts/builders/content-site-modernizer/src/profiles/bleeding-cool.mjs",
+        "action": "modify",
+        "sha256": "48b155f31f34621922b1962a2cd68e0d4adcff0be1864a08b64f1c739f376e3c",
+        "size": 6770,
+        "source_sha256": "7c98e2be1889df8ec96a2022a678264ceb168595b21615e1c81b0469205bf6c6"
+      },
+      {
+        "path": "userscripts/builders/content-site-modernizer/test/bleeding-cool-article-correctness.test.mjs",
         "action": "add",
-        "sha256": "4f877898099c523a1b0b6c8a24cbcaf770c73e44beb11983e6b287f8e263af86",
-        "size": 3431
+        "sha256": "a54b5a787d8697e9794ae537ff16eb7674ea41c589c6820e7ce5b263b29740df",
+        "size": 3814
+      },
+      {
+        "path": "userscripts/builders/content-site-modernizer/test/fixtures/bleeding-cool-article-regression.html",
+        "action": "add",
+        "sha256": "f50b2e341d14befd0945f0df2e046fcd0b970989edcf024463c5a64167ccd8c1",
+        "size": 982
+      },
+      {
+        "path": "userscripts/builders/content-site-modernizer/dist/bleeding-cool-modern-reader.meta.js",
+        "action": "modify",
+        "sha256": "3c347863c6ff309de0920294a0c0b261eb66d1372227763287144b92e6ee8623",
+        "size": 1090,
+        "source_sha256": "e393e29b17f3a699fe53f98691a58dedcabdc4612a9d2ec380eb1133166ed384"
+      },
+      {
+        "path": "userscripts/builders/content-site-modernizer/dist/aipt-comics-modern-reader.user.js",
+        "action": "modify",
+        "sha256": "32104cd7ee110c7b03028ca241cbea4751f812924de67cde9f2a00fb967c4e35",
+        "size": 84795,
+        "source_sha256": "6a2c7580dc00b8b0e44b8fe61caa67a0b9898616f242e5514394a17b6e710b56"
+      },
+      {
+        "path": "userscripts/builders/content-site-modernizer/dist/bleeding-cool-modern-reader.user.js",
+        "action": "modify",
+        "sha256": "7eb57c0368210211be169875437e6a46e229da6f83fdb6c389ef0c9eca0194d7",
+        "size": 85806,
+        "source_sha256": "be41cb8959b9109675f3e7e304db4a9e1ad61dd568264e410f67d7552ab17fe2"
+      },
+      {
+        "path": "userscripts/builders/content-site-modernizer/dist/menofporn-modern-ui.user.js",
+        "action": "modify",
+        "sha256": "e4497d42c0fe283d3a61825ea5ddb98633c240e9a5f4107c951f0e56cf58fae1",
+        "size": 84797,
+        "source_sha256": "118d1604583124457da633e3d6967617215503d6041c60dbd488e8ea7e0bcd13"
+      },
+      {
+        "path": "userscripts/builders/content-site-modernizer/dist/putinho-modern-ui.user.js",
+        "action": "modify",
+        "sha256": "7bdefb78e520d8b64266f2465b7e49cf16104649045a852835bfef2a9f6bcdbe",
+        "size": 84877,
+        "source_sha256": "285e0ef9d41dc2b6b02b97f4091b0761459a990d5d6fcfbabf2ff1a9227eaa3d"
+      },
+      {
+        "path": "userscripts/builders/content-site-modernizer/dist/gayteam-modern-ui.user.js",
+        "action": "modify",
+        "sha256": "0ce1f194f75c742ea4ca36cfd87e441a9a64bb02d755b28c3b2b8969932dbc66",
+        "size": 84320,
+        "source_sha256": "05664d62845f9b2b4e050e8b4ac5d1f3b263ee968716664b4b7b98966f648a3f"
+      },
+      {
+        "path": "userscripts/builders/content-site-modernizer/dist/justthegays-modern-ui.user.js",
+        "action": "modify",
+        "sha256": "26e1b9b6b8501e9262d76fd7a1e94e7d516d6bb091880ae729b423b326c54685",
+        "size": 83946,
+        "source_sha256": "548513b31fb699e197ac233e62d9a70ed7cd10e9dc2b592503e36f6061e8fead"
+      },
+      {
+        "path": "userscripts/builders/content-site-modernizer/dist/str8upgayporn-modern-ui.user.js",
+        "action": "modify",
+        "sha256": "fec65c359a88caed5631ad06079d64c15ece3ab55767070d6a1a9e6d5575529d",
+        "size": 84604,
+        "source_sha256": "8f7f41b854cf7b841e316afb8dc9094164e3c09f784cc59b392920dfed185330"
       }
     ]
   },
@@ -51,12 +128,30 @@
     "commit": {
       "enabled": true,
       "strategy": "single",
-      "message": "test(lpsg): seal mobile gallery release"
+      "message": "fix(bleedingcool): make article reader content complete"
     }
   },
   "validation": {
-    "required": false,
+    "required": true,
     "restore": false,
-    "notes": "Run npm run seal:lpsg for the deterministic LPSG release seal."
-  }
+    "build": true,
+    "test": true,
+    "rollback_on_failure": true,
+    "script": {
+      "path": ".devtool-artifact/validate-bleedingcool-ov01.sh",
+      "runner": "bash",
+      "sha256": "b90c158d38f4f42d87a955d47dc4286c0c6df8095f999dad3474bb1c0af76f61",
+      "timeout_seconds": 600
+    },
+    "expected": {
+      "build": "pass",
+      "tests": "pass",
+      "maximum_warnings": 0
+    }
+  },
+  "notes": [
+    "Overlay 1 of 4.",
+    "Validation is deliberately scoped to Bleeding Cool article correctness plus deterministic builder/profile checks.",
+    "Regression fixture locks the reported text-after-image truncation bug."
+  ]
 }

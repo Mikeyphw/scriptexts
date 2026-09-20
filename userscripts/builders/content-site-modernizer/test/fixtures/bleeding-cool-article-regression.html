@@ -1,0 +1,18 @@
+<!doctype html>
+<html><body class="single-post post-template-default">
+<main class="td-main-content-wrap">
+  <article class="post type-post">
+    <h1>Regression: text after images must remain complete</h1>
+    <time datetime="2026-09-20">20 September 2026</time>
+    <a rel="author" href="/author/test/">Test Author</a>
+    <div class="td-post-sub-title">A deliberately long article subtitle that must never inherit a feed clamp.</div>
+    <div class="td-post-content">
+      <p>Paragraph before the image.</p>
+      <p class="orphan-separator">·</p>
+      <figure><img src="cover.jpg" alt="Comic cover"><figcaption>Complete figure caption after the image.</figcaption></figure>
+      <p id="after-image">FULL_SENTINEL_AFTER_IMAGE: This entire paragraph must remain visible after modernization, including these final words: END_OF_SENTINEL.</p>
+      <ul><li>FULL_LIST_SENTINEL: this complete list item must remain visible.</li></ul>
+    </div>
+  </article>
+</main>
+</body></html>

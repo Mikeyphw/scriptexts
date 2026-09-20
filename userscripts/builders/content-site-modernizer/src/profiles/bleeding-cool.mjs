@@ -1,7 +1,7 @@
 export default {
   "id": "bleeding-cool-modern-reader",
   "name": "Bleeding Cool Modern Reader",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Modern dark mobile-first reader UI for Bleeding Cool.",
   "matches": [
     "https://bleedingcool.com/*",
@@ -45,6 +45,9 @@ export default {
       "imageFit": "contain",
       "minCardTextLength": 24
     },
+    "articleCleanup": {
+      "removeOrphanSeparators": true
+    },
     "performance": {
       "lowResource": true,
       "disableMutationObserver": true,
@@ -57,6 +60,13 @@ export default {
       "body.single-post",
       "body.post-template-default",
       "path:^/(comics|tv|movies|games|collectibles|wrestling)/.+/.+"
+    ],
+    "articleEvidenceMin": 2,
+    "articleEvidence": [
+      "article .td-post-content,article .td-article-content,article .entry-content,article .post-content",
+      "article h1,.single-post h1,.post-template-default h1",
+      "article time,.single-post time,.post-template-default time",
+      "article [rel='author'],article .td-post-author-name,.single-post .author,.post-template-default .author"
     ],
     "selectors": {
       "page": {
