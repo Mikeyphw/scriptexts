@@ -1,0 +1,11 @@
+{
+  "name": "poast-timeline-metadata-reset-builder",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs",
+    "build:check": "node build.mjs --check",
+    "test": "node --test test/*.test.mjs",
+    "seal": "npm run build:check && npm test"
+  }
+}

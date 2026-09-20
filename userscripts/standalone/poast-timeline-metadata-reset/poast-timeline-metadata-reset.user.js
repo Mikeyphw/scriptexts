@@ -24,8 +24,7 @@
     '.profile-banner,.profile-banner>a,.profile-banner>a>img{display:block!important}'
   ];
 
-  const css = `
-:root {
+  const css = `:root {
   --cc-bg: #06090f;
   --cc-bg-2: #0a0f18;
   --cc-border: rgba(255,255,255,.08);
@@ -2830,12 +2829,8 @@ body.cc-route-media-grid .timeline.media-gallery-view .gallery-masonry {
     gap: var(--cc-density-media-gap) !important;
   }
 }
-
 `;
-
-
-
-  const DENSITY_KEY = 'cc_poast_density_range';
+const DENSITY_KEY = 'cc_poast_density_range';
   const GAP_KEY = 'cc_poast_gap_range';
   const GRID_KEY = 'cc_poast_grid_min_range';
   const MOBILE_GRID_KEY = 'cc_poast_mobile_grid_min_range';

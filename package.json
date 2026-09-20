@@ -80,7 +80,10 @@
     "check:userscripts": "node tools/check-userscripts.mjs",
     "test:telegram": "node --test userscripts/standalone/telegram-media-downloader/test/*.test.mjs",
     "test:sims": "npm --prefix userscripts/builders/sims-cc-download-basket test",
-    "seal:sims": "npm --prefix userscripts/builders/sims-cc-download-basket run seal"
+    "seal:sims": "npm --prefix userscripts/builders/sims-cc-download-basket run seal",
+    "test:utilities": "node --test tools/tests/utility-userscripts.test.mjs",
+    "check:poast": "npm --prefix userscripts/builders/poast-timeline-metadata-reset run build:check",
+    "seal:poast": "npm --prefix userscripts/builders/poast-timeline-metadata-reset run seal"
   },
   "engines": {
     "node": ">=20"

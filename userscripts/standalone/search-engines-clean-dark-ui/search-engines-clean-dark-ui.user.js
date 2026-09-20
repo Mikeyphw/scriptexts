@@ -5,7 +5,7 @@
 // @supportURL   https://github.com/Mikeyphw/scriptexts/issues
 // @updateURL    https://raw.githubusercontent.com/Mikeyphw/scriptexts/main/userscripts/standalone/search-engines-clean-dark-ui/search-engines-clean-dark-ui.meta.js
 // @downloadURL  https://raw.githubusercontent.com/Mikeyphw/scriptexts/main/userscripts/standalone/search-engines-clean-dark-ui/search-engines-clean-dark-ui.user.js
-// @version      3.4
+// @version      3.5
 // @description  Full UI normalization: tabs, sub-tabs, popups, border removal
 // @match        https://www.100searchengines.com/*
 // @run-at       document-end
@@ -34,14 +34,16 @@
         }
 
         /* ================= HARD BORDER REMOVAL ================= */
-        * {
-            border: none !important;
-            outline: none !important;
+        /* Keep the reset scoped: never erase keyboard focus or every container background. */
+        #engine-tabs, #custom-sidebar, .gsc-webResult, .gsc-result, .result-item,
+        .gsc-context-menu, .gsc-context-menu-item, input, select, textarea, button {
+            border-color: transparent !important;
             box-shadow: none !important;
         }
 
-        table, tr, td, div, section {
-            background: transparent !important;
+        :where(a, button, input, select, textarea, [tabindex]):focus-visible {
+            outline: 2px solid var(--accent) !important;
+            outline-offset: 2px !important;
         }
 
         /* ================= LINKS ================= */
@@ -182,13 +184,16 @@
         const tabs = ['all', 'google', 'bing', 'duckduckgo', 'startpage', 'brave'];
 
         tabs.forEach(t => {
-            const btn = document.createElement('div');
+            const btn = document.createElement('button');
+            btn.type = 'button';
             btn.className = 'tab-btn';
+            btn.setAttribute('aria-pressed', 'false');
             btn.textContent = t.toUpperCase();
 
             btn.onclick = () => {
-                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-btn').forEach(b => { b.classList.remove('active'); b.setAttribute('aria-pressed', 'false'); });
                 btn.classList.add('active');
+                btn.setAttribute('aria-pressed', 'true');
 
                 document.querySelectorAll('.result-item').forEach(el => {
                     if (t === 'all') {
@@ -208,8 +213,11 @@
     }
 
     /* ================= TAG RESULTS ================= */
-    function tagResults() {
-        document.querySelectorAll('a[href]').forEach(a => {
+    function tagResults(root = document) {
+        const anchors = [];
+        if (root instanceof Element && root.matches('a[href]')) anchors.push(root);
+        if (root.querySelectorAll) anchors.push(...root.querySelectorAll('a[href]'));
+        anchors.forEach(a => {
             const engine =
                 /google\./i.test(a.href) ? 'google' :
                 /bing\./i.test(a.href) ? 'bing' :
@@ -236,11 +244,18 @@
         const sidebar = document.createElement('div');
         sidebar.id = 'custom-sidebar';
 
-        const toggle = document.createElement('div');
+        const toggle = document.createElement('button');
+        toggle.type = 'button';
         toggle.id = 'sidebar-toggle';
         toggle.textContent = '☰';
+        toggle.setAttribute('aria-label', 'Toggle search links sidebar');
+        toggle.setAttribute('aria-controls', 'custom-sidebar');
+        toggle.setAttribute('aria-expanded', 'false');
 
-        toggle.onclick = () => sidebar.classList.toggle('open');
+        toggle.onclick = () => {
+            const open = sidebar.classList.toggle('open');
+            toggle.setAttribute('aria-expanded', String(open));
+        };
 
         const seen = new Set();
 
@@ -267,8 +282,13 @@
             tagResults();
             buildSidebar();
 
-            new MutationObserver(tagResults)
-                .observe(document.body, { childList: true, subtree: true });
+            new MutationObserver(records => {
+                for (const record of records) {
+                    for (const node of record.addedNodes) {
+                        if (node.nodeType === Node.ELEMENT_NODE) tagResults(node);
+                    }
+                }
+            }).observe(document.body, { childList: true, subtree: true });
         });
     }
 
