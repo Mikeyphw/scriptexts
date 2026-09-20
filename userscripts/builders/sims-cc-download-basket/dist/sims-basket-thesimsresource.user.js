@@ -66,6 +66,7 @@ const APP = 'sims-cc-basket';
     cleanupTimers: new Map(),
     layoutRecoveryShown: false,
     downloadQueue: null,
+    downloadCancelled: false,
     lastFailedFileKeys: [],
     basketRefineOpen: false,
     basketSearchTimer: 0,
@@ -2920,11 +2921,16 @@ const APP = 'sims-cc-basket';
     if (!files.length) return toast('No files selected.', true);
     if (getSettings().resolveBeforeDownload) files = await resolveMetadataForFileList(files);
     files = await refreshStaleFiles(files);
-    state.downloadQueue = { mode, total: files.length, done: 0, failed: 0, current: '', startedAt: Date.now(), items: files.map(file => ({ key: file.key, status: 'queued', name: file.fileName })) };
+    state.downloadCancelled = false;
+    state.downloadQueue = { mode, total: files.length, done: 0, failed: 0, cancelled: false, current: '', startedAt: Date.now(), items: files.map(file => ({ key: file.key, status: 'queued', name: file.fileName })) };
     state.lastFailedFileKeys = [];
     if (state.activePanel) renderPanelContents(state.activePanel.querySelector('.sccb-panel'));
     const basket = loadBasket();
     for (const file of files) {
+      if (state.downloadCancelled) {
+        state.downloadQueue.cancelled = true;
+        break;
+      }
       state.downloadQueue.current = file.fileName;
       updateDownloadQueueItem(file.key, 'running');
       try {
@@ -2941,11 +2947,11 @@ const APP = 'sims-cc-basket';
         state.lastFailedFileKeys.push(file.key);
       }
       if (state.activePanel) renderPanelContents(state.activePanel.querySelector('.sccb-panel'));
-      await delay(DOWNLOAD_DELAY_MS);
+      if (!state.downloadCancelled) await delay(DOWNLOAD_DELAY_MS);
     }
     saveBasket(basket);
     const failed = state.downloadQueue.failed;
-    toast(failed ? `${state.downloadQueue.done} opened · ${failed} failed. Use Retry failed or Copy failed links.` : `${state.downloadQueue.done} download link${state.downloadQueue.done === 1 ? '' : 's'} opened.` , Boolean(failed));
+    toast(state.downloadQueue.cancelled ? `Download queue cancelled after ${state.downloadQueue.done} of ${state.downloadQueue.total}.` : failed ? `${state.downloadQueue.done} opened · ${failed} failed. Use Retry failed or Copy failed links.` : `${state.downloadQueue.done} download link${state.downloadQueue.done === 1 ? '' : 's'} opened.` , Boolean(failed));
     if (state.activePanel) renderPanelContents(state.activePanel.querySelector('.sccb-panel'));
   }
 
@@ -2954,7 +2960,8 @@ const APP = 'sims-cc-basket';
     const box = document.createElement('section');
     box.className = 'sccb-queue-state';
     if (!q) return box;
-    box.innerHTML = `<strong>${q.failed ? 'Download queue completed with failures' : q.done >= q.total ? 'Download queue complete' : 'Downloading'}</strong><span>${q.done} of ${q.total}${q.failed ? ` · ${q.failed} failed` : ''}</span>${q.current ? `<span>Current: ${escapeHtml(q.current)}</span>` : ''}`;
+    box.innerHTML = `<strong>${q.cancelled ? 'Download queue cancelled' : q.failed ? 'Download queue completed with failures' : q.done >= q.total ? 'Download queue complete' : 'Downloading'}</strong><span>${q.done} of ${q.total}${q.failed ? ` · ${q.failed} failed` : ''}</span>${q.current ? `<span>Current: ${escapeHtml(q.current)}</span>` : ''}`;
+    if (!q.cancelled && q.done < q.total) box.appendChild(makeButton('Cancel queue', '', () => { state.downloadCancelled = true; q.cancelled = true; }));
     if (q.failed) box.appendChild(makeButton('Retry failed', '', () => retryFailedDownloads()));
     return box;
   }

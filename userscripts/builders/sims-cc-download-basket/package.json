@@ -4,7 +4,10 @@
   "type": "module",
   "scripts": {
     "build": "node build.mjs",
-    "check": "node --check dist/sims-basket-modthesims.user.js && node --check dist/sims-basket-simblrcc.user.js && node --check dist/sims-basket-thesimsresource.user.js"
+    "check": "node --check dist/sims-basket-modthesims.user.js && node --check dist/sims-basket-simblrcc.user.js && node --check dist/sims-basket-thesimsresource.user.js",
+    "test": "node --test test/*.test.mjs",
+    "build:check": "node build.mjs --check",
+    "seal": "npm run build:check && npm test && npm run check"
   },
   "devDependencies": {}
 }

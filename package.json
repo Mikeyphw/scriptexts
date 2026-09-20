@@ -78,7 +78,9 @@
     "check:repo:static": "node tools/check-repo.mjs",
     "test:userscripts:validation": "node --test tools/tests/userscript-validation.test.mjs",
     "check:userscripts": "node tools/check-userscripts.mjs",
-    "test:telegram": "node --test userscripts/standalone/telegram-media-downloader/test/*.test.mjs"
+    "test:telegram": "node --test userscripts/standalone/telegram-media-downloader/test/*.test.mjs",
+    "test:sims": "npm --prefix userscripts/builders/sims-cc-download-basket test",
+    "seal:sims": "npm --prefix userscripts/builders/sims-cc-download-basket run seal"
   },
   "engines": {
     "node": ">=20"
