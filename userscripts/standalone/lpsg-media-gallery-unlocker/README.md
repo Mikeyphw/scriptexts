@@ -37,3 +37,7 @@ MIT.
 ## Development source and tests
 
 The standalone `.user.js` is generated from `userscripts/builders/lpsg-media-gallery-unlocker/src/`. Run `npm run build:lpsg` to regenerate it, `npm run check:lpsg` to verify byte-for-byte reproducibility, and `npm run test:lpsg` for the dedicated XenForo/LPSG contract fixture suite. The gallery includes page filtering, selected-only filtering, and optional page grouping for navigating large scanned threads.
+
+## Release seal
+
+The LPSG builder has a deterministic final seal. Run `npm run seal:lpsg` from the repository root. It verifies byte-for-byte generated output reproducibility, userscript syntax, the complete LPSG regression suite, wide-mobile/Iceraven responsive contracts, large-gallery performance guardrails, and preservation of discovery, filtering, URL export, direct download, ZIP, selection, cache, lightbox, video, pagination and post-attribution features. `npm run seal:lpsg:json` emits machine-readable evidence.

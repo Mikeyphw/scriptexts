@@ -70,7 +70,9 @@
     "smoke:mrm-reimagined": "npm --prefix userscripts/builders/myreadingmanga-reimagined run smoke",
     "build:lpsg": "npm --prefix userscripts/builders/lpsg-media-gallery-unlocker run build",
     "check:lpsg": "npm --prefix userscripts/builders/lpsg-media-gallery-unlocker run build:check",
-    "test:lpsg": "npm --prefix userscripts/builders/lpsg-media-gallery-unlocker test"
+    "test:lpsg": "npm --prefix userscripts/builders/lpsg-media-gallery-unlocker test",
+    "seal:lpsg": "node userscripts/builders/lpsg-media-gallery-unlocker/release-seal.mjs",
+    "seal:lpsg:json": "node userscripts/builders/lpsg-media-gallery-unlocker/release-seal.mjs --json"
   },
   "engines": {
     "node": ">=20"
