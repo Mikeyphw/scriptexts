@@ -1,0 +1,11 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {readFile} from 'node:fs/promises';
+const root=new URL('../../',import.meta.url);
+const pkg=JSON.parse(await readFile(new URL('package.json',root),'utf8'));
+const seal=await readFile(new URL('tools/userscripts-release-seal.mjs',root),'utf8');
+const validator=await readFile(new URL('tools/validate-content-site-modernizer.sh',root),'utf8');
+test('root exposes authoritative userscript release seal',()=>{assert.equal(pkg.scripts['seal:userscripts'],'node tools/userscripts-release-seal.mjs'); assert.ok(pkg.scripts['seal:userscripts:json']);});
+test('release seal covers supported project seals and aggregate validation',()=>{for(const m of ['check:userscripts','build:userscripts','seal:lpsg','seal:sims','manga-reader-modernizer','seal:poast','content-sites:bleedingcool:seal','content-sites:seal']) assert.match(seal,new RegExp(m.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')));});
+test('release seal prevents legacy MRM resurrection and duplicate route claims',()=>{assert.match(seal,/legacy MyReadingManga remains retired/);assert.match(seal,/duplicate namespace\/@match claims/);assert.match(seal,/MyReadingManga route has one canonical install artifact/);});
+test('managed content-site validator keeps browser smoke opt-in with retained evidence',()=>{assert.match(validator,/PLAYWRIGHT_SMOKE/);assert.match(validator,/PAGETUAL_SCRIPT/);assert.match(validator,/interactions:managed/);assert.match(validator,/--trace retain-on-failure/);assert.match(validator,/--snapshot retain-on-failure/);});

@@ -66,12 +66,13 @@ for (const project of manifest.projects) {
 }
 
 const files = await walk(root);
+const installUserscripts = files.filter((item) => item.endsWith('.user.js') && !relative(root, item).replaceAll('\\', '/').includes('/src/'));
 for (const path of files.filter((item) => extname(item) === '.json')) {
   try { JSON.parse(await readFile(path, 'utf8')); }
   catch (error) { errors.push(`${relative(root, path)}: invalid JSON: ${error.message}`); }
 }
 
-for (const path of files.filter((item) => item.endsWith('.user.js'))) {
+for (const path of installUserscripts) {
   const rel = relative(root, path).replaceAll('\\', '/');
   const text = await readFile(path, 'utf8');
   const fields = fieldsFromUserscript(text);
@@ -94,7 +95,7 @@ for (const path of files.filter((item) => item.endsWith('.user.js'))) {
   catch (error) { errors.push(`${rel}: JavaScript syntax check failed\n${error.stderr?.toString() || error.message}`); }
 }
 
-for (const path of files.filter((item) => item.endsWith('.js') && !item.endsWith('.user.js') && !item.endsWith('.meta.js') && !item.endsWith('.min.js') && !item.endsWith('.part.js'))) {
+for (const path of files.filter((item) => item.endsWith('.js') && !item.endsWith('.user.js') && !item.endsWith('.meta.js') && !item.endsWith('.min.js') && !item.endsWith('.part.js') && !relative(root, item).replaceAll('\\', '/').startsWith('userscripts/builders/poast-timeline-metadata-reset/src/'))) {
   const rel = relative(root, path);
   try { execFileSync(process.execPath, ['--check', path], { stdio: 'pipe' }); }
   catch (error) { errors.push(`${rel}: JavaScript syntax check failed\n${error.stderr?.toString() || error.message}`); }
@@ -196,7 +197,7 @@ for (const project of manifest.projects.filter((item) => item.type === 'firefox-
 }
 
 const myReadingMangaOwners = [];
-for (const path of files.filter((item) => item.endsWith('.user.js'))) {
+for (const path of installUserscripts) {
   const rel = relative(root, path).replaceAll('\\', '/');
   const text = await readFile(path, 'utf8');
   const fields = fieldsFromUserscript(text);

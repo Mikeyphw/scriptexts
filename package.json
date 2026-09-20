@@ -83,7 +83,9 @@
     "seal:sims": "npm --prefix userscripts/builders/sims-cc-download-basket run seal",
     "test:utilities": "node --test tools/tests/utility-userscripts.test.mjs",
     "check:poast": "npm --prefix userscripts/builders/poast-timeline-metadata-reset run build:check",
-    "seal:poast": "npm --prefix userscripts/builders/poast-timeline-metadata-reset run seal"
+    "seal:poast": "npm --prefix userscripts/builders/poast-timeline-metadata-reset run seal",
+    "seal:userscripts": "node tools/userscripts-release-seal.mjs",
+    "seal:userscripts:json": "node tools/userscripts-release-seal.mjs --json"
   },
   "engines": {
     "node": ">=20"

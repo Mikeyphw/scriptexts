@@ -6,7 +6,7 @@ const builderRoot = new URL('../', import.meta.url);
 const repoRoot = new URL('../../../', builderRoot);
 const runtime = await readFile(new URL('src/core/runtime.template.js', builderRoot), 'utf8');
 const runner = await readFile(new URL('tools/smoke/run-content-site-smoke.py', repoRoot), 'utf8');
-const validate = await readFile(new URL('.devtool-artifact/validate.sh', repoRoot), 'utf8');
+const validate = await readFile(new URL('tools/validate-content-site-modernizer.sh', repoRoot), 'utf8');
 const finalSeal = await readFile(new URL('tools/content-sites/final-seal.mjs', repoRoot), 'utf8');
 const builtScripts = await Promise.all([
   'dist/aipt-comics-modern-reader.user.js',

@@ -84,7 +84,7 @@ async function main() {
   const project = manifest.projects.find((item) => item.path === `userscripts/builders/${builderId}`);
   const runtimeText = await readFile(join(builderRoot, 'src/core/runtime.template.js'), 'utf8');
   const smokeRunnerText = await readFile(join(repoRoot, 'tools/smoke/run-content-site-smoke.py'), 'utf8');
-  const validatorText = await readFile(join(repoRoot, '.devtool-artifact/validate.sh'), 'utf8').catch(() => '');
+  const validatorText = await readFile(join(repoRoot, 'tools/validate-content-site-modernizer.sh'), 'utf8').catch(() => '');
   const checks = [];
 
   push(checks, 'builder id', builder.id === builderId, builder.id);
