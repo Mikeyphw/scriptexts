@@ -1,0 +1,8 @@
+import test from "node:test"; import assert from "node:assert/strict"; import fs from "node:fs"; import path from "node:path"; import {fileURLToPath} from "node:url";
+const here=path.dirname(fileURLToPath(import.meta.url)); const builder=path.dirname(here); const modules=JSON.parse(fs.readFileSync(path.join(builder,"modules.json"),"utf8")); const source=modules.map(n=>fs.readFileSync(path.join(builder,"src",n),"utf8")).join(""); const fixture=fs.readFileSync(path.join(here,"fixtures/xenforo-thread.html"),"utf8");
+test("builder modules reconstruct one self-contained userscript",()=>{assert.match(source,/==UserScript==/);assert.match(source,/function init\(/);assert.equal(source.includes('import '),false);});
+test("XenForo fixture covers pagination, image attachment and video poster/source",()=>{assert.match(fixture,/page-2/);assert.match(fixture,/bbImageWrapper/);assert.match(fixture,/poster=/);assert.match(fixture,/video\.mp4/);});
+test("scanner/cache contracts remain present",()=>{for(const token of ["scanMedia(","loadPageScanCache(","savePageScanCache(","fingerprintThreadPage("]) assert.ok(source.includes(token),token);});
+test("network resilience contracts remain present",()=>{for(const token of ["Retry-After","scanFetchMaxAttempts","scanRetryBaseMs","AbortError"]) assert.ok(source.includes(token),token);});
+test("gallery navigation contracts are generated",()=>{for(const token of ["pg-page-filter","pg-selected-only","pg-group-by-page","pg-page-group-heading","setPageFilter("]) assert.ok(source.includes(token),token);});
+test("archive contracts remain present",()=>{for(const token of ["manifest.json","pg_zip_part_size_mib","pg_zip_grouping","runZipDownloadInBackground("]) assert.ok(source.includes(token),token);});

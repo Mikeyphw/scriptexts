@@ -136,6 +136,9 @@
         lightboxControlsHidden: false,
         lightboxZoomed: false,
         gallerySearch: "",
+        pageFilter: "all",
+        selectedOnly: false,
+        groupByPage: false,
         gallerySort: localStorage.getItem("pg_gallery_sort") || "scan",
         chromeCollapsed: localStorage.getItem("pg_chrome_collapsed") === "1",
         videoDurationHydrationRunning: false,
@@ -684,6 +687,17 @@
             width: 100%;
             max-width: 1800px;
             margin: 0 auto;
+        }
+
+        .pg-page-group-heading {
+            column-span: all;
+            break-after: avoid;
+            margin: 12px 0 8px;
+            padding: 8px 10px;
+            border-radius: 8px;
+            background: rgba(255,255,255,.07);
+            font-weight: 700;
+            color: #f2f2f2;
         }
 
         .pg-item {
@@ -4760,6 +4774,11 @@
                 <label class="pg-search-control">Search
                     <input type="search" id="pg-gallery-search" placeholder="page, type, URL…" autocomplete="off">
                 </label>
+                <label class="pg-size-control">Page
+                    <select id="pg-page-filter"><option value="all">All pages</option></select>
+                </label>
+                <label class="pg-cache-pill"><input type="checkbox" id="pg-selected-only"> Selected only</label>
+                <label class="pg-cache-pill"><input type="checkbox" id="pg-group-by-page"> Group by page</label>
                 <label class="pg-size-control">Sort
                     <select id="pg-sort-order">
                         <option value="scan">Scan order</option>
@@ -4884,6 +4903,15 @@
                                     <option value="large">Large</option>
                                     <option value="xlarge">XL</option>
                                 </select>
+                            </label>
+                            <label class="pg-sheet-setting">Page
+                                <select id="pg-more-page-filter"><option value="all">All pages</option></select>
+                            </label>
+                            <label class="pg-sheet-setting">Selected only
+                                <input type="checkbox" id="pg-more-selected-only">
+                            </label>
+                            <label class="pg-sheet-setting">Group by page
+                                <input type="checkbox" id="pg-more-group-by-page">
                             </label>
                             <label class="pg-sheet-setting">Sort
                                 <select id="pg-more-sort-order">
@@ -5045,6 +5073,9 @@
         container.querySelector("#pg-gallery-search").addEventListener("input", event => {
             setGallerySearch(event.currentTarget.value);
         });
+        container.querySelector("#pg-page-filter").addEventListener("change", event => setPageFilter(event.currentTarget.value));
+        container.querySelector("#pg-selected-only").addEventListener("change", event => setSelectedOnly(event.currentTarget.checked));
+        container.querySelector("#pg-group-by-page").addEventListener("change", event => setGroupByPage(event.currentTarget.checked));
         container.querySelector("#pg-toggle-chrome").addEventListener("click", toggleChromeCollapsed);
         container.querySelector("#pg-toggle-details").addEventListener("click", toggleDesktopDetails);
         container.querySelector("#pg-desktop-more").addEventListener("click", toggleGalleryMoreSheet);
@@ -5100,6 +5131,9 @@
         container.querySelector("#pg-more-zip-grouping").addEventListener("change", event => setZipGrouping(event.currentTarget.value));
         container.querySelector("#pg-more-card-size").addEventListener("change", event => setGalleryCardSize(event.currentTarget.value));
         container.querySelector("#pg-more-sort-order").addEventListener("change", event => setGallerySort(event.currentTarget.value));
+        container.querySelector("#pg-more-page-filter").addEventListener("change", event => setPageFilter(event.currentTarget.value));
+        container.querySelector("#pg-more-selected-only").addEventListener("change", event => setSelectedOnly(event.currentTarget.checked));
+        container.querySelector("#pg-more-group-by-page").addEventListener("change", event => setGroupByPage(event.currentTarget.checked));
         container.querySelector("#pg-shortcut-close").addEventListener("click", hideShortcutHelp);
         container.querySelector("#pg-debug-toggle").addEventListener("click", toggleDebugPanel);
         container.querySelector("#pg-debug-close").addEventListener("click", () => setDebugPanelVisible(false));
@@ -5308,6 +5342,37 @@
         }
 
         renderGrid();
+    }
+
+    function setPageFilter(value) {
+        state.pageFilter = value === "all" ? "all" : String(Math.max(1, Number.parseInt(value, 10) || 1));
+        state.filteredMediaCache = null;
+        document.querySelectorAll("#pg-page-filter, #pg-more-page-filter").forEach(select => { select.value = state.pageFilter; });
+        renderGrid();
+    }
+
+    function setSelectedOnly(enabled) {
+        state.selectedOnly = Boolean(enabled);
+        state.filteredMediaCache = null;
+        document.querySelectorAll("#pg-selected-only, #pg-more-selected-only").forEach(input => { input.checked = state.selectedOnly; });
+        renderGrid();
+    }
+
+    function setGroupByPage(enabled) {
+        state.groupByPage = Boolean(enabled);
+        state.filteredMediaCache = null;
+        document.querySelectorAll("#pg-group-by-page, #pg-more-group-by-page").forEach(input => { input.checked = state.groupByPage; });
+        renderGrid();
+    }
+
+    function refreshPageNavigationControls(allMedia = getAllMedia()) {
+        const pages = [...new Set(allMedia.map(item => Number(item.pageNumber)).filter(Number.isFinite))].sort((a,b) => a-b);
+        document.querySelectorAll("#pg-page-filter, #pg-more-page-filter").forEach(select => {
+            const previous = state.pageFilter;
+            select.replaceChildren(new Option("All pages", "all"), ...pages.map(page => new Option(`Page ${page}`, String(page))));
+            if (previous !== "all" && !pages.includes(Number(previous))) state.pageFilter = "all";
+            select.value = state.pageFilter;
+        });
     }
 
     function setGallerySearch(value) {
@@ -5868,6 +5933,10 @@
             state.mediaRevision,
             sort === "selected" ? state.selectionRevision : 0,
             state.filter,
+            state.pageFilter,
+            state.selectedOnly ? state.selectionRevision : 0,
+            state.selectedOnly,
+            state.groupByPage,
             query,
             sort,
         ].join("|");
@@ -5880,6 +5949,14 @@
 
         if (state.filter !== "all") {
             media = media.filter(item => item.type === state.filter);
+        }
+
+        if (state.pageFilter !== "all") {
+            media = media.filter(item => Number(item.pageNumber) === Number(state.pageFilter));
+        }
+
+        if (state.selectedOnly) {
+            media = media.filter(item => state.selectedMediaIds.has(item.id));
         }
 
         if (query) {
@@ -5915,7 +5992,7 @@
             return direction === "asc" ? left - right : right - left;
         };
 
-        if (sort === "page") {
+        if (state.groupByPage || sort === "page") {
             media.sort((a, b) => (Number(a.pageNumber) || 0) - (Number(b.pageNumber) || 0) || byOriginalOrder(a, b));
         } else if (sort === "type") {
             media.sort((a, b) => String(a.type || "").localeCompare(String(b.type || "")) || byOriginalOrder(a, b));
@@ -6104,6 +6181,10 @@
         const postLink = item.postUrl
             ? `<a class="pg-meta-chip pg-meta-link" href="${escapeHtml(item.postUrl)}" target="_blank" rel="noopener noreferrer">Post</a>`
             : "";
+        let sourceHost = "";
+        try { sourceHost = new URL(item.src || item.thumb || "", window.location.href).hostname; } catch {}
+        const sourceMeta = sourceHost ? `<span class="pg-meta-chip pg-meta-muted" title="Media source host">${escapeHtml(sourceHost)}</span>` : "";
+        const postIdMeta = item.postId ? `<span class="pg-meta-chip pg-meta-muted" title="XenForo post ID">#${escapeHtml(item.postId)}</span>` : "";
 
         const checked = state.selectedMediaIds.has(item.id) ? "checked" : "";
         const selectorHtml = `<label class="pg-select-wrap" title="Include in ZIP"><input type="checkbox" ${checked} aria-label="Include this media in ZIP"></label>`;
@@ -6116,7 +6197,7 @@
                 ${item.postUrl ? `<a href="${escapeHtml(item.postUrl)}" target="_blank" rel="noopener noreferrer">Post</a>` : ""}
             </div>`;
 
-        card.innerHTML = `${selectorHtml}${badge}${content}${quickActionsHtml}<div class="pg-meta"><span class="pg-meta-chip">Page ${item.pageNumber || "?"}</span>${likesMeta}${durationMeta}${postLink}</div>`;
+        card.innerHTML = `${selectorHtml}${badge}${content}${quickActionsHtml}<div class="pg-meta"><span class="pg-meta-chip">Page ${item.pageNumber || "?"}</span>${likesMeta}${durationMeta}${sourceMeta}${postIdMeta}${postLink}</div>`;
 
         if (imageNode) {
             card.insertBefore(imageNode, card.querySelector(".pg-meta"));
@@ -6386,6 +6467,7 @@
         grid.replaceChildren();
 
         const allMedia = getAllMedia();
+        refreshPageNavigationControls(allMedia);
         let imageCount = 0;
         let videoCount = 0;
 
@@ -6422,7 +6504,7 @@
             return;
         }
 
-        const displayOrder = isMobileLayout() ? state.filteredMedia.slice() : reorderForColumns(state.filteredMedia, getColumnCount());
+        const displayOrder = (isMobileLayout() || state.groupByPage) ? state.filteredMedia.slice() : reorderForColumns(state.filteredMedia, getColumnCount());
         const filteredIndexById = new Map(state.filteredMedia.map((item, index) => [item.id, index]));
         const token = ++state.renderToken;
         let cursor = 0;
@@ -6437,6 +6519,15 @@
 
             while (cursor < end) {
                 const item = displayOrder[cursor];
+                if (state.groupByPage) {
+                    const previous = cursor > 0 ? displayOrder[cursor - 1] : null;
+                    if (!previous || Number(previous.pageNumber) !== Number(item.pageNumber)) {
+                        const heading = document.createElement("div");
+                        heading.className = "pg-page-group-heading";
+                        heading.textContent = `Page ${item.pageNumber || "?"}`;
+                        fragment.appendChild(heading);
+                    }
+                }
                 fragment.appendChild(createMediaCard(item, filteredIndexById.get(item.id) ?? cursor));
                 cursor += 1;
             }

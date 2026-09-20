@@ -10,7 +10,7 @@
   ],
   "scripts": {
     "build": "npm run build:userscripts && npm run build:extensions && npm run userscripts:metadata",
-    "build:userscripts": "npm run build:content-sites && npm run build:manga && npm run build:mrm-reimagined && npm run build:sims",
+    "build:userscripts": "npm run build:content-sites && npm run build:manga && npm run build:mrm-reimagined && npm run build:sims && npm run build:lpsg",
     "build:content-sites": "npm --prefix userscripts/builders/content-site-modernizer run build",
     "build:manga": "npm --prefix userscripts/builders/manga-reader-modernizer run build",
     "build:sims": "npm --prefix userscripts/builders/sims-cc-download-basket run build",
@@ -67,7 +67,10 @@
     "build:mrm-reimagined": "npm --prefix userscripts/builders/myreadingmanga-reimagined run build:verify",
     "build:mrm-reimagined:write": "npm --prefix userscripts/builders/myreadingmanga-reimagined run build",
     "check:mrm-reimagined": "npm --prefix userscripts/builders/myreadingmanga-reimagined run check",
-    "smoke:mrm-reimagined": "npm --prefix userscripts/builders/myreadingmanga-reimagined run smoke"
+    "smoke:mrm-reimagined": "npm --prefix userscripts/builders/myreadingmanga-reimagined run smoke",
+    "build:lpsg": "npm --prefix userscripts/builders/lpsg-media-gallery-unlocker run build",
+    "check:lpsg": "npm --prefix userscripts/builders/lpsg-media-gallery-unlocker run build:check",
+    "test:lpsg": "npm --prefix userscripts/builders/lpsg-media-gallery-unlocker test"
   },
   "engines": {
     "node": ">=20"

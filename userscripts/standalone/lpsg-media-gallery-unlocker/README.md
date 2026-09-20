@@ -32,3 +32,8 @@ npm run check
 ## License
 
 MIT.
+
+
+## Development source and tests
+
+The standalone `.user.js` is generated from `userscripts/builders/lpsg-media-gallery-unlocker/src/`. Run `npm run build:lpsg` to regenerate it, `npm run check:lpsg` to verify byte-for-byte reproducibility, and `npm run test:lpsg` for the dedicated XenForo/LPSG contract fixture suite. The gallery includes page filtering, selected-only filtering, and optional page grouping for navigating large scanned threads.

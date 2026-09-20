@@ -1,39 +1,135 @@
 {
   "schema_version": 2,
   "type": "overlay",
-  "name": "LPSG download archive v2 — overlay 4 of 6",
-  "description": "Adds mobile-aware configurable ZIP splitting, preflight size estimates, page-grouped archives, per-archive manifest.json metadata, and stronger cancellation/failure preservation while retaining existing direct and URL download workflows.",
-  "repository": {"name": "scriptexts", "branch": "main"},
-  "workspace": {"name": "scriptexts", "root": "."},
+  "name": "LPSG navigation, modularization and tests \u2014 overlay 5 of 6",
+  "description": "Adds page-oriented gallery navigation and metadata, selected-only/page grouping views, a deterministic modular LPSG builder, XenForo fixture coverage, and dedicated scanner/cache/network/gallery/archive regression contracts.",
+  "repository": {
+    "name": "scriptexts",
+    "branch": "main"
+  },
+  "workspace": {
+    "name": "scriptexts",
+    "root": "."
+  },
   "target": "root",
   "inventory": {
     "format": 1,
-    "entries": [{
-      "path": "userscripts/standalone/lpsg-media-gallery-unlocker/lpsg-media-gallery-unlocker.user.js",
-      "action": "modify",
-      "sha256": "0b04559e99473d0f1f5260a44fa8db2944cb60f265f3b232c64d20a92d8a1f2d",
-      "size": 292814,
-      "source_sha256": "c23d4354be927312a2650b645cdc129eb73bea144e94d1d66b183edfd88dd4fd"
-    }]
+    "entries": [
+      {
+        "path": "package.json",
+        "action": "modify",
+        "sha256": "de90878a9c4ca2e4aff128aff11a02fc61c092b79d1397eaf87c8a63e265deb8",
+        "size": 7807,
+        "source_sha256": "214e29e1c6478f1ed80e20d7bbb09d98aa62c23cf042a2f4a3b07e40fa500d17"
+      },
+      {
+        "path": "userscripts/standalone/lpsg-media-gallery-unlocker/README.md",
+        "action": "modify",
+        "sha256": "464087d4e3827efd526e07173df2544804d6b8e9a5b71e9ae433961822f250dc",
+        "size": 1172,
+        "source_sha256": "54903ca7e03de58af9e2e4a177f8dfc47b8fdd695474ced8ca0c1908163a2f0b"
+      },
+      {
+        "path": "userscripts/standalone/lpsg-media-gallery-unlocker/lpsg-media-gallery-unlocker.user.js",
+        "action": "modify",
+        "sha256": "8ff7bde408a2b7fbaf97afb7593e1a1f6138351e566db501029a56ea79ebbba8",
+        "size": 298105,
+        "source_sha256": "0b04559e99473d0f1f5260a44fa8db2944cb60f265f3b232c64d20a92d8a1f2d"
+      },
+      {
+        "path": "userscripts/builders/lpsg-media-gallery-unlocker/modules.json",
+        "action": "add",
+        "sha256": "f39035830f3a6f368856ddec8788e0de4930994458f78b64dd3829c94d6c9a07",
+        "size": 217
+      },
+      {
+        "path": "userscripts/builders/lpsg-media-gallery-unlocker/package.json",
+        "action": "add",
+        "sha256": "f49edc1f41d971ac0067c6e62ffd6cd22358ea7e760abd4704f98483f660b718",
+        "size": 229
+      },
+      {
+        "path": "userscripts/builders/lpsg-media-gallery-unlocker/build.mjs",
+        "action": "add",
+        "sha256": "d3eaa9ad8514c995e8339ad3a2f480f0bd15dc19adf151df699c14e8cc5a4cdb",
+        "size": 767
+      },
+      {
+        "path": "userscripts/builders/lpsg-media-gallery-unlocker/src/00-bootstrap-ui.part.js",
+        "action": "add",
+        "sha256": "c6b88efef0111495a728d9dd8f814a24f2196e958facefcb81fb14f8e39adc08",
+        "size": 68185
+      },
+      {
+        "path": "userscripts/builders/lpsg-media-gallery-unlocker/src/30-media-renderer-lightbox.part.js",
+        "action": "add",
+        "sha256": "4cb5b38022ca50d8e65b8856e22676aa37053ebeaadd73045952dd63f995c66a",
+        "size": 39902
+      },
+      {
+        "path": "userscripts/builders/lpsg-media-gallery-unlocker/src/50-integration-init.part.js",
+        "action": "add",
+        "sha256": "06a89409635d3c364e4ac6afeb596669be446fa71b3ccb150088e49b3cad8157",
+        "size": 10374
+      },
+      {
+        "path": "userscripts/builders/lpsg-media-gallery-unlocker/src/10-xenforo-scanner-cache.part.js",
+        "action": "add",
+        "sha256": "bfe3c3facbd2f2528c8cafa01ba63ec43b8c96a185f01adb8bb7770174737e16",
+        "size": 77630
+      },
+      {
+        "path": "userscripts/builders/lpsg-media-gallery-unlocker/src/20-gallery-controls.part.js",
+        "action": "add",
+        "sha256": "180d4fe921fa68dbeed038525a7cfb05ff9d8246199828abb3e87a550a5b862f",
+        "size": 67624
+      },
+      {
+        "path": "userscripts/builders/lpsg-media-gallery-unlocker/src/40-download-archive-network.part.js",
+        "action": "add",
+        "sha256": "8f42c032e9524c95f5bae79924068389b2f9dc2ea4e05f51844d4343279795e7",
+        "size": 34390
+      },
+      {
+        "path": "userscripts/builders/lpsg-media-gallery-unlocker/test/lpsg.test.mjs",
+        "action": "add",
+        "sha256": "7a8438131a93d9ba0f6a5be3cad9f22fd9c3e5ab953f2b899ab7dc27aebd398e",
+        "size": 1748
+      },
+      {
+        "path": "userscripts/builders/lpsg-media-gallery-unlocker/test/fixtures/xenforo-thread.html",
+        "action": "add",
+        "sha256": "7fe6f0f006ebc9404c0f883d890885256ea4318ddc412ca37627d1baf92be7d3",
+        "size": 561
+      }
+    ]
   },
   "apply": {
     "atomic": true,
     "conflict_policy": "overwrite",
     "path_policy": "repository-relative",
     "requires_clean_worktree": false,
-    "commit": {"enabled": true, "strategy": "single", "message": "feat(lpsg): harden ZIP archive pipeline"}
+    "commit": {
+      "enabled": true,
+      "strategy": "single",
+      "message": "refactor(lpsg): modularize gallery and add navigation tests"
+    }
   },
-  "validation": {"required": false, "restore": false, "build": false, "test": false, "rollback_on_failure": true},
+  "validation": {
+    "required": false,
+    "restore": false,
+    "build": false,
+    "test": false,
+    "rollback_on_failure": true
+  },
   "notes": [
-    "Roadmap overlay 4 of 6. Requires overlay 3 v1 as its exact source state.",
-    "Auto ZIP part size is mobile-aware (64 MiB mobile, 512 MiB desktop) and can be overridden with 32/64/96/256/512 MiB presets.",
-    "ZIP start status reports selected count and known estimated bytes, explicitly identifying unknown-size items.",
-    "ZIP grouping can archive the full selection or create page-scoped archives; page mode sorts selected media deterministically by page/order.",
-    "Every emitted ZIP contains manifest.json with archive/job metadata, file names, type, page/post attribution, source/original URL, size, and relevant failed entries.",
-    "Existing pause/cancel/retry-failed behavior is retained; cancellation/crash now preserves failures already observed for retry/export.",
-    "Existing URL export and direct-download behavior is untouched.",
-    "Audit pass 1 fixed page-part naming and made failed manifest entries page-relevant without duplication.",
-    "Audit pass 2 fixed deterministic page grouping so arbitrary selection order cannot create duplicate page archive runs.",
-    "Audit pass 3 found no remaining promised-scope gaps; node --check and archive contract assertions passed."
+    "Roadmap overlay 5 of 6. Requires overlay 4 v1 exact source state.",
+    "Adds page selector/navigation, selected-only filtering, optional page grouping, source-host and XenForo post-ID card metadata.",
+    "Introduces six function-boundary source modules and deterministic builder that reproduces the single self-contained userscript byte-for-byte.",
+    "Adds dedicated XenForo fixture plus scanner/cache, network resilience, gallery navigation, and ZIP/archive contract tests.",
+    "Root scripts: build:lpsg, check:lpsg, test:lpsg; build:userscripts now regenerates LPSG.",
+    "Audit pass 1 caught and corrected a stale scanner-signature test contract.",
+    "Audit pass 2 strengthened source/post metadata and checked selection-cache invalidation/navigation behavior.",
+    "Audit pass 3 corrected module boundaries so no function is split between source modules; reproducibility and all tests pass."
   ]
 }

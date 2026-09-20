@@ -1,0 +1,8 @@
+[
+  "00-bootstrap-ui.part.js",
+  "10-xenforo-scanner-cache.part.js",
+  "20-gallery-controls.part.js",
+  "30-media-renderer-lightbox.part.js",
+  "40-download-archive-network.part.js",
+  "50-integration-init.part.js"
+]
