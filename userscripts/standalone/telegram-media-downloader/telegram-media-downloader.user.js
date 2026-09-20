@@ -9,7 +9,7 @@
 // @name:zh-CN   Telegram 受限图片视频下载器
 // @name:zh-TW   Telegram 受限圖片影片下載器
 // @name:ru      Telegram: загрузчик медиафайлов
-// @version      1.212
+// @version      1.213
 // @description  Download images, GIFs, videos, and voice messages on the Telegram webapp from private channels that disable downloading and restrict saving content
 // @description:en  Download images, GIFs, videos, and voice messages on the Telegram webapp from private channels that disable downloading and restrict saving content
 // @description:ru Загружайте изображения, GIF-файлы, видео и голосовые сообщения в веб-приложении Telegram из частных каналов, которые отключили загрузку и ограничили сохранение контента
@@ -43,7 +43,10 @@
   const DOWNLOAD_ICON = "\ue979";
   const FORWARD_ICON = "\ue99a";
   const contentRangeRegex = /^bytes (\d+)-(\d+)\/(\d+)$/;
-  const REFRESH_DELAY = 500;
+  const DOWNLOAD_MAX_RETRIES = 3;
+  const DOWNLOAD_RETRY_BASE_MS = 700;
+  const FALLBACK_MEMORY_LIMIT = 256 * 1024 * 1024;
+  const activeDownloads = new Map();
   const hashCode = (s) => {
     var h = 0,
       l = s.length,
@@ -56,7 +59,7 @@
     return h >>> 0;
   };
 
-  const createProgressBar = (videoId, fileName) => {
+  const createProgressBar = (videoId, fileName, onCancel = null) => {
     const isDarkMode =
       document.querySelector("html").classList.contains("night") ||
       document.querySelector("html").classList.contains("theme-dark");
@@ -87,8 +90,11 @@
     closeButton.style.fontSize = "1.2rem";
     closeButton.style.color = isDarkMode ? "#8a8a8a" : "white";
     closeButton.innerHTML = "&times;";
+    closeButton.setAttribute("role", "button");
+    closeButton.setAttribute("aria-label", onCancel ? "Cancel download" : "Dismiss download");
     closeButton.onclick = function () {
-      container.removeChild(innerContainer);
+      if (onCancel) onCancel();
+      innerContainer.remove();
     };
 
     const progressBar = document.createElement("div");
@@ -127,347 +133,195 @@
     const innerContainer = document.getElementById(
       "tel-downloader-progress-" + videoId
     );
+    if (!innerContainer) return;
     innerContainer.querySelector("p.filename").innerText = fileName;
     const progressBar = innerContainer.querySelector("div.progress");
     progressBar.querySelector("p").innerText = progress + "%";
     progressBar.querySelector("div").style.width = progress + "%";
   };
 
+  const updateProgressStatus = (videoId, message) => {
+    const innerContainer = document.getElementById("tel-downloader-progress-" + videoId);
+    if (!innerContainer) return;
+    innerContainer.querySelector("div.progress p").innerText = message;
+  };
+
   const completeProgress = (videoId) => {
-    const progressBar = document
-      .getElementById("tel-downloader-progress-" + videoId)
-      .querySelector("div.progress");
+    const innerContainer = document.getElementById("tel-downloader-progress-" + videoId);
+    if (!innerContainer) return;
+    const progressBar = innerContainer.querySelector("div.progress");
     progressBar.querySelector("p").innerText = "Completed";
     progressBar.querySelector("div").style.backgroundColor = "#B6C649";
     progressBar.querySelector("div").style.width = "100%";
   };
 
   const AbortProgress = (videoId) => {
-    const progressBar = document
-      .getElementById("tel-downloader-progress-" + videoId)
-      .querySelector("div.progress");
+    const innerContainer = document.getElementById("tel-downloader-progress-" + videoId);
+    if (!innerContainer) return;
+    const progressBar = innerContainer.querySelector("div.progress");
     progressBar.querySelector("p").innerText = "Aborted";
     progressBar.querySelector("div").style.backgroundColor = "#D16666";
     progressBar.querySelector("div").style.width = "100%";
   };
 
-  const tel_download_video = (url) => {
-    let _blobs = [];
-    let _next_offset = 0;
-    let _total_size = null;
-    let _file_extension = "mp4";
+  const sleepWithAbort = (ms, signal) =>
+    new Promise((resolve, reject) => {
+      if (signal?.aborted) return reject(new DOMException("Aborted", "AbortError"));
+      const timer = setTimeout(resolve, ms);
+      signal?.addEventListener("abort", () => {
+        clearTimeout(timer);
+        reject(new DOMException("Aborted", "AbortError"));
+      }, { once: true });
+    });
 
-    const videoId =
-      (Math.random() + 1).toString(36).substring(2, 10) +
-      "_" +
-      Date.now().toString();
-    let fileName = hashCode(url).toString(36) + "." + _file_extension;
+  const retryDelayMs = (response, attempt) => {
+    const retryAfter = response?.headers?.get("Retry-After");
+    if (retryAfter) {
+      const seconds = Number(retryAfter);
+      if (Number.isFinite(seconds)) return Math.max(0, seconds * 1000);
+      const date = Date.parse(retryAfter);
+      if (Number.isFinite(date)) return Math.max(0, date - Date.now());
+    }
+    return DOWNLOAD_RETRY_BASE_MS * 2 ** attempt;
+  };
 
-    // Some video src is in format:
-    // 'stream/{"dcId":5,"location":{...},"size":...,"mimeType":"video/mp4","fileName":"xxxx.MP4"}'
-    try {
-      const metadata = JSON.parse(
-        decodeURIComponent(url.split("/")[url.split("/").length - 1])
-      );
-      if (metadata.fileName) {
-        fileName = metadata.fileName;
+  const fetchMediaPart = async (url, offset, signal, jobId = null) => {
+    for (let attempt = 0; ; attempt += 1) {
+      let response;
+      try {
+        response = await fetch(url, {
+          method: "GET",
+          headers: { Range: `bytes=${offset}-` },
+          signal,
+        });
+      } catch (error) {
+        if (error?.name === "AbortError" || attempt >= DOWNLOAD_MAX_RETRIES) throw error;
+        if (jobId) updateProgressStatus(jobId, `Retrying ${attempt + 1}/${DOWNLOAD_MAX_RETRIES}…`);
+        await sleepWithAbort(DOWNLOAD_RETRY_BASE_MS * 2 ** attempt, signal);
+        continue;
       }
-    } catch (e) {
-      // Invalid JSON string, pass extracting fileName
-    }
-    logger.info(`URL: ${url}`, fileName);
-
-    const fetchNextPart = (_writable) => {
-      fetch(url, {
-        method: "GET",
-        headers: {
-          Range: `bytes=${_next_offset}-`,
-        },
-        "User-Agent":
-          "User-Agent Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/117.0",
-      })
-        .then((res) => {
-          if (![200, 206].includes(res.status)) {
-            throw new Error("Non 200/206 response was received: " + res.status);
-          }
-          const mime = res.headers.get("Content-Type").split(";")[0];
-          if (!mime.startsWith("video/")) {
-            throw new Error("Get non video response with MIME type " + mime);
-          }
-          _file_extension = mime.split("/")[1];
-          fileName =
-            fileName.substring(0, fileName.indexOf(".") + 1) + _file_extension;
-
-          const match = res.headers
-            .get("Content-Range")
-            .match(contentRangeRegex);
-
-          const startOffset = parseInt(match[1]);
-          const endOffset = parseInt(match[2]);
-          const totalSize = parseInt(match[3]);
-
-          if (startOffset !== _next_offset) {
-            logger.error("Gap detected between responses.", fileName);
-            logger.info("Last offset: " + _next_offset, fileName);
-            logger.info("New start offset " + match[1], fileName);
-            throw "Gap detected between responses.";
-          }
-          if (_total_size && totalSize !== _total_size) {
-            logger.error("Total size differs", fileName);
-            throw "Total size differs";
-          }
-
-          _next_offset = endOffset + 1;
-          _total_size = totalSize;
-
-          logger.info(
-            `Get response: ${res.headers.get(
-              "Content-Length"
-            )} bytes data from ${res.headers.get("Content-Range")}`,
-            fileName
-          );
-          logger.info(
-            `Progress: ${((_next_offset * 100) / _total_size).toFixed(0)}%`,
-            fileName
-          );
-          updateProgress(
-            videoId,
-            fileName,
-            ((_next_offset * 100) / _total_size).toFixed(0)
-          );
-          return res.blob();
-        })
-        .then((resBlob) => {
-          if (_writable !== null) {
-            _writable.write(resBlob).then(() => {});
-          } else {
-            _blobs.push(resBlob);
-          }
-        })
-        .then(() => {
-          if (!_total_size) {
-            throw new Error("_total_size is NULL");
-          }
-
-          if (_next_offset < _total_size) {
-            fetchNextPart(_writable);
-          } else {
-            if (_writable !== null) {
-              _writable.close().then(() => {
-                logger.info("Download finished", fileName);
-              });
-            } else {
-              save();
-            }
-            completeProgress(videoId);
-          }
-        })
-        .catch((reason) => {
-          logger.error(reason, fileName);
-          AbortProgress(videoId);
-        });
-    };
-
-    const save = () => {
-      logger.info("Finish downloading blobs", fileName);
-      logger.info("Concatenating blobs and downloading...", fileName);
-
-      const blob = new Blob(_blobs, { type: "video/mp4" });
-      const blobUrl = window.URL.createObjectURL(blob);
-
-      logger.info("Final blob size: " + blob.size + " bytes", fileName);
-
-      const a = document.createElement("a");
-      document.body.appendChild(a);
-      a.href = blobUrl;
-      a.download = fileName;
-      a.click();
-      document.body.removeChild(a);
-      window.URL.revokeObjectURL(blobUrl);
-
-      logger.info("Download triggered", fileName);
-    };
-
-    const supportsFileSystemAccess =
-      "showSaveFilePicker" in unsafeWindow &&
-      (() => {
-        try {
-          return unsafeWindow.self === unsafeWindow.top;
-        } catch {
-          return false;
-        }
-      })();
-    if (supportsFileSystemAccess) {
-      unsafeWindow
-        .showSaveFilePicker({
-          suggestedName: fileName,
-        })
-        .then((handle) => {
-          handle
-            .createWritable()
-            .then((writable) => {
-              fetchNextPart(writable);
-              createProgressBar(videoId);
-            })
-            .catch((err) => {
-              console.error(err.name, err.message);
-            });
-        })
-        .catch((err) => {
-          if (err.name !== "AbortError") {
-            console.error(err.name, err.message);
-          }
-        });
-    } else {
-      fetchNextPart(null);
-      createProgressBar(videoId);
+      if ([408, 429, 500, 502, 503, 504].includes(response.status) && attempt < DOWNLOAD_MAX_RETRIES) {
+        if (jobId) updateProgressStatus(jobId, `HTTP ${response.status} · retry ${attempt + 1}/${DOWNLOAD_MAX_RETRIES}…`);
+        await sleepWithAbort(retryDelayMs(response, attempt), signal);
+        continue;
+      }
+      if (![200, 206].includes(response.status)) {
+        throw new Error(`Unexpected media response: HTTP ${response.status}`);
+      }
+      return response;
     }
   };
 
-  const tel_download_audio = (url) => {
-    let _blobs = [];
-    let _next_offset = 0;
-    let _total_size = null;
-    const fileName = hashCode(url).toString(36) + ".ogg";
+  const parseMediaResponse = (response, requestedOffset) => {
+    const contentType = (response.headers.get("Content-Type") || "application/octet-stream")
+      .split(";", 1)[0]
+      .trim();
+    const contentLength = Number(response.headers.get("Content-Length")) || null;
+    const contentRange = response.headers.get("Content-Range");
 
-    const fetchNextPart = (_writable) => {
-      fetch(url, {
-        method: "GET",
-        headers: {
-          Range: `bytes=${_next_offset}-`,
-        },
-      })
-        .then((res) => {
-          if (res.status !== 206 && res.status !== 200) {
-            logger.error(
-              "Non 200/206 response was received: " + res.status,
-              fileName
-            );
-            return;
-          }
+    // A server may legally ignore Range and return the complete object as HTTP 200.
+    if (response.status === 200) {
+      if (requestedOffset > 0) {
+        throw new Error("Server stopped honoring Range during a resumed transfer");
+      }
+      return { start: 0, end: contentLength ? contentLength - 1 : null, total: contentLength, complete: true, contentType };
+    }
 
-          const mime = res.headers.get("Content-Type").split(";")[0];
-          if (!mime.startsWith("audio/")) {
-            logger.error(
-              "Get non audio response with MIME type " + mime,
-              fileName
-            );
-            throw "Get non audio response with MIME type " + mime;
-          }
+    const match = contentRange?.match(contentRangeRegex);
+    if (!match) throw new Error("HTTP 206 response is missing a valid Content-Range header");
+    const start = Number(match[1]);
+    const end = Number(match[2]);
+    const total = Number(match[3]);
+    if (start !== requestedOffset) throw new Error(`Range gap: expected ${requestedOffset}, received ${start}`);
+    if (end < start || total <= end) throw new Error(`Invalid Content-Range: ${contentRange}`);
+    return { start, end, total, complete: end + 1 >= total, contentType };
+  };
 
-          try {
-            const match = res.headers
-              .get("Content-Range")
-              .match(contentRangeRegex);
+  const saveBlobDownload = (parts, contentType, fileName) => {
+    const blob = new Blob(parts, { type: contentType });
+    const blobUrl = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = blobUrl;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(blobUrl), 0);
+  };
 
-            const startOffset = parseInt(match[1]);
-            const endOffset = parseInt(match[2]);
-            const totalSize = parseInt(match[3]);
+  const downloadMedia = async (url, { kind, extension }) => {
+    const jobId = `${(Math.random() + 1).toString(36).substring(2, 10)}_${Date.now()}`;
+    const controller = new AbortController();
+    const parts = [];
+    let offset = 0;
+    let total = null;
+    let contentType = `${kind}/${extension}`;
+    let fileName = `${hashCode(url).toString(36)}.${extension}`;
+    try {
+      const metadata = JSON.parse(decodeURIComponent(url.split("/").at(-1)));
+      if (metadata?.fileName) fileName = metadata.fileName;
+    } catch { /* URL does not contain Telegram stream metadata. */ }
 
-            if (startOffset !== _next_offset) {
-              logger.error("Gap detected between responses.");
-              logger.info("Last offset: " + _next_offset);
-              logger.info("New start offset " + match[1]);
-              throw "Gap detected between responses.";
-            }
-            if (_total_size && totalSize !== _total_size) {
-              logger.error("Total size differs");
-              throw "Total size differs";
-            }
+    activeDownloads.set(jobId, controller);
+    createProgressBar(jobId, fileName, () => controller.abort());
 
-            _next_offset = endOffset + 1;
-            _total_size = totalSize;
-          } finally {
-            logger.info(
-              `Get response: ${res.headers.get(
-                "Content-Length"
-              )} bytes data from ${res.headers.get("Content-Range")}`
-            );
-            return res.blob();
-          }
-        })
-        .then((resBlob) => {
-          if (_writable !== null) {
-            _writable.write(resBlob).then(() => {});
-          } else {
-            _blobs.push(resBlob);
-          }
-        })
-        .then(() => {
-          if (_next_offset < _total_size) {
-            fetchNextPart(_writable);
-          } else {
-            if (_writable !== null) {
-              _writable.close().then(() => {
-                logger.info("Download finished", fileName);
-              });
-            } else {
-              save();
-            }
-          }
-        })
-        .catch((reason) => {
-          logger.error(reason, fileName);
-        });
-    };
+    let writable = null;
+    const canStreamToDisk = "showSaveFilePicker" in unsafeWindow && (() => {
+      try { return unsafeWindow.self === unsafeWindow.top; } catch { return false; }
+    })();
 
-    const save = () => {
-      logger.info(
-        "Finish downloading blobs. Concatenating blobs and downloading...",
-        fileName
-      );
+    try {
+      if (canStreamToDisk) {
+        const handle = await unsafeWindow.showSaveFilePicker({ suggestedName: fileName });
+        writable = await handle.createWritable();
+      }
 
-      let blob = new Blob(_blobs, { type: "audio/ogg" });
-      const blobUrl = window.URL.createObjectURL(blob);
-
-      logger.info("Final blob size in bytes: " + blob.size, fileName);
-
-      blob = 0;
-
-      const a = document.createElement("a");
-      document.body.appendChild(a);
-      a.href = blobUrl;
-      a.download = fileName;
-      a.click();
-      document.body.removeChild(a);
-      window.URL.revokeObjectURL(blobUrl);
-
-      logger.info("Download triggered", fileName);
-    };
-
-    const supportsFileSystemAccess =
-      "showSaveFilePicker" in unsafeWindow &&
-      (() => {
-        try {
-          return unsafeWindow.self === unsafeWindow.top;
-        } catch {
-          return false;
+      while (true) {
+        const response = await fetchMediaPart(url, offset, controller.signal, jobId);
+        const info = parseMediaResponse(response, offset);
+        if (!info.contentType.startsWith(`${kind}/`)) {
+          throw new Error(`Expected ${kind} media, received ${info.contentType}`);
         }
-      })();
-    if (supportsFileSystemAccess) {
-      unsafeWindow
-        .showSaveFilePicker({
-          suggestedName: fileName,
-        })
-        .then((handle) => {
-          handle
-            .createWritable()
-            .then((writable) => {
-              fetchNextPart(writable);
-            })
-            .catch((err) => {
-              console.error(err.name, err.message);
-            });
-        })
-        .catch((err) => {
-          if (err.name !== "AbortError") {
-            console.error(err.name, err.message);
+        contentType = info.contentType;
+        if (!writable && info.total && info.total > FALLBACK_MEMORY_LIMIT) {
+          throw new Error("Media is too large for the in-memory fallback. Use a browser with File System Access support.");
+        }
+        const subtype = contentType.split("/")[1]?.replace(/[^a-z0-9.+-]/gi, "") || extension;
+        fileName = fileName.replace(/\.[^.]+$/, `.${subtype}`);
+        const part = await response.blob();
+
+        if (writable) {
+          await writable.write(part);
+        } else {
+          parts.push(part);
+          const buffered = parts.reduce((sum, item) => sum + item.size, 0);
+          if (buffered > FALLBACK_MEMORY_LIMIT) {
+            throw new Error("Media is too large for the in-memory fallback. Use a browser with File System Access support.");
           }
-        });
-    } else {
-      fetchNextPart(null);
+        }
+
+        total = info.total || part.size;
+        offset = info.complete ? total : info.end + 1;
+        updateProgress(jobId, fileName, total ? Math.min(100, Math.round((offset * 100) / total)) : 100);
+        if (info.complete) break;
+      }
+
+      if (writable) await writable.close();
+      else saveBlobDownload(parts, contentType, fileName);
+      completeProgress(jobId);
+    } catch (error) {
+      if (writable) {
+        try { await writable.abort?.(); } catch { /* best effort */ }
+      }
+      if (error?.name !== "AbortError") logger.error(error?.message || error, fileName);
+      AbortProgress(jobId);
+    } finally {
+      activeDownloads.delete(jobId);
     }
   };
+
+  const tel_download_video = (url) => downloadMedia(url, { kind: "video", extension: "mp4" });
+  const tel_download_audio = (url) => downloadMedia(url, { kind: "audio", extension: "ogg" });
 
   const tel_download_image = (imageUrl) => {
     const fileName =
@@ -485,8 +339,8 @@
 
   logger.info("Initialized");
 
-  // For webz /a/ webapp
-  setInterval(() => {
+  // For WebZ (/a/) webapp. DOM-driven scans avoid permanent polling.
+  const scanWebZ = () => {
     // Stories
     const storiesContainer = document.getElementById("StoryViewer");
     if (storiesContainer) {
@@ -523,9 +377,10 @@
         return downloadButton;
       };
 
+      const dropdownMenu = storiesContainer.querySelector(".DropdownMenu");
       const storyHeader =
         storiesContainer.querySelector(".GrsJNw3y") ||
-        storiesContainer.querySelector(".DropdownMenu").parentNode;
+        dropdownMenu?.parentNode;
       if (storyHeader && !storyHeader.querySelector(".tel-download")) {
         console.log("storyHeader");
         storyHeader.insertBefore(
@@ -637,10 +492,10 @@
         mediaViewerActions.prepend(downloadButton);
       }
     }
-  }, REFRESH_DELAY);
+  };
 
-  // For webk /k/ webapp
-  setInterval(() => {
+  // For WebK (/k/) webapp.
+  const scanWebK = () => {
     /* Voice Message or Circle Video */
     const pinnedAudio = document.body.querySelector(".pinned-audio");
     let dataMid;
@@ -832,7 +687,7 @@
       }
       mediaButtons.prepend(downloadButton);
     }
-  }, REFRESH_DELAY);
+  };
 
   // Progress bar container setup
   (function setupProgressBar() {
@@ -851,4 +706,43 @@
   })();
 
   logger.info("Completed script setup.");
+
+  let telegramScanScheduled = false;
+  const runTelegramScans = () => {
+    telegramScanScheduled = false;
+    scanWebZ();
+    scanWebK();
+  };
+  const scheduleTelegramScan = () => {
+    if (telegramScanScheduled) return;
+    telegramScanScheduled = true;
+    (window.requestAnimationFrame || ((callback) => setTimeout(callback, 0)))(runTelegramScans);
+  };
+  const TELEGRAM_MEDIA_SELECTOR = [
+    "#MediaViewer", "#StoryViewer", ".media-viewer-whole", "#stories-viewer",
+    ".pinned-audio", "audio-element", ".bubble", "video", "img.media-photo", "img.PVZ8TOWS"
+  ].join(",");
+  const mutationTouchesTelegramMedia = (mutation) => {
+    const nodes = mutation.type === "childList"
+      ? [...mutation.addedNodes, mutation.target]
+      : [mutation.target];
+    return nodes.some((node) => {
+      if (!(node instanceof Element)) return false;
+      return node.matches(TELEGRAM_MEDIA_SELECTOR) ||
+        node.closest(TELEGRAM_MEDIA_SELECTOR) ||
+        node.querySelector?.(TELEGRAM_MEDIA_SELECTOR);
+    });
+  };
+  const telegramObserver = new MutationObserver((mutations) => {
+    // Ignore unrelated chat churn; only newly-added/changed media surfaces schedule work.
+    if (mutations.some(mutationTouchesTelegramMedia)) scheduleTelegramScan();
+  });
+  telegramObserver.observe(document.body, {
+    childList: true,
+    subtree: true,
+    attributes: true,
+    attributeFilter: ["class", "src"],
+  });
+  scheduleTelegramScan();
+
 })();

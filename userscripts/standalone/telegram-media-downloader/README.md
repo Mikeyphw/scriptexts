@@ -32,3 +32,7 @@ npm run check
 ## License
 
 GNU GPLv3.
+
+## Runtime v2
+
+The userscript uses MutationObserver-driven WebK/WebZ discovery and a shared cancellable media transfer engine with bounded retries, Range validation, and a 256 MiB in-memory fallback guard. Run `npm run test:telegram` from the repository root for its regression suite.

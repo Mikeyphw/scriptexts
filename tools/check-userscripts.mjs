@@ -12,6 +12,7 @@ const steps = [
   ["myreadingmanga-reimagined", npm, ["--prefix", "userscripts/builders/myreadingmanga-reimagined", "run", "check"]],
   ["sims-cc-download-basket", npm, ["--prefix", "userscripts/builders/sims-cc-download-basket", "run", "check"]],
   ["lpsg-media-gallery-unlocker", npm, ["--prefix", "userscripts/builders/lpsg-media-gallery-unlocker", "run", "check"]],
+  ["telegram-media-downloader", npm, ["run", "test:telegram"]],
   ["repository static checks", process.execPath, ["tools/check-repo.mjs"]],
 ];
 
