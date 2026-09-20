@@ -21,7 +21,24 @@
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
         (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
     const isAndroid = /Android/i.test(navigator.userAgent);
-    const isMobileProfile = isAndroid || isIOS || window.innerWidth <= 700 || navigator.maxTouchPoints > 1;
+    const coarsePointerQuery = window.matchMedia?.("(hover: none), (pointer: coarse)") || null;
+    let isCoarsePointer = Boolean(coarsePointerQuery?.matches);
+    let isMobileProfile = isAndroid || isIOS || window.innerWidth <= 700 || navigator.maxTouchPoints > 1 || isCoarsePointer;
+
+    function refreshDeviceProfile() {
+        isCoarsePointer = Boolean(coarsePointerQuery?.matches);
+        isMobileProfile = isAndroid || isIOS || window.innerWidth <= 700 || navigator.maxTouchPoints > 1 || isCoarsePointer;
+        const container = document.getElementById("pg-container");
+        if (container) {
+            container.classList.toggle("pg-mobile-profile", isMobileProfile);
+            container.classList.toggle("pg-coarse-pointer", isCoarsePointer);
+            container.dataset.deviceProfile = isMobileProfile ? "mobile" : "desktop";
+        }
+        return isMobileProfile;
+    }
+
+    window.addEventListener("resize", refreshDeviceProfile, { passive: true });
+    coarsePointerQuery?.addEventListener?.("change", refreshDeviceProfile);
 
     const config = {
         volume: 0.1,
@@ -2099,6 +2116,93 @@
             }
         }
 
+        /* Overlay 1/6: runtime mobile profile convergence.
+           Do not rely on the CSS viewport alone: Android/Iceraven may expose a
+           desktop-width layout viewport while still needing touch-first UI. */
+        #pg-container.pg-mobile-profile .pg-header {
+            display: block;
+            padding: 8px 10px;
+        }
+        #pg-container.pg-mobile-profile .pg-header-main {
+            display: grid;
+            grid-template-columns: 1fr auto auto;
+            grid-template-areas: "title more close" "filters filters filters";
+            align-items: center;
+            gap: 8px;
+        }
+        #pg-container.pg-mobile-profile .pg-title-wrap { grid-area: title; }
+        #pg-container.pg-mobile-profile .pg-filter-segment {
+            grid-area: filters;
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 7px;
+            width: 100%;
+        }
+        #pg-container.pg-mobile-profile .pg-filter-segment .pg-filter-btn { width: 100%; }
+        #pg-container.pg-mobile-profile .pg-mobile-more {
+            grid-area: more;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        #pg-container.pg-mobile-profile .pg-close { grid-area: close; }
+        #pg-container.pg-mobile-profile .pg-mobile-subtitle { display: block; }
+        #pg-container.pg-mobile-profile .pg-mobile-subtitle:empty { display: none; }
+        #pg-container.pg-mobile-profile .pg-desktop-subtitle,
+        #pg-container.pg-mobile-profile .pg-desktop-actions,
+        #pg-container.pg-mobile-profile .pg-desktop-overview,
+        #pg-container.pg-mobile-profile .pg-desktop-toolbar-chip,
+        #pg-container.pg-mobile-profile .pg-selection-bar,
+        #pg-container.pg-mobile-profile .pg-search-control,
+        #pg-container.pg-mobile-profile .pg-card-quick-actions,
+        #pg-container.pg-mobile-profile .pg-lb-filmstrip {
+            display: none !important;
+        }
+        #pg-container.pg-mobile-profile .pg-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: var(--pg-grid-gap);
+            column-width: auto;
+            column-gap: var(--pg-grid-gap);
+        }
+        #pg-container.pg-mobile-profile .pg-item {
+            margin-bottom: 0;
+            min-width: 0;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+        #pg-container.pg-mobile-profile .pg-select-wrap {
+            width: 44px;
+            height: 44px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.15s ease;
+        }
+        #pg-container.pg-mobile-profile.pg-selection-mode .pg-select-wrap {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        #pg-container.pg-mobile-profile .pg-select-wrap input { width: 24px; height: 24px; }
+        #pg-container:not(.pg-selection-mode) .pg-item.pg-selected {
+            border-color: transparent;
+            box-shadow: none;
+        }
+        #pg-container:not(.pg-selection-mode) .pg-item.pg-selected .pg-select-wrap {
+            opacity: 0;
+            pointer-events: none;
+        }
+        #pg-container.pg-mobile-profile .pg-sticky-download-bar {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto auto auto;
+            gap: 8px;
+            padding: 8px 10px calc(8px + var(--pg-safe-bottom));
+        }
+        #pg-container.pg-mobile-profile .pg-sticky-download-bar .pg-selection-count {
+            min-width: 0; margin-right: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+        }
+        #pg-container.pg-mobile-profile .pg-sticky-status { display: none !important; }
+        #pg-container.pg-coarse-pointer .pg-item:hover { transform: none; box-shadow: none; }
+
     `;
 
     const gridIconSvg = `<svg viewBox="0 0 24 24" width="22" height="22" stroke="white" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>`;
@@ -3827,11 +3931,6 @@
         box.classList.add("visible");
         text.textContent = message;
 
-        const stickyStatus = document.getElementById("pg-sticky-status");
-        if (stickyStatus) {
-            stickyStatus.textContent = message;
-        }
-
         updateMobileUiState();
 
         if (total > 0) {
@@ -3854,17 +3953,9 @@
             text.textContent = message;
             fill.style.width = "100%";
 
-            const stickyStatus = document.getElementById("pg-sticky-status");
-            if (stickyStatus) {
-                stickyStatus.textContent = message;
-            }
 
             setTimeout(() => {
                 box.classList.remove("visible");
-                const currentStickyStatus = document.getElementById("pg-sticky-status");
-                if (currentStickyStatus && currentStickyStatus.textContent === message) {
-                    currentStickyStatus.textContent = "";
-                }
                 updateMobileUiState();
             }, 1600);
 
@@ -3990,7 +4081,7 @@
 
         buttons.forEach(button => {
             button.disabled = disabled || selected === 0;
-            const zipLabel = button.id === "pg-sticky-zip" ? "ZIP" : "ZIP selected";
+            const zipLabel = "ZIP";
             button.textContent = disabled ? "ZIP running…" : (selected > 0 ? `${zipLabel} (${selected})` : zipLabel);
         });
         updateMobileUiState();
@@ -4057,7 +4148,7 @@
         };
 
         try {
-            showToast("scan", `Scanning pages in parallel: 0/${queue.length}`, { current: 0, total: Math.max(queue.length, 1) });
+            setProgress(`Scanning pages: 0/${queue.length} checked · ${state.mediaById.size} media · 0 failed`, 0, Math.max(queue.length, 1));
             const workQueue = queue.map(url => ({ url, pageNumber: getPageNumberFromUrl(url) }));
 
             await runConcurrent(workQueue, config.scanConcurrency, async entry => {
@@ -4084,7 +4175,6 @@
                     completed += 1;
                     const message = `Scanning pages: ${completed}/${queue.length} checked · ${state.mediaById.size + pendingMedia.length} candidates · ${failed} failed`;
                     setProgress(message, completed, queue.length);
-                    showToast("scan", message, { current: completed, total: queue.length });
                 }
             });
 
@@ -4376,6 +4466,10 @@
 
         const container = document.createElement("div");
         container.id = "pg-container";
+        refreshDeviceProfile();
+        container.classList.toggle("pg-mobile-profile", isMobileProfile);
+        container.classList.toggle("pg-coarse-pointer", isCoarsePointer);
+        container.dataset.deviceProfile = isMobileProfile ? "mobile" : "desktop";
 
         container.innerHTML = `
             <div class="pg-header">
@@ -4395,7 +4489,7 @@
                 </div>
                 <div class="pg-filters pg-desktop-actions">
                     <button class="pg-action-btn" id="pg-scan-all">Scan all</button>
-                    <button class="pg-action-btn" id="pg-cancel-scan" style="display:none;">Cancel</button>
+                    <button class="pg-action-btn" id="pg-cancel-scan" style="display:none;">Stop scan</button>
                     <button class="pg-action-btn" id="pg-export-urls">URLs</button>
                     <button class="pg-action-btn pg-primary-action" id="pg-download-zip">ZIP selected</button>
                     <button class="pg-action-btn" id="pg-zip-pause" style="display:none;">Pause</button>
@@ -4493,7 +4587,7 @@
                         <div class="pg-sheet-section-title">Main actions</div>
                         <div class="pg-sheet-grid">
                             <button class="pg-sheet-btn" id="pg-more-scan-all" type="button">Scan all pages</button>
-                            <button class="pg-sheet-btn" id="pg-more-cancel-scan" type="button" style="display:none;">Cancel scan</button>
+                            <button class="pg-sheet-btn" id="pg-more-cancel-scan" type="button" style="display:none;">Stop scan</button>
                             <button class="pg-sheet-btn" id="pg-more-download-zip" type="button">Download ZIP</button>
                             <button class="pg-sheet-btn" id="pg-more-export-urls" type="button">Export URLs</button>
                             <button class="pg-sheet-btn" id="pg-more-zip-pause" type="button" style="display:none;">Pause ZIP</button>
@@ -4714,11 +4808,7 @@
         container.querySelector("#pg-more-debug-toggle").addEventListener("click", () => { closeGalleryMoreSheet(); toggleDebugPanel(); });
         container.querySelector("#pg-more-retry-failed").addEventListener("click", retryFailedZipItems);
         container.querySelector("#pg-more-selection-mode").addEventListener("click", () => {
-            if (getSelectedMedia().length > 0) {
-                deselectAllMedia();
-            } else {
-                setSelectionMode(!state.selectionMode);
-            }
+            setSelectionMode(!state.selectionMode);
         });
         container.querySelector("#pg-more-select-all").addEventListener("click", selectAllMedia);
         container.querySelector("#pg-more-select-none").addEventListener("click", deselectAllMedia);
@@ -4808,12 +4898,12 @@
         const selected = getSelectedMedia().length;
         const total = state.mediaById.size;
 
-        container?.classList.toggle("pg-selection-mode", state.selectionMode || selected > 0);
+        container?.classList.toggle("pg-selection-mode", state.selectionMode);
         container?.classList.toggle("pg-has-selection", selected > 0);
         container?.classList.toggle("pg-has-job", state.zipRunning || state.scanRunning);
 
         if (selectionModeButton) {
-            selectionModeButton.textContent = selected > 0 ? "Clear selection" : (state.selectionMode ? "Exit selection mode" : "Selection mode");
+            selectionModeButton.textContent = state.selectionMode ? "Done editing selection" : "Edit selection";
         }
 
         chromeButtons.forEach(button => {
@@ -4829,9 +4919,12 @@
             if (state.zipRunning) {
                 mobileStatus.textContent = state.zipPaused ? "ZIP paused." : "ZIP running in background.";
             } else if (state.scanRunning) {
-                mobileStatus.textContent = "Scanning thread pages…";
-            } else if (selected > 0) {
+                // Detailed live scan state belongs exclusively to #pg-progress.
+                mobileStatus.textContent = "";
+            } else if (state.selectionMode && selected > 0) {
                 mobileStatus.textContent = `${selected} selected. Use ZIP, URLs, or More.`;
+            } else if (selected > 0) {
+                mobileStatus.textContent = `${selected} included in ZIP · long-press to edit selection.`;
             } else if (total > 0) {
                 mobileStatus.textContent = `${total} media found. Tap to open. Long-press to select.`;
             } else {
@@ -5267,7 +5360,7 @@
 
         [zipButton, stickyZipButton, moreZipButton].filter(Boolean).forEach(button => {
             if (!state.zipRunning) {
-                const zipLabel = button.id === "pg-sticky-zip" ? "ZIP" : "ZIP selected";
+                const zipLabel = "ZIP";
                 button.textContent = selected > 0 ? `${zipLabel} (${selected})` : zipLabel;
                 button.disabled = selected === 0;
             }
@@ -5524,7 +5617,7 @@
     }
 
     function isMobileLayout() {
-        return isAndroid || isIOS || window.innerWidth <= 700;
+        return refreshDeviceProfile();
     }
 
     function getGalleryCardWidth() {
