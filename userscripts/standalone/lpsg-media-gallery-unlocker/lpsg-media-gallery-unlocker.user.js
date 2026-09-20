@@ -5,7 +5,7 @@
 // @supportURL   https://github.com/Mikeyphw/scriptexts/issues
 // @updateURL    https://raw.githubusercontent.com/Mikeyphw/scriptexts/main/userscripts/standalone/lpsg-media-gallery-unlocker/lpsg-media-gallery-unlocker.meta.js
 // @downloadURL  https://raw.githubusercontent.com/Mikeyphw/scriptexts/main/userscripts/standalone/lpsg-media-gallery-unlocker/lpsg-media-gallery-unlocker.user.js
-// @version      6.7.3-optimized
+// @version      6.7.4-optimized
 // @description  Optimized LPSG media gallery with complete post-scoped discovery, streaming ZIPs, page-title archive names, mobile-safe defaults, smart source fallback, and lightweight optional resume caching.
 // @author       CurlyWurly
 // @match        https://www.lpsg.com/*
@@ -70,7 +70,8 @@
         autoDeleteAfterSuccessfulZip: true,
         maxBlobCacheBytes: isMobileProfile ? 256 * 1024 * 1024 : 750 * 1024 * 1024,
         maxSingleBlobBytes: isMobileProfile ? 96 * 1024 * 1024 : 250 * 1024 * 1024,
-        maxZipBlobBytes: isMobileProfile ? 96 * 1024 * 1024 : 512 * 1024 * 1024,
+        maxZipBlobBytes: isMobileProfile ? 64 * 1024 * 1024 : 512 * 1024 * 1024,
+        zipPartSizePresetsMiB: [32, 64, 96, 256, 512],
         staleCacheMs: isMobileProfile ? 4 * 60 * 60 * 1000 : 24 * 60 * 60 * 1000,
         metadataCacheTtlMs: 7 * 24 * 60 * 60 * 1000,
         cacheStatsDebounceMs: isMobileProfile ? 5000 : 2500,
@@ -126,6 +127,8 @@
         currentZipJobId: "",
         blockedZipSourceHosts: new Map(),
         zipSourceScores: new Map(),
+        zipPartSizeMiB: Number(localStorage.getItem("pg_zip_part_size_mib")) || 0,
+        zipGrouping: localStorage.getItem("pg_zip_grouping") === "page" ? "page" : "selection",
         cacheStatsTimer: null,
         galleryCardSize: localStorage.getItem("pg_gallery_card_size") || config.defaultGalleryCardSize,
         selectionMode: false,
@@ -4894,6 +4897,22 @@
                                     <option value="selected">Selected first</option>
                                 </select>
                             </label>
+                            <label class="pg-sheet-setting">ZIP part size
+                                <select id="pg-more-zip-part-size">
+                                    <option value="0">Auto</option>
+                                    <option value="32">32 MiB</option>
+                                    <option value="64">64 MiB</option>
+                                    <option value="96">96 MiB</option>
+                                    <option value="256">256 MiB</option>
+                                    <option value="512">512 MiB</option>
+                                </select>
+                            </label>
+                            <label class="pg-sheet-setting">ZIP grouping
+                                <select id="pg-more-zip-grouping">
+                                    <option value="selection">Selected media</option>
+                                    <option value="page">One archive per page</option>
+                                </select>
+                            </label>
                             <label class="pg-sheet-setting">Resume cache (slower)
                                 <input type="checkbox" id="pg-more-keep-temp-cache">
                             </label>
@@ -5077,6 +5096,8 @@
         container.querySelector("#pg-more-clear-temp-cache").addEventListener("click", clearTempCacheFromUi);
         container.querySelector("#pg-more-clear-all-cache").addEventListener("click", clearAllCacheFromUi);
         container.querySelector("#pg-more-keep-temp-cache").addEventListener("change", event => setKeepTempCache(event.currentTarget.checked));
+        container.querySelector("#pg-more-zip-part-size").addEventListener("change", event => setZipPartSize(event.currentTarget.value));
+        container.querySelector("#pg-more-zip-grouping").addEventListener("change", event => setZipGrouping(event.currentTarget.value));
         container.querySelector("#pg-more-card-size").addEventListener("change", event => setGalleryCardSize(event.currentTarget.value));
         container.querySelector("#pg-more-sort-order").addEventListener("change", event => setGallerySort(event.currentTarget.value));
         container.querySelector("#pg-shortcut-close").addEventListener("click", hideShortcutHelp);
@@ -5095,6 +5116,10 @@
         document.querySelectorAll("#pg-sort-order, #pg-more-sort-order").forEach(sortSelector => {
             sortSelector.value = getValidGallerySort(state.gallerySort);
         });
+        const zipPartSizeSelector = document.getElementById("pg-more-zip-part-size");
+        if (zipPartSizeSelector) zipPartSizeSelector.value = String(state.zipPartSizeMiB || 0);
+        const zipGroupingSelector = document.getElementById("pg-more-zip-grouping");
+        if (zipGroupingSelector) zipGroupingSelector.value = state.zipGrouping;
         if (getValidGallerySort(state.gallerySort).startsWith("duration")) {
             void hydrateVideoDurations("initial-sort");
         }
@@ -5127,6 +5152,65 @@
     }
 
 
+
+    function getZipPartLimitBytes() {
+        const requestedMiB = Number(state.zipPartSizeMiB) || 0;
+        const allowed = new Set(config.zipPartSizePresetsMiB);
+        if (allowed.has(requestedMiB)) return requestedMiB * 1024 * 1024;
+        return config.maxZipBlobBytes;
+    }
+
+    function setZipPartSize(value) {
+        const parsed = Number(value) || 0;
+        state.zipPartSizeMiB = config.zipPartSizePresetsMiB.includes(parsed) ? parsed : 0;
+        localStorage.setItem("pg_zip_part_size_mib", String(state.zipPartSizeMiB));
+    }
+
+    function setZipGrouping(value) {
+        state.zipGrouping = value === "page" ? "page" : "selection";
+        localStorage.setItem("pg_zip_grouping", state.zipGrouping);
+    }
+
+    function getZipEstimate(items) {
+        const known = items.map(item => Number(item.size) || 0).filter(size => size > 0);
+        const knownBytes = known.reduce((sum, size) => sum + size, 0);
+        const unknownCount = Math.max(0, items.length - known.length);
+        return { knownBytes, knownCount: known.length, unknownCount };
+    }
+
+    function buildArchiveManifest({ runId, jobId, partNumber, archiveBaseName, grouping, pageNumber, entries, failures }) {
+        return {
+            schemaVersion: 1,
+            generator: "LPSG Media Gallery Unlocker",
+            generatedAt: new Date().toISOString(),
+            threadUrl: window.location.href,
+            archiveBaseName,
+            grouping,
+            pageNumber: pageNumber || null,
+            partNumber,
+            runId,
+            jobId,
+            files: entries.map(entry => ({
+                fileName: entry.fileName,
+                type: entry.item.type,
+                pageNumber: entry.item.pageNumber || null,
+                postId: entry.item.postId || null,
+                postUrl: entry.item.postUrl || null,
+                sourceUrl: entry.url || entry.item.src || null,
+                originalUrl: entry.item.originalSrc || entry.item.src || null,
+                size: entry.size || null,
+            })),
+            failedEntries: failures.map(entry => ({
+                fileName: entry.fileName,
+                type: entry.item?.type || null,
+                pageNumber: entry.item?.pageNumber || null,
+                postId: entry.item?.postId || null,
+                postUrl: entry.item?.postUrl || null,
+                sources: entry.sources || [],
+                error: entry.error || "Unknown error",
+            })),
+        };
+    }
 
     function setKeepTempCache(value, persist = true) {
         state.keepTempCacheAfterZip = Boolean(value);
@@ -7119,6 +7203,9 @@
         }
 
         const items = getSelectedMedia();
+        if (state.zipGrouping === "page") {
+            items.sort((a, b) => (Number(a.pageNumber) || 1) - (Number(b.pageNumber) || 1) || (Number(a.orderIndex) || 0) - (Number(b.orderIndex) || 0));
+        }
 
         if (items.length === 0) {
             alert("Select at least one media item to zip.");
@@ -7134,7 +7221,12 @@
         state.debugRunId = runId;
         setDebugPanelVisible(true);
 
-        showToast("zip", `ZIP started in background: 0/${items.length}`, {
+        const estimate = getZipEstimate(items);
+        const estimateLabel = estimate.knownBytes > 0
+            ? ` · known size ~${formatBytes(estimate.knownBytes)}${estimate.unknownCount ? ` + ${estimate.unknownCount} unknown` : ""}`
+            : ` · size unknown`;
+        const groupingLabel = state.zipGrouping === "page" ? " · grouped by page" : "";
+        showToast("zip", `ZIP started: ${items.length} item(s)${estimateLabel}${groupingLabel}`, {
             current: 0,
             total: items.length,
         });
@@ -7230,11 +7322,13 @@
         return sanitizeArchiveBaseName(pageName || "lpsg_gallery_media");
     }
 
-    function triggerZipPartDownload(blob, partNumber, isOnlyPart, runId, jobId, archiveBaseName) {
+    function triggerZipPartDownload(blob, partNumber, isOnlyPart, runId, jobId, archiveBaseName, pageNumber = null, pagePartIndex = 1) {
         const zipUrl = URL.createObjectURL(blob);
         const baseName = sanitizeArchiveBaseName(archiveBaseName || getPageArchiveBaseName());
-        const suffix = isOnlyPart ? "" : ` - part ${String(partNumber).padStart(2, "0")}`;
-        const fileName = `${baseName}${suffix}.zip`;
+        const pageSuffix = pageNumber ? ` - page ${String(pageNumber).padStart(2, "0")}` : "";
+        const displayPart = pageNumber ? pagePartIndex : partNumber;
+        const partSuffix = isOnlyPart && displayPart === 1 ? "" : ` - part ${String(displayPart).padStart(2, "0")}`;
+        const fileName = `${baseName}${pageSuffix}${partSuffix}.zip`;
         const link = document.createElement("a");
         link.href = zipUrl;
         link.download = fileName;
@@ -7265,10 +7359,16 @@
         let partBytes = 0;
         let partFiles = 0;
         let writer = null;
+        let currentPartPage = null;
+        let currentPagePartIndex = 0;
+        let partManifestEntries = [];
+        const emittedFailures = new Set();
         const failedEntries = [];
         const downloadActions = [];
         const jobId = `zip-${Date.now()}-${Math.random().toString(36).slice(2)}`;
         const archiveBaseName = getPageArchiveBaseName();
+        const partLimitBytes = getZipPartLimitBytes();
+        const grouping = state.zipGrouping;
         const startedAt = performance.now();
 
         state.zipRunning = true;
@@ -7291,7 +7391,8 @@
             videoItems: items.filter(item => item.type === "video").length,
             imageItems: items.filter(item => item.type === "image").length,
             fetchConcurrency: config.zipConcurrency,
-            partLimitBytes: config.maxZipBlobBytes,
+            partLimitBytes,
+            grouping,
             resumeCacheEnabled: state.keepTempCacheAfterZip,
             page: window.location.href,
             archiveBaseName,
@@ -7299,10 +7400,14 @@
             mobileProfile: isMobileProfile,
         });
 
-        const openPart = () => {
+        const openPart = (pageNumber = null) => {
             partNumber += 1;
             partBytes = 0;
             partFiles = 0;
+            const nextPage = grouping === "page" ? (Number(pageNumber) || 1) : null;
+            currentPagePartIndex = nextPage && nextPage === currentPartPage ? currentPagePartIndex + 1 : 1;
+            currentPartPage = nextPage;
+            partManifestEntries = [];
             writer = new zip.ZipWriter(
                 new zip.BlobWriter("application/zip"),
                 { level: 0, bufferedWrite: false }
@@ -7316,8 +7421,21 @@
 
             updateZipProgressUi(`Finalizing ZIP part ${partNumber}…`, archivedFiles, items.length, failed > 0 ? "warn" : "info", true);
             const closeStartedAt = performance.now();
+            const partFailures = failedEntries.filter(entry => {
+                if (emittedFailures.has(entry)) return false;
+                if (grouping !== "page") return true;
+                return (Number(entry.item?.pageNumber) || 1) === currentPartPage;
+            });
+            partFailures.forEach(entry => emittedFailures.add(entry));
+            const manifest = buildArchiveManifest({
+                runId, jobId, partNumber, archiveBaseName, grouping,
+                pageNumber: currentPartPage,
+                entries: partManifestEntries,
+                failures: partFailures,
+            });
+            await writer.add("manifest.json", new zip.TextReader(JSON.stringify(manifest, null, 2)), { level: 0 });
             const zipBlob = await writer.close();
-            const action = triggerZipPartDownload(zipBlob, partNumber, isOnlyPart, runId, jobId, archiveBaseName);
+            const action = triggerZipPartDownload(zipBlob, partNumber, isOnlyPart, runId, jobId, archiveBaseName, currentPartPage, currentPagePartIndex);
             downloadActions.push(action);
             addDebugLog("ok", "ZIP part finalized.", {
                 runId,
@@ -7331,6 +7449,7 @@
             writer = null;
             partBytes = 0;
             partFiles = 0;
+            partManifestEntries = [];
         };
 
         try {
@@ -7413,13 +7532,17 @@
                     assertNotAborted(state.zipAbortController?.signal);
                     stagedBytes += file.blob.size;
 
+                    const filePage = Number(file.item.pageNumber) || 1;
                     if (!writer) {
-                        openPart();
+                        openPart(filePage);
                     }
 
-                    if (partFiles > 0 && partBytes + file.blob.size > config.maxZipBlobBytes) {
+                    if (grouping === "page" && partFiles > 0 && currentPartPage !== filePage) {
+                        await closePart(true);
+                        openPart(filePage);
+                    } else if (partFiles > 0 && partBytes + file.blob.size > partLimitBytes) {
                         await closePart(false);
-                        openPart();
+                        openPart(filePage);
                     }
 
                     const addStartedAt = performance.now();
@@ -7437,6 +7560,7 @@
                     });
                     partBytes += file.blob.size;
                     partFiles += 1;
+                    partManifestEntries.push({ item: file.item, fileName: file.fileName, url: file.url, size: file.blob.size });
                     archivedBytes += file.blob.size;
                     archivedFiles += 1;
 
@@ -7475,7 +7599,7 @@
                 throw new Error("No files could be fetched for ZIP.");
             }
 
-            await closePart(partNumber === 1);
+            await closePart(grouping === "page" || partNumber === 1);
             const elapsedMs = Math.round(performance.now() - startedAt);
             clearProgress(`ZIP complete. ${archivedFiles} file(s) added, ${failed} failed.`);
             showToast("zip", `ZIP complete: ${archivedFiles}/${items.length} added · ${failed} failed · ${partNumber} part(s).`, {
@@ -7501,6 +7625,7 @@
                 void clearJobTempCache(jobId);
             }
         } catch (error) {
+            state.lastFailedZipEntries = failedEntries;
             try {
                 if (writer) {
                     await writer.close();

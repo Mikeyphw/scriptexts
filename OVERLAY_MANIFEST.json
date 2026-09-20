@@ -1,57 +1,39 @@
 {
   "schema_version": 2,
   "type": "overlay",
-  "name": "LPSG incremental resilient scanner \u2014 overlay 3 of 6",
-  "description": "Adds resumable per-page scan caching, incremental page reuse/change detection, bounded retry/backoff with Retry-After, cancellation-safe waits, cached fallback, and explicit page failure/retry state.",
-  "repository": {
-    "name": "scriptexts",
-    "branch": "main"
-  },
-  "workspace": {
-    "name": "scriptexts",
-    "root": "."
-  },
+  "name": "LPSG download archive v2 — overlay 4 of 6",
+  "description": "Adds mobile-aware configurable ZIP splitting, preflight size estimates, page-grouped archives, per-archive manifest.json metadata, and stronger cancellation/failure preservation while retaining existing direct and URL download workflows.",
+  "repository": {"name": "scriptexts", "branch": "main"},
+  "workspace": {"name": "scriptexts", "root": "."},
   "target": "root",
   "inventory": {
     "format": 1,
-    "entries": [
-      {
-        "path": "userscripts/standalone/lpsg-media-gallery-unlocker/lpsg-media-gallery-unlocker.user.js",
-        "action": "modify",
-        "sha256": "c23d4354be927312a2650b645cdc129eb73bea144e94d1d66b183edfd88dd4fd",
-        "size": 285760,
-        "source_sha256": "434595a8de061fb5fac09e84bdd6d7f7cdd0fc1ebe85d5fbcb5b057441445026"
-      }
-    ]
+    "entries": [{
+      "path": "userscripts/standalone/lpsg-media-gallery-unlocker/lpsg-media-gallery-unlocker.user.js",
+      "action": "modify",
+      "sha256": "0b04559e99473d0f1f5260a44fa8db2944cb60f265f3b232c64d20a92d8a1f2d",
+      "size": 292814,
+      "source_sha256": "c23d4354be927312a2650b645cdc129eb73bea144e94d1d66b183edfd88dd4fd"
+    }]
   },
   "apply": {
     "atomic": true,
     "conflict_policy": "overwrite",
     "path_policy": "repository-relative",
     "requires_clean_worktree": false,
-    "commit": {
-      "enabled": true,
-      "strategy": "single",
-      "message": "feat(lpsg): make thread scanning incremental and resilient"
-    }
+    "commit": {"enabled": true, "strategy": "single", "message": "feat(lpsg): harden ZIP archive pipeline"}
   },
-  "validation": {
-    "required": false,
-    "restore": false,
-    "build": false,
-    "test": false,
-    "rollback_on_failure": true
-  },
+  "validation": {"required": false, "restore": false, "build": false, "test": false, "rollback_on_failure": true},
   "notes": [
-    "Roadmap overlay 3 of 6. Requires overlay 2 v1 as its exact source state.",
-    "Successful page scans are persisted independently, so a cancelled/interrupted scan resumes by reusing completed pages.",
-    "Fresh stable pages are reused without network fetches; the current page and newest two pages are revalidated, while stale pages are periodically revalidated.",
-    "Revalidated pages use a lightweight signature to detect unchanged versus changed content; changed/new pages are rescanned and recached.",
-    "Thread fetches retry transient network errors and HTTP 408/425/429/5xx responses with bounded exponential backoff and Retry-After support.",
-    "Retry waits and requests honor the scan AbortSignal; cancellation remains immediate and cached progress survives.",
-    "Pages that still fail after retries retain explicit failure state/page numbers and fall back to cached media when available.",
-    "Audit pass 1 fixed stale-cache revalidation/change comparison and stabilized pre-scan page signatures.",
-    "Audit pass 2 fixed failed revalidation dropping previously cached media and surfaced failed page numbers in completion status.",
-    "Audit pass 3 found no remaining promised-scope gaps; node --check and scanner contract assertions passed."
+    "Roadmap overlay 4 of 6. Requires overlay 3 v1 as its exact source state.",
+    "Auto ZIP part size is mobile-aware (64 MiB mobile, 512 MiB desktop) and can be overridden with 32/64/96/256/512 MiB presets.",
+    "ZIP start status reports selected count and known estimated bytes, explicitly identifying unknown-size items.",
+    "ZIP grouping can archive the full selection or create page-scoped archives; page mode sorts selected media deterministically by page/order.",
+    "Every emitted ZIP contains manifest.json with archive/job metadata, file names, type, page/post attribution, source/original URL, size, and relevant failed entries.",
+    "Existing pause/cancel/retry-failed behavior is retained; cancellation/crash now preserves failures already observed for retry/export.",
+    "Existing URL export and direct-download behavior is untouched.",
+    "Audit pass 1 fixed page-part naming and made failed manifest entries page-relevant without duplication.",
+    "Audit pass 2 fixed deterministic page grouping so arbitrary selection order cannot create duplicate page archive runs.",
+    "Audit pass 3 found no remaining promised-scope gaps; node --check and archive contract assertions passed."
   ]
 }
