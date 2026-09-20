@@ -1,6 +1,10 @@
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
+const articleDetectionPolicy = readFileSync(
+  fileURLToPath(new URL('./article-detection.runtime.js', import.meta.url)),
+  'utf8'
+).trim();
 const cleanupPolicy = readFileSync(
   fileURLToPath(new URL('./article-cleanup.runtime.js', import.meta.url)),
   'utf8'
@@ -15,6 +19,7 @@ const runtimeTemplate = readFileSync(
 ).trim();
 
 export const runtime = `(() => {
+${articleDetectionPolicy}
 ${cleanupPolicy}
 ${feedLayoutPolicy}
 return ${runtimeTemplate};

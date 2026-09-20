@@ -27,7 +27,9 @@ test('Bleeding Cool article DOM evidence independently classifies an article', (
   const evidence = profile.client.articleEvidence;
   const score = evidence.filter(fixtureHas).length;
   assert.ok(score >= profile.client.articleEvidenceMin, `evidence score ${score} is below threshold`);
-  assert.ok(runtime.includes('articleEvidenceScore() >= Math.max(1, profile.articleEvidenceMin || 2)'), 'runtime must consume the evidence threshold');
+  assert.match(runtime, /csmArticleDecision\(\{/);
+  assert.match(runtime, /evidenceScore:\s*articleEvidenceScore\(\)/);
+  assert.match(runtime, /evidenceMin:\s*profile\.articleEvidenceMin \|\| 2/);
 });
 
 test('article fixture protects complete text after an image', () => {

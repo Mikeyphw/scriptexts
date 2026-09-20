@@ -9,7 +9,9 @@
     "profiles:check": "node tools/check-profiles.mjs",
     "seal": "node ../../../tools/content-sites/final-seal.mjs --builder content-site-modernizer",
     "release-pack": "node ../../../tools/content-sites/release-pack.mjs --builder content-site-modernizer",
-    "release-pack:check": "node ../../../tools/content-sites/release-pack.mjs --builder content-site-modernizer --check"
+    "release-pack:check": "node ../../../tools/content-sites/release-pack.mjs --builder content-site-modernizer --check",
+    "seal:bleedingcool": "node tools/bleeding-cool-release-seal.mjs",
+    "seal:bleedingcool:json": "node tools/bleeding-cool-release-seal.mjs --json"
   },
   "engines": {
     "node": ">=20"

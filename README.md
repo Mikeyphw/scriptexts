@@ -46,6 +46,16 @@ Install `.user.js` files. The companion `.meta.js` files are update beacons used
 ## Content-site modernizers
 
 AIPT Comics Modern Reader, MenOfPorn Modern UI, Putinho Modern UI, Gayteam Modern UI, JustTheGays Modern UI, and STR8UPGAYPORN Modern UI are generated from shared runtime profiles by the `userscripts/builders/content-site-modernizer` builder alongside Bleeding Cool. Installable outputs live under `userscripts/builders/content-site-modernizer/dist/`, including `aipt-comics-modern-reader.user.js`, `putinho-modern-ui.user.js`, `gayteam-modern-ui.user.js`, `justthegays-modern-ui.user.js`, and `str8upgayporn-modern-ui.user.js`. The content-site scripts share one PageTual-compatible runtime: they keep PageTual navigation visible, reprocess next-page cards after PageTual appends them, and use the same drawer/feed-state/load-more behavior across all generated sites.
+### Bleeding Cool release seal
+
+After Bleeding Cool reader changes, run the deterministic browser-free release gate:
+
+```bash
+npm run content-sites:bleedingcool:seal
+```
+
+This is stricter than an overlay apply: it rechecks generated output, syntax, fixtures, regression contracts, and feature preservation.
+
 ## Optional Playwright smoke tests
 
 Browser smoke tests are repo-wide, not builder-local. Create one local Python environment when you want runtime proof:

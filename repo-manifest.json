@@ -34,7 +34,7 @@
       ],
       "versions": {
         "aipt-comics-modern-reader": "0.1.4",
-        "bleeding-cool-modern-reader": "0.1.6",
+        "bleeding-cool-modern-reader": "0.1.7",
         "menofporn-modern-ui": "1.5.2",
         "putinho-modern-ui": "1.1.2",
         "gayteam-modern-ui": "1.0.5",
@@ -143,6 +143,13 @@
           "RELEASE_INDEX.md"
         ],
         "policy": "dependency-free ZIP packer for generated content-site userscripts; check mode is browser-free and does not write output",
+        "normalValidation": "browser-free"
+      },
+      "bleeding_cool_release_seal": {
+        "script": "npm run content-sites:bleedingcool:seal",
+        "json_script": "npm run content-sites:bleedingcool:seal:json",
+        "builder_alias": "npm run seal:bleedingcool",
+        "policy": "browser-free aggregate regression gate for Bleeding Cool article completeness, cleanup safety, media association, mobile feed geometry, fixture scale, generated output freshness, syntax, and feature preservation",
         "normalValidation": "browser-free"
       }
     },

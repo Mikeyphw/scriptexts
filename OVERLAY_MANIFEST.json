@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "type": "overlay",
-  "name": "Bleeding Cool feed mobile convergence OV03",
-  "description": "Normalizes Bleeding Cool feed cards into explicit featured/standard variants, fills feed thumbnails without cropping article media, compacts mobile cards/navigation, rebuilds breaking news overflow accessibly, adds wide/coarse-pointer mobile parity, and adds regression coverage.",
+  "name": "Bleeding Cool regression release seal OV04",
+  "description": "Adds a dedicated browser-free Bleeding Cool release seal with executable article-classification policy tests, long-article no-truncation regression coverage, safe-area/navigation checks, cleanup/media association coverage, large-feed/mobile contracts, feature-preservation checks, deterministic generated-output verification, and machine-readable seal evidence.",
   "repository": {
     "name": "scriptexts",
     "remote": "git@github.com:Mikeyphw/scriptexts.git",
@@ -17,126 +17,166 @@
     "format": 1,
     "entries": [
       {
-        "path": ".devtool-artifact/validate-bleedingcool-ov03.sh",
+        "path": ".devtool-artifact/validate-bleedingcool-ov04.sh",
         "action": "add",
-        "sha256": "fb3b5ac9560b405604d5abca7916e0f0f93e3096c5239398ad4f8b54c31bdd45",
-        "size": 552
+        "sha256": "320884f3cce25f56079743d31e1fbed6c90425fbec239b2481cdcab744c23dc7",
+        "size": 338
+      },
+      {
+        "path": "README.md",
+        "action": "modify",
+        "sha256": "76839c84c7a8789c76ed34e3f8de44e352abbffad607bd3e1cb98d26df0bdbb5",
+        "size": 12871,
+        "source_sha256": "74038212f95b17904286b4a64e431774a4200c6747cb28cffadeea1ed5239795"
+      },
+      {
+        "path": "package.json",
+        "action": "modify",
+        "sha256": "d5bf7fc7a3a408eb3260bab606513d7020d4d7410fb6cbc19ae495dd5675d2dd",
+        "size": 7760,
+        "source_sha256": "214e29e1c6478f1ed80e20d7bbb09d98aa62c23cf042a2f4a3b07e40fa500d17"
       },
       {
         "path": "repo-manifest.json",
         "action": "modify",
-        "sha256": "2d8265ec45486c992b9e100ee9fa704d58e4c86106a952fbe62a485f54ed032f",
-        "size": 21808,
-        "source_sha256": "da852660178bc7c9e5ebc08d605058e569ee6a5eb5079fe5fa48f5c7e650b045"
+        "sha256": "e5845c93b7255c2dfea2aa635f98e0a7bb1251907868325c0575d586d15ba439",
+        "size": 22317,
+        "source_sha256": "2d8265ec45486c992b9e100ee9fa704d58e4c86106a952fbe62a485f54ed032f"
+      },
+      {
+        "path": "userscripts/builders/content-site-modernizer/README.md",
+        "action": "modify",
+        "sha256": "611077fa1bdab685c6b7cd881d69eb2c9dfd446fdf4ef97f7b2e7596c7d2853f",
+        "size": 12592,
+        "source_sha256": "67826390d110db5693545e77b6cb77ac23a769f01eddfdd9521192d489bffd16"
       },
       {
         "path": "userscripts/builders/content-site-modernizer/dist/aipt-comics-modern-reader.user.js",
         "action": "modify",
-        "sha256": "5c09c0dc9c5f41201360d571978eeb39ca0cb8998eb5581787e2191f183fa668",
-        "size": 106430,
-        "source_sha256": "f193a899196681d3a77b9562c9587c0915d2ff56ad459b170c80d8423d7a984f"
+        "sha256": "adc9cc073caca5afef62a1beda6559065e1460940afa03888931f7827d06f2a0",
+        "size": 106853,
+        "source_sha256": "5c09c0dc9c5f41201360d571978eeb39ca0cb8998eb5581787e2191f183fa668"
       },
       {
         "path": "userscripts/builders/content-site-modernizer/dist/bleeding-cool-modern-reader.meta.js",
         "action": "modify",
-        "sha256": "4e7a1b74cb6354e6924ab175ceff8d5b2a09547936081f62131e630bf13d6ae5",
+        "sha256": "2ce0194c9b9dc38749a39031492da18da9ef9b7c1ff6cba28da889e2679ab509",
         "size": 1090,
-        "source_sha256": "3c347863c6ff309de0920294a0c0b261eb66d1372227763287144b92e6ee8623"
+        "source_sha256": "4e7a1b74cb6354e6924ab175ceff8d5b2a09547936081f62131e630bf13d6ae5"
       },
       {
         "path": "userscripts/builders/content-site-modernizer/dist/bleeding-cool-modern-reader.user.js",
         "action": "modify",
-        "sha256": "6291151fede50cbb5b386312b90c6b3e5b04f13bc3da663b79fc1c74fa05c38d",
-        "size": 109614,
-        "source_sha256": "6716fa29cb2274c7bb35a7dced9f876e37e9bce081fe0f4074a08c3c688367e2"
+        "sha256": "07df75ec7e204d5797127e18fffa1c12a91c61db81fe79d2ff3863a224d1c5a4",
+        "size": 110037,
+        "source_sha256": "6291151fede50cbb5b386312b90c6b3e5b04f13bc3da663b79fc1c74fa05c38d"
       },
       {
         "path": "userscripts/builders/content-site-modernizer/dist/gayteam-modern-ui.user.js",
         "action": "modify",
-        "sha256": "b79afbc6739ec4c5abbb12aa494c1b46e90ad8555e2122808452d5a78934821c",
-        "size": 105955,
-        "source_sha256": "a7107c0971f008d169207ba19c02bd923fd4c5ed54296c9b3828b8fc906bc48a"
+        "sha256": "876b41a1856bf703142a1e6a5b527f27caca25898cdf7486cc88d3d8848c1ca8",
+        "size": 106378,
+        "source_sha256": "b79afbc6739ec4c5abbb12aa494c1b46e90ad8555e2122808452d5a78934821c"
       },
       {
         "path": "userscripts/builders/content-site-modernizer/dist/justthegays-modern-ui.user.js",
         "action": "modify",
-        "sha256": "16cb3e95b9eccf4ec32b338e604797ddd60647db887e98cae62980e03f8b682d",
-        "size": 105581,
-        "source_sha256": "113295246c90da77e17b35b6dea9e4eee4cab625d5f3f4fac03b152162e57d44"
+        "sha256": "d16d02a7b15cff4183f84cffb211f881dbd8696313366d2a025e180b5271572a",
+        "size": 106004,
+        "source_sha256": "16cb3e95b9eccf4ec32b338e604797ddd60647db887e98cae62980e03f8b682d"
       },
       {
         "path": "userscripts/builders/content-site-modernizer/dist/menofporn-modern-ui.user.js",
         "action": "modify",
-        "sha256": "53b2f9431d025773c900eae6a17411fb23ac6769158ea3c561f7b60febd9840c",
-        "size": 106432,
-        "source_sha256": "1cb06c0049d1ef5c6206130a0e9db55131d443462dcef5e543c9a7fea8126f65"
+        "sha256": "8730bd54ed269d05ead688bd975cc3c65a30f2d0a089d5591ff4e33805d4f2b8",
+        "size": 106855,
+        "source_sha256": "53b2f9431d025773c900eae6a17411fb23ac6769158ea3c561f7b60febd9840c"
       },
       {
         "path": "userscripts/builders/content-site-modernizer/dist/putinho-modern-ui.user.js",
         "action": "modify",
-        "sha256": "ab50fd46d9a5727a9df2b84f715181882897a78e5e7d1ea6d1eec80cb067e0a8",
-        "size": 106512,
-        "source_sha256": "999ed9e766ea8a9d56913806de032f362a29581478b122f7d0c62b360dc9ac62"
+        "sha256": "9792074e4c66fd59e2c8d070f69e307813a540e85599aacf902b578fb74603ca",
+        "size": 106935,
+        "source_sha256": "ab50fd46d9a5727a9df2b84f715181882897a78e5e7d1ea6d1eec80cb067e0a8"
       },
       {
         "path": "userscripts/builders/content-site-modernizer/dist/str8upgayporn-modern-ui.user.js",
         "action": "modify",
-        "sha256": "0617f19c96424fa1576f46d69e25121ea157184c4dd58361399e57958e617bf6",
-        "size": 106239,
-        "source_sha256": "46b2911ca72a560203ba8326ce8ef946d565d338dfc2edcab3ae27586aba56de"
+        "sha256": "91904574687f32679b00ef624b6ebb06efb5d13698a9be24c0924006bcf09d39",
+        "size": 106662,
+        "source_sha256": "0617f19c96424fa1576f46d69e25121ea157184c4dd58361399e57958e617bf6"
       },
       {
-        "path": "userscripts/builders/content-site-modernizer/src/core/feed-layout.runtime.js",
+        "path": "userscripts/builders/content-site-modernizer/package.json",
+        "action": "modify",
+        "sha256": "e3b23d3b05494917c9b7d3f2cfdd70533752d64b82085d11b9a686397182b1fd",
+        "size": 884,
+        "source_sha256": "4a9ca0724eaf5bb09612d7dbc0d98f3ece56dbdbc279c04fc52392b4240b16b5"
+      },
+      {
+        "path": "userscripts/builders/content-site-modernizer/src/core/article-detection.runtime.js",
         "action": "add",
-        "sha256": "17e6115ba1d6f918bb36b83e434cd8c448f9c9bc2395cfb04d5bb79a151afca5",
-        "size": 1221
+        "sha256": "3b9afbbcf41267c0bda31571839921532e012a4184631452dd1abf6ec04ffc43",
+        "size": 365
       },
       {
         "path": "userscripts/builders/content-site-modernizer/src/core/runtime.mjs",
         "action": "modify",
-        "sha256": "321735618771fd5be437cf6c2c462ce20908f3160ef02f38f15139aa65e9e394",
-        "size": 572,
-        "source_sha256": "9857e1c0e16e38b2a5de21a4af68b30c1364b5d1518da10d6853afdf51b9dfce"
+        "sha256": "51a2cbbc4f95c6b6bb06fb69f7c31680cb09d68945f151f1cd89e631d7a4b0c3",
+        "size": 739,
+        "source_sha256": "321735618771fd5be437cf6c2c462ce20908f3160ef02f38f15139aa65e9e394"
       },
       {
         "path": "userscripts/builders/content-site-modernizer/src/core/runtime.template.js",
         "action": "modify",
-        "sha256": "4639eb1cd2b31103c265a7cb3c4287c2ef3cd5e557953b89824da296dc2d043a",
-        "size": 57131,
-        "source_sha256": "087718eaf88b77b7d4f4e5e7bee47a271b20621e65aafa4a08a47bc013a6ce6c"
-      },
-      {
-        "path": "userscripts/builders/content-site-modernizer/src/core/styles.css",
-        "action": "modify",
-        "sha256": "549582e26736f791d8d5a2da5c7a98a69915830a7fc58130fc3dd8cb6433e3d5",
-        "size": 38357,
-        "source_sha256": "63df84e76a79cc639beda2cbba57c19095b7029d3e44e1d7c14a0cd0d62ec234"
+        "sha256": "39ed19374d68f883d73ba94801e3138b471d4e520769a3976a10a2bb720ed17d",
+        "size": 57189,
+        "source_sha256": "4639eb1cd2b31103c265a7cb3c4287c2ef3cd5e557953b89824da296dc2d043a"
       },
       {
         "path": "userscripts/builders/content-site-modernizer/src/profiles/bleeding-cool.mjs",
         "action": "modify",
-        "sha256": "483a8105db019e250b91002888ad74c98c7da69ff38beec9882878bcf98317b6",
+        "sha256": "275e336755945188d12dae9613bfe7d9342fa733a4a8dc1746ab39aef0105b31",
         "size": 9029,
-        "source_sha256": "d9620e9bffdcfb638ba522c1c081ee405b33d7b822819f8dc1675af96c4239de"
+        "source_sha256": "483a8105db019e250b91002888ad74c98c7da69ff38beec9882878bcf98317b6"
       },
       {
-        "path": "userscripts/builders/content-site-modernizer/test/bleeding-cool-feed-mobile.test.mjs",
-        "action": "add",
-        "sha256": "7a0bf97bb573815bcd43b793f32149234ceebfbdb3afd6d3c31d49f9decbb90b",
-        "size": 6192
+        "path": "userscripts/builders/content-site-modernizer/test/bleeding-cool-article-correctness.test.mjs",
+        "action": "modify",
+        "sha256": "0981e53761d59ea06d14e5bd79865c51eca58b74083ddb221a91899174003eaf",
+        "size": 3861,
+        "source_sha256": "a54b5a787d8697e9794ae537ff16eb7674ea41c589c6820e7ce5b263b29740df"
       },
       {
-        "path": "userscripts/builders/content-site-modernizer/test/fixtures/bleeding-cool-feed-mobile-regression.html",
+        "path": "userscripts/builders/content-site-modernizer/test/bleeding-cool-release-seal.test.mjs",
         "action": "add",
-        "sha256": "96538b0279e09d7af6cddc4d76177d0c23b2bce3f76945246ee4195634498d69",
-        "size": 1566
+        "sha256": "745a201c32a2cc76dd2125a94fb2acfdce13ee8ddde5b69af1ee787010c6ff68",
+        "size": 8409
+      },
+      {
+        "path": "userscripts/builders/content-site-modernizer/test/fixtures/bleeding-cool-release-large-feed.html",
+        "action": "add",
+        "sha256": "fdf86bef21ebf854684d68090abefad7f4f65f8fd760f219ab5a4f0f0712ae62",
+        "size": 22899
+      },
+      {
+        "path": "userscripts/builders/content-site-modernizer/test/fixtures/bleeding-cool-release-long-article.html",
+        "action": "add",
+        "sha256": "0fa10e2c42c091d8983642c7b0001f030a8378a745fef26b28e1d057e2cc5c58",
+        "size": 5573
       },
       {
         "path": "userscripts/builders/content-site-modernizer/test/profile-schema.test.mjs",
         "action": "modify",
-        "sha256": "8c556f3b57af39ac169fb4e7cffb7b8f96f9cc35c90c6de0b5442e57ab4a6a1a",
+        "sha256": "c017fd852b5b1bfb65c271cbbec87d114773dbdc371a4169f6f183d66cedccf1",
         "size": 5743,
-        "source_sha256": "5654cc97813e0e8072049798c96f36d493a607776dae4c1917f078c363393e94"
+        "source_sha256": "8c556f3b57af39ac169fb4e7cffb7b8f96f9cc35c90c6de0b5442e57ab4a6a1a"
+      },
+      {
+        "path": "userscripts/builders/content-site-modernizer/tools/bleeding-cool-release-seal.mjs",
+        "action": "add",
+        "sha256": "d740b4f2d345109c7516f6f8eca484fd600fd7ce71e07f0210183c9487939aa1",
+        "size": 2041
       }
     ]
   },
@@ -148,7 +188,7 @@
     "commit": {
       "enabled": true,
       "strategy": "single",
-      "message": "feat(bleedingcool): converge mobile feed layout"
+      "message": "test(bleedingcool): seal reader regression coverage"
     }
   },
   "validation": {
@@ -158,9 +198,9 @@
     "test": true,
     "rollback_on_failure": true,
     "script": {
-      "path": ".devtool-artifact/validate-bleedingcool-ov03.sh",
+      "path": ".devtool-artifact/validate-bleedingcool-ov04.sh",
       "runner": "bash",
-      "sha256": "fb3b5ac9560b405604d5abca7916e0f0f93e3096c5239398ad4f8b54c31bdd45",
+      "sha256": "320884f3cce25f56079743d31e1fbed6c90425fbec239b2481cdcab744c23dc7",
       "timeout_seconds": 600
     },
     "expected": {
@@ -170,10 +210,12 @@
     }
   },
   "notes": [
-    "Overlay 3 of 4.",
-    "Reconstructed from the exact OV02 post-apply state.",
-    "Regression coverage includes featured/standard card variants, feed image fit, two-line mobile summaries, breaking-news overflow, bottom-nav touch targets, and wide/coarse-pointer mobile behavior.",
-    "The Bleeding Cool profile is advanced to 0.1.6 and the repository manifest/schema regression expectation is synchronized.",
-    "Validation remains Bleeding-Cool-focused plus deterministic builder/profile checks; unrelated historical PageTual final-seal issues are not masked."
+    "Overlay 4 of 4; final Bleeding Cool convergence/release seal.",
+    "Reconstructed from the exact OV03 post-apply state.",
+    "Adds executable article decision policy coverage rather than relying only on source-string assertions.",
+    "Long-article fixture contains post-image and end-of-article sentinels to lock the screenshot truncation regression closed.",
+    "Large-feed fixture covers 80 cards and verifies one featured card plus stable standard-card behavior.",
+    "Dedicated seal verifies generated-output freshness, syntax, Bleeding Cool regression tests, profile schema validity, and emits the install artifact SHA-256.",
+    "Bleeding Cool profile advances to 0.1.7."
   ]
 }

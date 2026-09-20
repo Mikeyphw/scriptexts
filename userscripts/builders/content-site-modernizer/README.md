@@ -229,3 +229,14 @@ npm run smoke:content-sites:interactions:managed -- --pagetual "$HOME/Downloads/
 ```
 
 Devtool can run that same lane during validation when `PLAYWRIGHT_SMOKE=1` and `PAGETUAL_SCRIPT` points to the PageTual userscript.
+
+
+## Bleeding Cool release seal
+
+The Bleeding Cool modernization has a browser-free aggregate regression gate:
+
+```bash
+npm run seal:bleedingcool
+```
+
+It verifies generated-output freshness, userscript syntax, article classification and no-truncation invariants, article chrome/media cleanup, mobile feed geometry including wide mobile/coarse-pointer behavior, long-article and large-feed fixtures, profile schema validity, and preservation of the reader's primary actions. Use `npm run seal:bleedingcool:json` for machine-readable evidence.

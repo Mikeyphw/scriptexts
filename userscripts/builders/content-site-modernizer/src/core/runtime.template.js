@@ -47,10 +47,13 @@ function installContentSiteModernizer(profile, cssText) {
   const articleEvidenceScore = () => (profile.articleEvidence || []).reduce((score, selector) =>
     score + (d.querySelector(selector) ? 1 : 0), 0);
   const isArticlePage = () => {
-    if (profile.articleHints?.some(matchesArticleHint)) return true;
     const evidence = profile.articleEvidence || [];
-    if (!evidence.length) return false;
-    return articleEvidenceScore() >= Math.max(1, profile.articleEvidenceMin || 2);
+    return csmArticleDecision({
+      hintMatched: Boolean(profile.articleHints?.some(matchesArticleHint)),
+      evidenceScore: articleEvidenceScore(),
+      evidenceCount: evidence.length,
+      evidenceMin: profile.articleEvidenceMin || 2
+    });
   };
 
   function currentInteractionProfile() {
