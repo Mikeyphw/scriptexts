@@ -75,6 +75,11 @@
         metadataCacheTtlMs: 7 * 24 * 60 * 60 * 1000,
         cacheStatsDebounceMs: isMobileProfile ? 5000 : 2500,
         scanBatchPages: isMobileProfile ? 3 : 4,
+        scanFetchMaxAttempts: 4,
+        scanRetryBaseMs: 800,
+        scanRetryMaxMs: 8000,
+        pageScanCacheTtlMs: 24 * 60 * 60 * 1000,
+        pageScanTailRevalidateCount: 2,
         zipProgressIntervalMs: isMobileProfile ? 500 : 250,
         debugLevel: localStorage.getItem("pg_debug_level") || "summary", // summary | verbose | trace
         galleryGridGap: isMobileProfile ? 8 : 15,
@@ -97,6 +102,7 @@
         scanStarted: false,
         scanRunning: false,
         scanAbortController: null,
+        scanPageFailures: new Map(),
         observer: null,
         pendingRoots: new Set(),
         debounceTimer: null,
@@ -4124,25 +4130,161 @@
         return new Promise(resolve => setTimeout(resolve, 0));
     }
 
-    async function fetchThreadDocument(url, signal) {
-        const response = await fetch(url, {
-            credentials: "include",
-            cache: "default",
-            signal,
-        });
-
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
-        }
-
-        const html = await response.text();
-        return new DOMParser().parseFromString(html, "text/html");
-    }
-
     function assertNotAborted(signal) {
         if (signal?.aborted) {
             throw new DOMException("Scan cancelled.", "AbortError");
         }
+    }
+
+    function abortableDelay(ms, signal) {
+        assertNotAborted(signal);
+        return new Promise((resolve, reject) => {
+            const timer = setTimeout(() => {
+                signal?.removeEventListener("abort", onAbort);
+                resolve();
+            }, Math.max(0, ms));
+            const onAbort = () => {
+                clearTimeout(timer);
+                reject(new DOMException("Scan cancelled.", "AbortError"));
+            };
+            signal?.addEventListener("abort", onAbort, { once: true });
+        });
+    }
+
+    function parseRetryAfterMs(value) {
+        if (!value) {
+            return 0;
+        }
+        const seconds = Number(value);
+        if (Number.isFinite(seconds) && seconds >= 0) {
+            return seconds * 1000;
+        }
+        const timestamp = Date.parse(value);
+        return Number.isFinite(timestamp) ? Math.max(0, timestamp - Date.now()) : 0;
+    }
+
+    function isRetryableScanStatus(status) {
+        return [408, 425, 429, 500, 502, 503, 504].includes(Number(status));
+    }
+
+    async function fetchThreadDocument(url, signal, pageNumber = getPageNumberFromUrl(url)) {
+        let lastError = null;
+
+        for (let attempt = 1; attempt <= config.scanFetchMaxAttempts; attempt += 1) {
+            assertNotAborted(signal);
+
+            try {
+                const response = await fetch(url, {
+                    credentials: "include",
+                    cache: attempt === 1 ? "default" : "no-cache",
+                    signal,
+                });
+
+                if (response.ok) {
+                    const html = await response.text();
+                    return {
+                        document: new DOMParser().parseFromString(html, "text/html"),
+                        html,
+                        attempts: attempt,
+                    };
+                }
+
+                const error = new Error(`HTTP ${response.status}`);
+                error.status = response.status;
+                error.retryAfterMs = parseRetryAfterMs(response.headers.get("Retry-After"));
+                lastError = error;
+
+                if (!isRetryableScanStatus(response.status) || attempt >= config.scanFetchMaxAttempts) {
+                    throw error;
+                }
+            } catch (error) {
+                if (error?.name === "AbortError") {
+                    throw error;
+                }
+                lastError = error;
+                const retryable = error?.status ? isRetryableScanStatus(error.status) : error instanceof TypeError;
+                if (!retryable || attempt >= config.scanFetchMaxAttempts) {
+                    throw error;
+                }
+            }
+
+            const exponentialMs = Math.min(config.scanRetryMaxMs, config.scanRetryBaseMs * (2 ** (attempt - 1)));
+            const waitMs = Math.max(Number(lastError?.retryAfterMs) || 0, exponentialMs);
+            state.scanPageFailures.set(pageNumber, {
+                pageNumber,
+                url,
+                status: "retrying",
+                attempt: attempt + 1,
+                maxAttempts: config.scanFetchMaxAttempts,
+                error: stringifyDebugValue(lastError),
+            });
+            setProgress(`Retrying page ${pageNumber} · attempt ${attempt + 1}/${config.scanFetchMaxAttempts} in ${Math.ceil(waitMs / 1000)}s`, 0, 1);
+            addDebugLog("warn", "Retrying thread page scan.", { pageNumber, url, attempt: attempt + 1, waitMs, error: stringifyDebugValue(lastError) });
+            await abortableDelay(waitMs, signal);
+        }
+
+        throw lastError || new Error("Thread page request failed.");
+    }
+
+    function getPageScanCacheKey(pageNumber) {
+        return `scan:${getThreadCacheId()}:page:${pageNumber}`;
+    }
+
+    function fingerprintThreadPage(pageDocument) {
+        const root = pageDocument?.querySelector?.(".p-body-pageContent, .block--messages, main") || pageDocument?.body;
+        if (!root) {
+            return "";
+        }
+        const markers = Array.from(root.querySelectorAll("article.message, .message, [data-content=message]"), node => {
+            const id = node.getAttribute("data-content") || node.id || node.getAttribute("data-author") || "";
+            const time = node.querySelector("time")?.getAttribute("datetime") || "";
+            const mediaCount = node.querySelectorAll("img, video, source, a[href]").length;
+            return `${id}:${time}:${mediaCount}`;
+        });
+        return hashString(markers.join("|") || root.textContent?.slice(0, 4096) || "");
+    }
+
+    async function loadPageScanCache(pageNumber) {
+        try {
+            const record = await getCacheRecord(getPageScanCacheKey(pageNumber));
+            if (!record || record.kind !== "pageScan" || !Array.isArray(record.items)) {
+                return null;
+            }
+            return { ...record, stale: Boolean(record.expiresAt && record.expiresAt < Date.now()) };
+        } catch (error) {
+            addDebugLog("warn", "Page scan cache load failed.", { pageNumber, error: stringifyDebugValue(error) });
+            return null;
+        }
+    }
+
+    async function savePageScanCache(pageNumber, url, pageDocument, items, signatureOverride = "") {
+        try {
+            const serializedItems = items.map(serializeMediaItem);
+            const now = Date.now();
+            await putCacheRecord({
+                key: getPageScanCacheKey(pageNumber),
+                threadId: getThreadCacheId(),
+                kind: "pageScan",
+                pageNumber,
+                pageUrl: url,
+                signature: signatureOverride || fingerprintThreadPage(pageDocument),
+                items: serializedItems,
+                size: JSON.stringify(serializedItems).length,
+                createdAt: now,
+                expiresAt: now + config.pageScanCacheTtlMs,
+                temporary: false,
+            });
+        } catch (error) {
+            addDebugLog("warn", "Page scan cache save failed.", { pageNumber, error: stringifyDebugValue(error) });
+        }
+    }
+
+    function shouldRevalidateCachedPage(entry, lastPage, threadInfo) {
+        if (!entry.cacheRecord || entry.cacheRecord.stale) {
+            return true;
+        }
+        const tailStart = Math.max(1, lastPage - config.pageScanTailRevalidateCount + 1);
+        return entry.pageNumber >= tailStart || entry.pageNumber === threadInfo.currentPage || isCurrentDocumentUrl(entry.url, threadInfo);
     }
 
     async function scanAllThreadPages() {
@@ -4159,12 +4301,16 @@
 
         state.scanRunning = true;
         state.scanAbortController = new AbortController();
+        state.scanPageFailures.clear();
         setActionButtonsDisabled(true);
         setCancelButtonVisible(true);
         const signal = state.scanAbortController.signal;
         const queue = discoverThreadPageUrls(document, threadInfo);
+        const lastPage = Math.max(1, ...queue.map(getPageNumberFromUrl));
         let completed = 0;
         let failed = 0;
+        let reused = 0;
+        let changed = 0;
         let pendingMedia = [];
         let pagesSinceFlush = 0;
 
@@ -4180,20 +4326,58 @@
         };
 
         try {
-            setProgress(`Scanning pages: 0/${queue.length} checked · ${state.mediaById.size} media · 0 failed`, 0, Math.max(queue.length, 1));
-            const workQueue = queue.map(url => ({ url, pageNumber: getPageNumberFromUrl(url) }));
+            setProgress(`Preparing incremental scan · ${queue.length} page(s)`, 0, Math.max(queue.length, 1));
+            const workQueue = await Promise.all(queue.map(async url => {
+                const pageNumber = getPageNumberFromUrl(url);
+                return { url, pageNumber, cacheRecord: await loadPageScanCache(pageNumber) };
+            }));
+            assertNotAborted(signal);
 
             await runConcurrent(workQueue, config.scanConcurrency, async entry => {
                 assertNotAborted(signal);
 
                 try {
-                    const pageDocument = isCurrentDocumentUrl(entry.url, threadInfo)
-                        ? document
-                        : await fetchThreadDocument(entry.url, signal);
-                    state.lastKnownPage = Math.max(state.lastKnownPage, entry.pageNumber);
-                    pendingMedia.push(...scanMedia(pageDocument, entry.pageNumber));
-                    pagesSinceFlush += 1;
+                    if (!shouldRevalidateCachedPage(entry, lastPage, threadInfo)) {
+                        const cachedItems = entry.cacheRecord.items.map(item => ({ ...item, el: null }));
+                        pendingMedia.push(...cachedItems);
+                        reused += 1;
+                        state.lastKnownPage = Math.max(state.lastKnownPage, entry.pageNumber);
+                        addDebugLog("trace", "Reused cached thread page scan.", { pageNumber: entry.pageNumber, items: cachedItems.length });
+                    } else {
+                        let pageDocument;
+                        let signature = "";
+                        if (isCurrentDocumentUrl(entry.url, threadInfo)) {
+                            pageDocument = document;
+                            signature = fingerprintThreadPage(pageDocument);
+                        } else {
+                            const fetched = await fetchThreadDocument(entry.url, signal, entry.pageNumber);
+                            pageDocument = fetched.document;
+                            signature = fingerprintThreadPage(pageDocument);
+                        }
 
+                        state.lastKnownPage = Math.max(state.lastKnownPage, entry.pageNumber);
+                        const signatureMatches = Boolean(entry.cacheRecord?.signature && signature && entry.cacheRecord.signature === signature);
+                        if (signatureMatches) {
+                            const cachedItems = entry.cacheRecord.items.map(item => ({ ...item, el: null }));
+                            pendingMedia.push(...cachedItems);
+                            reused += 1;
+                            // Refresh the TTL of a verified unchanged page without rescanning its DOM.
+                            await savePageScanCache(entry.pageNumber, entry.url, pageDocument, cachedItems, signature);
+                        } else {
+                            const pageItems = scanMedia(pageDocument, entry.pageNumber);
+                            pendingMedia.push(...pageItems);
+                            if (entry.cacheRecord) {
+                                changed += 1;
+                                addDebugLog("info", "Changed thread page detected; media rescanned.", { pageNumber: entry.pageNumber, previousSignature: entry.cacheRecord.signature, signature });
+                            } else {
+                                addDebugLog("info", "New uncached thread page scanned.", { pageNumber: entry.pageNumber, items: pageItems.length });
+                            }
+                            await savePageScanCache(entry.pageNumber, entry.url, pageDocument, pageItems, signature);
+                        }
+                    }
+
+                    state.scanPageFailures.delete(entry.pageNumber);
+                    pagesSinceFlush += 1;
                     if (pagesSinceFlush >= config.scanBatchPages) {
                         flushPendingMedia();
                     }
@@ -4202,10 +4386,22 @@
                         throw error;
                     }
                     failed += 1;
-                    addDebugLog("warn", "Thread page scan failed.", { pageNumber: entry.pageNumber, url: entry.url, error: stringifyDebugValue(error) });
+                    const usedCachedFallback = Boolean(entry.cacheRecord?.items);
+                    if (usedCachedFallback) {
+                        pendingMedia.push(...entry.cacheRecord.items.map(item => ({ ...item, el: null })));
+                        reused += 1;
+                    }
+                    state.scanPageFailures.set(entry.pageNumber, {
+                        pageNumber: entry.pageNumber,
+                        url: entry.url,
+                        status: usedCachedFallback ? "failed-cached-fallback" : "failed",
+                        cachedFallback: usedCachedFallback,
+                        error: stringifyDebugValue(error),
+                    });
+                    addDebugLog("warn", "Thread page scan failed after retries.", { pageNumber: entry.pageNumber, url: entry.url, cachedFallback: usedCachedFallback, error: stringifyDebugValue(error) });
                 } finally {
                     completed += 1;
-                    const message = `Scanning pages: ${completed}/${queue.length} checked · ${state.mediaById.size + pendingMedia.length} candidates · ${failed} failed`;
+                    const message = `Scanning pages: ${completed}/${queue.length} · ${reused} cached · ${changed} changed · ${failed} failed · ${state.mediaById.size + pendingMedia.length} candidates`;
                     setProgress(message, completed, queue.length);
                 }
             });
@@ -4214,18 +4410,21 @@
             state.scanStarted = true;
             renderGrid();
             clearProgress(`Scan complete. Found ${state.mediaById.size} media item(s).`);
-            showToast("scan", `Scan complete. Found ${state.mediaById.size} media item(s). ${failed} page(s) failed.`, {
+            const failedPages = Array.from(state.scanPageFailures.keys()).sort((a, b) => a - b);
+            const failedSuffix = failedPages.length ? ` · failed pages ${failedPages.join(", ")}` : "";
+            showToast("scan", `Scan complete · ${state.mediaById.size} media · ${reused} cached · ${changed} changed · ${failed} failed${failedSuffix}`, {
                 level: failed > 0 ? "warn" : "ok",
                 done: true,
-                timeout: 3500,
+                timeout: 4500,
             });
-            addDebugLog(failed > 0 ? "warn" : "ok", "Thread scan complete.", { pages: queue.length, failed, media: state.mediaById.size });
+            addDebugLog(failed > 0 ? "warn" : "ok", "Incremental thread scan complete.", { pages: queue.length, reused, changed, failed, media: state.mediaById.size, failures: Array.from(state.scanPageFailures.values()) });
+            scheduleThreadMetadataCacheSave();
         } catch (error) {
             flushPendingMedia();
 
             if (error?.name === "AbortError") {
                 clearProgress(`Scan cancelled. Found ${state.mediaById.size} media item(s).`);
-                showToast("scan", `Scan cancelled. Found ${state.mediaById.size} media item(s).`, { level: "warn", done: true, timeout: 3500 });
+                showToast("scan", `Scan cancelled. Progress was saved; the next scan can resume from cached pages.`, { level: "warn", done: true, timeout: 4500 });
             } else {
                 clearProgress(`Scan stopped. Found ${state.mediaById.size} media item(s).`);
                 showToast("scan", `Scan stopped. Found ${state.mediaById.size} media item(s).`, { level: "error", done: true, timeout: 5000 });
@@ -4236,6 +4435,7 @@
             state.scanAbortController = null;
             setActionButtonsDisabled(false);
             setCancelButtonVisible(false);
+            void updateCacheStats();
         }
     }
 
