@@ -56,6 +56,7 @@
         renderChunkSize: isMobileProfile ? 36 : 96,
         renderDebounceMs: 80,
         lazyObserverDebounceMs: 120,
+        eagerImageCount: isMobileProfile ? 10 : 18,
         metadataSaveDebounceMs: 1500,
         searchDebounceMs: 120,
         hoverPreviewDelayMs: 360,
@@ -680,6 +681,8 @@
             break-inside: avoid;
             margin-bottom: var(--pg-grid-gap);
             position: relative;
+            content-visibility: auto;
+            contain-intrinsic-size: auto 320px;
             border-radius: 8px;
             overflow: hidden;
             border: var(--pg-border);
@@ -773,12 +776,41 @@
             100% { opacity: 0.6; }
         }
 
-        .pg-lazy-img {
-            opacity: 0;
-            transition: opacity 0.4s ease-in-out;
+        .pg-lazy-img,
+        .pg-video-poster {
+            opacity: 1;
+            aspect-ratio: var(--pg-media-aspect, 4 / 3);
+            min-height: 0;
+            background: linear-gradient(110deg, #171717 8%, #242424 18%, #171717 33%);
+            background-size: 200% 100%;
+            animation: pg-media-skeleton 1.35s linear infinite;
+            transition: opacity 0.25s ease-in-out;
         }
 
-        .pg-lazy-img.pg-loaded { opacity: 1; }
+        .pg-lazy-img.pg-loaded,
+        .pg-video-poster.pg-loaded {
+            opacity: 1;
+            animation: none;
+            background: #111;
+        }
+
+        .pg-lazy-img.pg-broken,
+        .pg-video-poster.pg-broken { opacity: 0.28; animation: none; }
+
+        @keyframes pg-media-skeleton {
+            to { background-position-x: -200%; }
+        }
+
+        .pg-status-overlay button.pg-thumb-retry {
+            margin-top: 10px;
+            min-height: 38px;
+            padding: 7px 12px;
+            border: 1px solid rgba(255,255,255,0.22);
+            border-radius: 999px;
+            background: rgba(255,255,255,0.08);
+            color: #fff;
+            cursor: pointer;
+        }
 
         #pg-lightbox {
             position: absolute;
@@ -4275,47 +4307,66 @@
         const iconHtml = type === "retry"
             ? `<div class="pg-status-icon pg-status-retry">${warnIconSvg}</div>`
             : `<div class="pg-status-icon pg-status-broken">${brokenIconSvg}</div>`;
+        const retryButton = type === "broken"
+            ? `<button type="button" class="pg-thumb-retry" data-pg-action="retry-thumbnail">Retry thumbnail</button>`
+            : "";
 
         const textClass = type === "broken" ? "pg-status-broken" : "pg-status-retry";
 
         overlay.innerHTML = `
             ${iconHtml}
             <div class="pg-status-text ${textClass}">${text}</div>
+            ${retryButton}
         `;
     }
 
     let lazyImageObserver;
+    let lazyObserverRoot = null;
 
-    function initLazyObserver() {
-        if (lazyImageObserver) {
-            lazyImageObserver.disconnect();
+    function ensureLazyObserver() {
+        const root = document.querySelector(".pg-gallery-scroll");
+        if (!root) {
+            return null;
         }
 
-        const options = {
-            root: document.querySelector(".pg-gallery-scroll"),
-            rootMargin: "260px",
-            threshold: 0.01,
-        };
+        if (lazyImageObserver && lazyObserverRoot === root) {
+            return lazyImageObserver;
+        }
 
+        lazyImageObserver?.disconnect();
+        lazyObserverRoot = root;
         lazyImageObserver = new IntersectionObserver((entries, observer) => {
             entries.forEach(entry => {
-                if (!entry.isIntersecting) {
-                    return;
-                }
-
+                if (!entry.isIntersecting) return;
                 const img = entry.target;
                 const src = img.dataset.src;
-
-                if (src) {
+                if (src && !img.dataset.loadStarted) {
+                    img.dataset.loadStarted = "1";
                     img.src = src;
-                    observer.unobserve(img);
                 }
+                observer.unobserve(img);
             });
-        }, options);
+        }, { root, rootMargin: isMobileLayout() ? "75% 0px" : "520px 0px", threshold: 0.01 });
+        return lazyImageObserver;
+    }
 
-        document.querySelectorAll(".pg-lazy-img").forEach(img => {
-            lazyImageObserver.observe(img);
-        });
+    function observeLazyImage(img, eager = false) {
+        if (!img?.dataset?.src) return;
+        if (eager) {
+            img.dataset.loadStarted = "1";
+            img.loading = "eager";
+            img.fetchPriority = "high";
+            img.src = img.dataset.src;
+            return;
+        }
+        img.loading = "lazy";
+        ensureLazyObserver()?.observe(img);
+    }
+
+    function initLazyObserver() {
+        const observer = ensureLazyObserver();
+        if (!observer) return;
+        document.querySelectorAll(".pg-lazy-img:not([data-load-started])").forEach(img => observer.observe(img));
     }
 
 
@@ -5718,23 +5769,24 @@
             const poster = item.poster || "";
             badge = `<span class="pg-badge video">VIDEO</span>`;
             content = poster
-                ? `<img src="${escapeHtml(poster)}" loading="lazy" alt="">`
+                ? `<img class="pg-video-poster" src="${escapeHtml(poster)}" data-src="${escapeHtml(poster)}" data-retries="0" loading="lazy" alt="">`
                 : `<div style="height:150px; display:flex; align-items:center; justify-content:center; background:#222; color:#555;">No Thumb</div>`;
         } else {
             imageNode = document.createElement("img");
             imageNode.className = "pg-lazy-img";
-            imageNode.src = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
             imageNode.dataset.src = item.thumb || item.src;
             imageNode.dataset.fullSrc = item.src;
             imageNode.dataset.retries = "0";
 
-            if (item.width > 0 && item.height > 0) {
-                imageNode.style.aspectRatio = `${item.width} / ${item.height}`;
-            } else {
-                imageNode.style.minHeight = "200px";
-            }
+            const safeWidth = Number(item.width) > 0 ? Number(item.width) : 4;
+            const safeHeight = Number(item.height) > 0 ? Number(item.height) : 3;
+            imageNode.style.setProperty("--pg-media-aspect", `${safeWidth} / ${safeHeight}`);
 
             imageNode.onload = function () {
+                if (this.naturalWidth > 0 && this.naturalHeight > 0) {
+                    this.style.setProperty("--pg-media-aspect", `${this.naturalWidth} / ${this.naturalHeight}`);
+                }
+                this.classList.remove("pg-broken");
                 this.classList.add("pg-loaded");
                 setStatusOverlay(card, "clear");
             };
@@ -5749,8 +5801,8 @@
                     setStatusOverlay(card, "retry", `Retrying (${retries}/${config.maxRetries})`);
                     queueRetry(this, fullSrc, retries);
                 } else {
-                    setStatusOverlay(card, "broken", "Image Broken");
-                    this.classList.add("pg-loaded");
+                    setStatusOverlay(card, "broken", "Thumbnail unavailable");
+                    this.classList.add("pg-loaded", "pg-broken");
                 }
             };
 
@@ -5784,6 +5836,21 @@
 
         if (imageNode) {
             card.insertBefore(imageNode, card.querySelector(".pg-meta"));
+            observeLazyImage(imageNode, index < config.eagerImageCount);
+        }
+
+        const videoPoster = card.querySelector(".pg-video-poster");
+        if (videoPoster) {
+            videoPoster.onload = function () {
+                this.classList.remove("pg-broken");
+                this.classList.add("pg-loaded");
+                setStatusOverlay(card, "clear");
+            };
+            videoPoster.onerror = function () {
+                this.classList.add("pg-loaded", "pg-broken");
+                setStatusOverlay(card, "broken", "Video thumbnail unavailable");
+            };
+            if (videoPoster.complete && videoPoster.naturalWidth > 0) videoPoster.onload();
         }
 
         return card;
@@ -5856,6 +5923,26 @@
         grid.addEventListener("click", event => {
             const card = getCardFromEvent(event);
             if (!card) {
+                return;
+            }
+
+            const retryThumbnailButton = event.target.closest?.("[data-pg-action='retry-thumbnail']");
+            if (retryThumbnailButton) {
+                event.preventDefault();
+                event.stopPropagation();
+                const img = card.querySelector(".pg-lazy-img, .pg-video-poster");
+                if (img) {
+                    img.dataset.retries = "0";
+                    delete img.dataset.loadStarted;
+                    img.classList.remove("pg-loaded", "pg-broken");
+                    setStatusOverlay(card, "retry", "Retrying thumbnail");
+                    const src = img.dataset.src || img.dataset.fullSrc;
+                    if (src) {
+                        const separator = src.includes("?") ? "&" : "?";
+                        img.dataset.loadStarted = "1";
+                        img.src = `${src}${separator}retry=${Date.now()}`;
+                    }
+                }
                 return;
             }
 
@@ -6071,7 +6158,6 @@
             }
 
             grid.appendChild(fragment);
-            scheduleLazyObserver();
 
             if (cursor < displayOrder.length) {
                 requestAnimationFrame(appendChunk);

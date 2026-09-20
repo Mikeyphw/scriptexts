@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "type": "overlay",
-  "name": "LPSG mobile gallery UX \u2014 overlay 1 of 6",
-  "description": "Makes the LPSG gallery honor a live runtime mobile/touch profile on wide Iceraven viewports, compacts mobile controls into More, converges scan progress to one live surface, and separates ZIP inclusion from explicit selection editing.",
+  "name": "LPSG media rendering scalability \u2014 overlay 2 of 6",
+  "description": "Makes LPSG media cards load predictably at scale with a persistent observer, eager above-the-fold loading, visible skeleton/error/retry states, stable aspect ratios, content visibility, and chunked rendering.",
   "repository": {
     "name": "scriptexts",
     "branch": "main"
@@ -18,9 +18,9 @@
       {
         "path": "userscripts/standalone/lpsg-media-gallery-unlocker/lpsg-media-gallery-unlocker.user.js",
         "action": "modify",
-        "sha256": "6cecbd0e859962979befdc394952b5d96e00abdc81a978d13f1c692ccaaeea39",
-        "size": 271640,
-        "source_sha256": "6ac671dfbfe21f7821b31a75302e1ee0d33b6f7adc689bbfe0d1d072fe809cf7"
+        "sha256": "434595a8de061fb5fac09e84bdd6d7f7cdd0fc1ebe85d5fbcb5b057441445026",
+        "size": 275561,
+        "source_sha256": "6cecbd0e859962979befdc394952b5d96e00abdc81a978d13f1c692ccaaeea39"
       }
     ]
   },
@@ -32,7 +32,7 @@
     "commit": {
       "enabled": true,
       "strategy": "single",
-      "message": "fix(lpsg): converge mobile gallery UX"
+      "message": "perf(lpsg): harden scalable media rendering"
     }
   },
   "validation": {
@@ -43,13 +43,15 @@
     "rollback_on_failure": true
   },
   "notes": [
-    "Roadmap overlay 1 of 6.",
-    "Designed from the supplied 2026-09-20 scriptexts snapshot.",
-    "Preserves media discovery, filters, URL export, direct/ZIP downloads, cache, lightbox, video handling, pagination and post attribution.",
-    "Continuous scan progress is rendered only in the gallery progress surface; scan completion/cancel/error still use notifications.",
-    "Preselected media remains included in ZIP but yellow borders and checkboxes appear only while explicit selection mode is active.",
-    "Audit pass 1 fixed selection-mode entry when media is preselected and removed the remaining duplicate mobile scan-status surface.",
-    "Audit pass 2 fixed JS/CSS profile divergence by making isMobileLayout use the same live Android/iOS/touch/coarse-pointer/viewport profile and synchronizing it on resize/pointer changes.",
+    "Roadmap overlay 2 of 6.",
+    "Requires overlay 1 v2 as its exact source state.",
+    "Persistent IntersectionObserver is reused instead of being disconnected/recreated for every render chunk.",
+    "The first mobile/desktop media window is loaded eagerly; remaining images are observed ahead of the viewport.",
+    "Unknown image dimensions use a stable 4:3 provisional ratio instead of a 200px blank minimum and converge to natural dimensions after load.",
+    "Image/video thumbnail failures show an explicit state with manual Retry thumbnail action; automatic image retries remain preserved.",
+    "content-visibility and contain-intrinsic-size reduce off-screen rendering work while existing requestAnimationFrame chunking bounds insertion work.",
+    "Audit pass 1 added equivalent video-poster loading/error handling and natural image aspect-ratio convergence.",
+    "Audit pass 2 found and fixed an invisible-skeleton/1x1-placeholder race that could mark thumbnails loaded before the real request.",
     "Audit pass 3 found no remaining promised-scope gaps; node --check and static contract assertions passed."
   ]
 }
