@@ -61,3 +61,8 @@ test("Coomer discovery uses the current post API before HTML fallback",()=>{
 test("Coomer API extraction covers main file, attachments, server URLs and original names",()=>{
   for(const token of ["post.file","post.attachments","file.server","/data/","file.name||undefined"]) assert.ok(coomerSource.includes(token),token);
 });
+
+
+test("generated Coomer userscript is valid JavaScript, not only contract-shaped text",()=>{
+  assert.doesNotThrow(()=>new Function(coomerSource),"coomer-runtime.js must parse as JavaScript");
+});
