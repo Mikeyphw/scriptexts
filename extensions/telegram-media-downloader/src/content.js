@@ -363,11 +363,14 @@
       a.remove();
       return;
     }
-    await ext.runtime.sendMessage({
+    const response = await ext.runtime.sendMessage({
       type: ACTIONS.DOWNLOAD_URL,
+      requestId: `media_${entry.fingerprint || utils.hashCode(url)}_${Date.now()}`,
       url,
       filename: entry.fileName || "download.bin",
     });
+    if (!response?.ok) throw new Error(response?.error || "Download request failed");
+    return response;
   }
 
   function injectBridge() {
@@ -836,12 +839,23 @@
       if (state.browserOpen) renderMediaBrowser().catch(() => {});
     }, 120);
 
-    const observer = new MutationObserver(() => tick());
+    const observer = new MutationObserver((mutations) => {
+      const relevant = mutations.some((mutation) => {
+        if (mutation.type === "attributes") return mutation.target?.matches?.("video, audio, img, source");
+        return Array.from(mutation.addedNodes || []).some((node) =>
+          node.nodeType === Node.ELEMENT_NODE && (
+            node.matches?.("video, audio, img, source, [data-mid], .media-viewer-whole, #MediaViewer, .search-super-content-media-grid") ||
+            node.querySelector?.("video, audio, img, source, [data-mid], .media-viewer-whole, #MediaViewer, .search-super-content-media-grid")
+          )
+        );
+      });
+      if (relevant) tick();
+    });
     observer.observe(document.documentElement, {
       childList: true,
       subtree: true,
       attributes: true,
-      attributeFilter: ["class", "src", "style"],
+      attributeFilter: ["src"],
     });
 
     mountMessageButtons();

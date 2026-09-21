@@ -11,6 +11,8 @@
     GET_CHAT_MEDIA: "GET_CHAT_MEDIA",
     GET_ALL_INDEX_SUMMARY: "GET_ALL_INDEX_SUMMARY",
     DOWNLOAD_URL: "DOWNLOAD_URL",
+    CANCEL_DOWNLOAD: "CANCEL_DOWNLOAD",
+    GET_DOWNLOAD_JOBS: "GET_DOWNLOAD_JOBS",
     CLEAR_CHAT_INDEX: "CLEAR_CHAT_INDEX",
     CLEAR_ALL_INDEX: "CLEAR_ALL_INDEX",
     EXPORT_CHAT_INDEX: "EXPORT_CHAT_INDEX",
@@ -22,10 +24,11 @@
   };
 
   const CONFIG = {
-    version: "3.4.1",
+    version: "3.5.0",
     storage: {
       settings: "tmd:settings",
       logs: "tmd:logs",
+      downloadJobs: "tmd:download-jobs",
       chatPrefix: "tmd:chat:",
     },
     maxLogs: 600,
@@ -78,6 +81,7 @@
       },
       downloads: {
         download: wrap(chrome.downloads.download, chrome.downloads),
+        cancel: wrap(chrome.downloads.cancel, chrome.downloads),
       },
     };
   })();

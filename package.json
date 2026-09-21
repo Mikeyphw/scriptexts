@@ -87,7 +87,9 @@
     "seal:userscripts": "node tools/userscripts-release-seal.mjs",
     "seal:userscripts:json": "node tools/userscripts-release-seal.mjs --json",
     "test:extensions:architecture": "node --test tools/tests/extensions-architecture.test.mjs",
-    "check:extensions": "npm run test:extensions:architecture && npm run build:extensions"
+    "check:extensions": "npm run test:extensions:architecture && npm run build:extensions",
+    "test:extension:telegram": "node --test tools/tests/telegram-extension-runtime.test.mjs",
+    "seal:extension:telegram": "npm run test:extension:telegram && npm run build:extension:telegram"
   },
   "engines": {
     "node": ">=20"
