@@ -112,6 +112,7 @@
         debugLogs: [],
         debugPanelOpen: false,
         debugRunId: 0,
+        zipJobSummary: null,
         zipRunning: false,
         selectedMediaIds: new Set(),
         autoSelectNewMedia: true,
@@ -462,6 +463,14 @@
             min-height: 44px;
             touch-action: manipulation;
         }
+
+
+        .pg-zip-job-summary { margin: 10px 16px; padding: 14px; border: var(--pg-border); border-radius: 16px; background: rgba(255,255,255,.055); }
+        .pg-zip-job-summary[hidden] { display:none; }
+        .pg-zip-job-title { font-weight: 800; font-size: 16px; }
+        .pg-zip-job-count { margin-top: 5px; font-size: 15px; }
+        .pg-zip-job-meta, .pg-zip-job-problems { margin-top: 5px; color: var(--pg-muted); font-size: 13px; line-height: 1.4; }
+        .pg-zip-job-problems { color: #ffcc66; }
 
         .pg-progress {
             display: none;

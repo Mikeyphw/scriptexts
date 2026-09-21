@@ -352,8 +352,7 @@
 
         const runId = state.debugRunId + 1;
         state.debugRunId = runId;
-        setDebugPanelVisible(true);
-
+        // ZIP jobs stay in the friendly progress surface; diagnostics are opt-in.
         const estimate = getZipEstimate(items);
         const estimateLabel = estimate.knownBytes > 0
             ? ` · known size ~${formatBytes(estimate.knownBytes)}${estimate.unknownCount ? ` + ${estimate.unknownCount} unknown` : ""}`
@@ -482,6 +481,48 @@
         return { label: isOnlyPart ? "Open ZIP" : `Open part ${partNumber}`, href: zipUrl, download: fileName };
     }
 
+    const ZIP_JOB_STORAGE_KEY = "pg_zip_job_summary_v1";
+
+    function saveZipJobSummary(patch = {}) {
+        const previous = state.zipJobSummary || {};
+        state.zipJobSummary = { ...previous, ...patch, updatedAt: Date.now() };
+        try { localStorage.setItem(ZIP_JOB_STORAGE_KEY, JSON.stringify(state.zipJobSummary)); } catch {}
+        renderZipJobSummary();
+    }
+
+    function renderZipJobSummary() {
+        const summary = state.zipJobSummary;
+        const panel = document.getElementById("pg-zip-job-summary");
+        if (!panel || !summary) return;
+        panel.hidden = false;
+        const completed = Number(summary.completed || 0);
+        const total = Number(summary.total || 0);
+        const failed = Number(summary.failed || 0);
+        const parts = Number(summary.parts || 0);
+        const status = summary.status === "complete" ? (failed ? "Completed with problems" : "ZIP complete")
+            : summary.status === "cancelled" ? "ZIP cancelled"
+            : summary.status === "failed" ? "ZIP could not finish"
+            : state.zipPaused ? "ZIP paused" : "Creating ZIP";
+        panel.querySelector("[data-pg-job-title]").textContent = status;
+        panel.querySelector("[data-pg-job-count]").textContent = `${completed} / ${total} completed`;
+        panel.querySelector("[data-pg-job-meta]").textContent = [
+            summary.archivedBytes ? `${formatBytes(summary.archivedBytes)} archived` : "",
+            parts ? `${parts} part${parts === 1 ? "" : "s"} saved` : "",
+            failed ? `${failed} problem${failed === 1 ? "" : "s"}` : "No permanent failures",
+        ].filter(Boolean).join(" · ");
+        const problems = panel.querySelector("[data-pg-job-problems]");
+        problems.textContent = failed ? `${failed} item${failed === 1 ? "" : "s"} could not be archived. Retry failed items or open Diagnostics for technical details.` : "";
+        problems.hidden = !failed;
+    }
+
+    function restoreZipJobSummary() {
+        try {
+            const saved = JSON.parse(localStorage.getItem(ZIP_JOB_STORAGE_KEY) || "null");
+            if (saved && typeof saved === "object") state.zipJobSummary = saved;
+        } catch {}
+        renderZipJobSummary();
+    }
+
     async function runZipDownloadInBackground(items, runId) {
         let completed = 0;
         let failed = 0;
@@ -506,6 +547,7 @@
 
         state.zipRunning = true;
         state.zipPaused = false;
+        saveZipJobSummary({ status: "running", completed: 0, total: items.length, failed: 0, parts: 0, archivedBytes: 0, archiveBaseName });
         state.currentZipJobId = jobId;
         state.zipAbortController = new AbortController();
         state.lastFailedZipEntries = [];
@@ -613,7 +655,8 @@
                             url: result.url,
                             fromCache: Boolean(result.fromCache),
                         };
-                    } catch (error) {
+            saveZipJobSummary({ status: "complete", completed, total: items.length, failed, parts: partNumber, archivedBytes });
+        } catch (error) {
                         failed += 1;
                         failedEntries.push({
                             item: entry.item,
@@ -709,6 +752,7 @@
                 }
 
                 const message = `Building ZIP: ${completed}/${items.length} fetched · ${archivedFiles} archived · ${failed} failed · ${formatBytes(archivedBytes)}`;
+                saveZipJobSummary({ status: "running", completed, total: items.length, failed, parts: partNumber, archivedBytes });
                 updateZipProgressUi(message, completed, items.length, failed > 0 ? "warn" : "info", true);
 
                 if (completed % 20 === 0 || completed === items.length) {
@@ -768,8 +812,9 @@
             }
 
             const cancelled = error?.name === "AbortError";
+            saveZipJobSummary({ status: cancelled ? "cancelled" : "failed", completed, total: items.length, failed, parts: partNumber, archivedBytes });
             clearProgress(cancelled ? "ZIP cancelled." : `ZIP failed. ${archivedFiles} file(s) added, ${failed} failed.`);
-            showToast("zip", cancelled ? "ZIP cancelled." : "ZIP failed. Open Debug for details.", {
+            showToast("zip", cancelled ? "ZIP cancelled." : "ZIP could not finish. Use Details for problems and diagnostics.", {
                 level: cancelled ? "warn" : "error",
                 done: true,
                 timeout: 7000,
@@ -895,7 +940,6 @@
         selectFailedMedia();
         const runId = state.debugRunId + 1;
         state.debugRunId = runId;
-        setDebugPanelVisible(true);
         showToast("zip", `Retrying failed ZIP items: 0/${failedItems.length}`, {
             current: 0,
             total: failedItems.length,

@@ -1,0 +1,12 @@
+{
+  "id": "lpsg",
+  "label": "LPSG",
+  "builderRoot": "../lpsg-media-gallery-unlocker",
+  "output": "../../standalone/lpsg-media-gallery-unlocker/lpsg-media-gallery-unlocker.user.js",
+  "adapter": {
+    "engine": "xenforo-thread",
+    "pagination": "xenforo-page-nav",
+    "media": ["image-attachments", "html5-video", "video-sources"],
+    "archiveNaming": "thread-title"
+  }
+}

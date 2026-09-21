@@ -515,6 +515,13 @@
                 </div>
             </div>
 
+            <section class="pg-zip-job-summary" id="pg-zip-job-summary" aria-live="polite" hidden>
+                <div class="pg-zip-job-title" data-pg-job-title>Creating ZIP</div>
+                <div class="pg-zip-job-count" data-pg-job-count>0 / 0 completed</div>
+                <div class="pg-zip-job-meta" data-pg-job-meta></div>
+                <div class="pg-zip-job-problems" data-pg-job-problems hidden></div>
+            </section>
+
             <div id="pg-debug-panel" aria-live="polite">
                 <div class="pg-debug-header">
                     <div class="pg-debug-title">Gallery Debug</div>
@@ -571,6 +578,7 @@
 
         state.container = container;
         state.lightbox = container.querySelector("#pg-lightbox");
+        restoreZipJobSummary();
 
         container.querySelectorAll(".pg-filter-btn").forEach(button => {
             button.addEventListener("click", event => {
@@ -641,7 +649,7 @@
                 cancelScan();
             }
         });
-        container.querySelector("#pg-progress-details").addEventListener("click", () => setDebugPanelVisible(true));
+        container.querySelector("#pg-progress-details").addEventListener("click", () => { renderZipJobSummary(); const panel = document.getElementById("pg-zip-job-summary"); panel?.scrollIntoView?.({ block: "nearest", behavior: "smooth" }); });
         container.querySelector("#pg-more-scan-all").addEventListener("click", () => { closeGalleryMoreSheet(); void runManualRescan(); });
         container.querySelector("#pg-more-cancel-scan").addEventListener("click", cancelScan);
         container.querySelector("#pg-more-download-zip").addEventListener("click", () => { closeGalleryMoreSheet(); void downloadAllAsZip(); });

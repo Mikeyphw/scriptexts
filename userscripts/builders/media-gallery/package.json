@@ -1,0 +1,1 @@
+{"name":"media-gallery-builder","private":true,"type":"module","scripts":{"build:lpsg":"node build.mjs --site=lpsg","check:lpsg":"node build.mjs --site=lpsg --check","test":"node --test test/*.test.mjs"}}
