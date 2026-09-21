@@ -38,3 +38,26 @@ test("Coomer post fixture seals image, video and lazy original shapes",()=>{
   assert.match(fixture,/\.mp4/);
   assert.match(fixture,/data-original=/);
 });
+
+
+test("live Coomer fileThumb contract treats href as original and thumbnail only as preview",()=>{
+  const fixture=fs.readFileSync(path.join(root,"test/fixtures/coomer-live-filethumb.html"),"utf8");
+  assert.match(fixture,/class="fileThumb image-link"/);
+  assert.match(fixture,/href="https:\/\/n4\.coomer\.st\/data\//);
+  assert.match(fixture,/download="1320x1756_day-off\.jpg"/);
+  assert.match(fixture,/img\.coomer\.st\/thumbnail\/data\//);
+  for(const token of [".post__files a.fileThumb[href]","getAttribute('download')","/\\/thumbnail\\/data\\//i","searchParams.get(\"f\")","x.filename||filename(x.url,i)"]) assert.ok(coomerSource.includes(token),token);
+});
+
+test("Coomer original extraction is CDN-host agnostic inside allowed coomer.st subdomains",()=>{
+  assert.ok(coomerSource.includes('host.endsWith(".coomer.st")'));
+  assert.ok(coomerSource.includes('a[href*="/data/"]'));
+});
+
+
+test("Coomer discovery uses the current post API before HTML fallback",()=>{
+  for(const token of ["/api/v1/","responseType:\"json\"","Accept:\"text/css\"","mediaFromApi","mediaForPost(post,ac.signal)","Post API fallback to HTML"]) assert.ok(coomerSource.includes(token),token);
+});
+test("Coomer API extraction covers main file, attachments, server URLs and original names",()=>{
+  for(const token of ["post.file","post.attachments","file.server","/data/","file.name||undefined"]) assert.ok(coomerSource.includes(token),token);
+});
