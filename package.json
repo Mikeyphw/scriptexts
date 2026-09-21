@@ -91,7 +91,8 @@
     "test:extension:telegram": "node --test tools/tests/telegram-extension-runtime.test.mjs",
     "seal:extension:telegram": "npm run test:extension:telegram && npm run build:extension:telegram",
     "test:extensions:release": "node --test tools/tests/extensions-release-seal.test.mjs",
-    "seal:extensions": "node tools/extensions-release-seal.mjs"
+    "seal:extensions": "node tools/extensions-release-seal.mjs",
+    "build:extensions:chromium": "python3 tools/build-chromium-extensions.py"
   },
   "engines": {
     "node": ">=20"
