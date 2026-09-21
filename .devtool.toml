@@ -56,3 +56,22 @@ environment = ".venv-smoke"
 groups = ["smoke"]
 install_project = false
 offline = false
+[targets.lpsg-media-gallery-unlocker]
+type = "node"
+root = "userscripts/builders/lpsg-media-gallery-unlocker"
+
+[targets.poast-timeline-metadata-reset]
+type = "node"
+root = "userscripts/builders/poast-timeline-metadata-reset"
+
+[targets.search-engines-clean-dark-ui]
+type = "command"
+root = "."
+build_command = "node --check userscripts/standalone/search-engines-clean-dark-ui/search-engines-clean-dark-ui.user.js"
+
+[targets.telegram-media-downloader-userscript]
+type = "command"
+root = "."
+build_command = "node --check userscripts/standalone/telegram-media-downloader/telegram-media-downloader.user.js"
+test_command = "node --test userscripts/standalone/telegram-media-downloader/test/*.test.mjs"
+
