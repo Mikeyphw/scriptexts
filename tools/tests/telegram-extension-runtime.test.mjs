@@ -35,3 +35,12 @@ test('manifest and source runtime version converge',()=>{
 test('complete canonical extension source is buildable',()=>{
  for(const name of ['content.js','page-bridge.js','popup.js','library.js','settings.js','scripts/common.js','scripts/protocol-v2.js']) assert.ok(read('extensions/telegram-media-downloader/src/'+name).length>100);
 });
+
+test('extension package builder is reproducible and timestamp-independent',()=>{
+ const builder=read('extensions/telegram-media-downloader/build.py');
+ assert.match(builder,/ZIP_TIMESTAMP = \(1980, 1, 1, 0, 0, 0\)/);
+ assert.match(builder,/archive\.writestr\(deterministic_info\(rel\), path\.read_bytes\(\)/);
+ assert.doesNotMatch(builder,/archive\.write\(path,/);
+ assert.match(builder,/compresslevel=9/);
+});
+
