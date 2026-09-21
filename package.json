@@ -85,7 +85,9 @@
     "check:poast": "npm --prefix userscripts/builders/poast-timeline-metadata-reset run build:check",
     "seal:poast": "npm --prefix userscripts/builders/poast-timeline-metadata-reset run seal",
     "seal:userscripts": "node tools/userscripts-release-seal.mjs",
-    "seal:userscripts:json": "node tools/userscripts-release-seal.mjs --json"
+    "seal:userscripts:json": "node tools/userscripts-release-seal.mjs --json",
+    "test:extensions:architecture": "node --test tools/tests/extensions-architecture.test.mjs",
+    "check:extensions": "npm run test:extensions:architecture && npm run build:extensions"
   },
   "engines": {
     "node": ">=20"

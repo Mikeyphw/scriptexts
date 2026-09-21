@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Telegram Media Downloader",
-  "version": "3.4.9",
+  "version": "3.4.10",
   "description": "Telegram Web media tools with popup, floating media browser, debug mode, and debug panel.",
   "permissions": [
     "storage",
@@ -14,6 +14,7 @@
   ],
   "background": {
     "scripts": [
+      "scripts/protocol-v2.js",
       "scripts/common.js",
       "background.js"
     ],

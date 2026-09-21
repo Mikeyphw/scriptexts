@@ -2543,7 +2543,7 @@ async function openMetadataExtractionTab(message, sender) {
   });
 }
 
-browser.runtime.onMessage.addListener((message, sender) => {
+browser.runtime.onMessage.addListener(EXT_PROTOCOL_V2.adaptPromiseListener((message, sender) => {
   verbose("Runtime message received", { type: message?.type || "", senderTabId: sender?.tab?.id || null });
   if (!message || !message.type) return undefined;
 
@@ -3006,7 +3006,7 @@ if (message.type === "MRM_GET_PAGE_CONTEXT") {
   }
 
   return undefined;
-});
+}));
 
 browser.tabs.onRemoved.addListener((tabId) => {
   AUTO_DOWNLOAD_TAB_IDS.delete(tabId);

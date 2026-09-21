@@ -78,7 +78,7 @@
     ext.storage.local.set({ [CONFIG.storage.settings]: DEFAULT_SETTINGS }).catch(() => {});
   });
 
-  chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  chrome.runtime.onMessage.addListener(EXT_PROTOCOL_V2.adaptCallbackListener((message, sender, sendResponse) => {
     (async () => {
       switch (message?.type) {
         case ACTIONS.GET_SETTINGS:
@@ -129,5 +129,5 @@
       }
     })().catch((error) => sendResponse({ ok: false, error: String(error?.message || error) }));
     return true;
-  });
+  }));
 })();

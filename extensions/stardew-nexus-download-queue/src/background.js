@@ -61,13 +61,14 @@ function log(...args) {
 }
 
 async function loadState() {
-  const stored = await browser.storage.local.get(["settings", "queue", "nextQueueId"])
+  const stored = await browser.storage.local.get(["settings", "queue", "nextQueueId", "downloadToQueue"])
   state.settings = { ...DEFAULT_SETTINGS, ...(stored.settings || {}) }
   state.queue = Array.isArray(stored.queue) ? stored.queue : []
   state.nextQueueId = Number.isInteger(stored.nextQueueId) ? stored.nextQueueId : 1
+  state.downloadToQueue = stored.downloadToQueue && typeof stored.downloadToQueue === "object" ? stored.downloadToQueue : {}
   state.activeQueueId = state.queue.find(item => item.status === "resolving" || item.status === "downloading")?.id || null
   for (const item of state.queue) {
-    if (item.status === "downloading") {
+    if (item.status === "downloading" && !Object.values(state.downloadToQueue).includes(item.id)) {
       item.status = "queued"
       item.message = "Browser restarted. Re-queueing."
       item.downloadId = null
@@ -81,7 +82,8 @@ async function persist() {
   await browser.storage.local.set({
     settings: state.settings,
     queue: state.queue,
-    nextQueueId: state.nextQueueId
+    nextQueueId: state.nextQueueId,
+    downloadToQueue: state.downloadToQueue
   })
   broadcastState()
 }
@@ -335,7 +337,7 @@ browser.downloads.onChanged.addListener(async delta => {
   }
 })
 
-browser.runtime.onMessage.addListener((message, sender) => {
+browser.runtime.onMessage.addListener(EXT_PROTOCOL_V2.adaptPromiseListener((message, sender) => {
   if (!message || !message.type) return undefined
 
   if (message.type === "GET_STATE") {
@@ -452,6 +454,6 @@ if (message.type === "MOVE_QUEUE_ITEM") {
 
 
   return undefined
-})
+}))
 
 loadState()
