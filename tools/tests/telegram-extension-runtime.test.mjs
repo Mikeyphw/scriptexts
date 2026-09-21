@@ -30,7 +30,7 @@ test('WebK and WebZ fixtures remain represented',()=>{
  assert.match(content,/media-viewer/); assert.match(content,/MediaViewer/);
 });
 test('manifest and source runtime version converge',()=>{
- assert.equal(manifest.version,'3.5.0'); assert.match(common,/version: "3\.5\.0"/);
+ assert.equal(manifest.version,'3.5.1'); assert.match(common,/version: "3\.5\.1"/);
 });
 test('complete canonical extension source is buildable',()=>{
  for(const name of ['content.js','page-bridge.js','popup.js','library.js','settings.js','scripts/common.js','scripts/protocol-v2.js']) assert.ok(read('extensions/telegram-media-downloader/src/'+name).length>100);

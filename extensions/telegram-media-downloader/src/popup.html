@@ -10,7 +10,7 @@
     h1{margin:0;font-size:18px}
     p{margin:0;color:#9fb1c7}
     .actions,.toggles{display:grid;gap:8px}
-    button,label{background:#1b2a41;color:#fff;border:1px solid rgba(255,255,255,.14);border-radius:10px;padding:10px 12px}
+    button,label{min-height:44px;background:#1b2a41;color:#fff;border:1px solid rgba(255,255,255,.14);border-radius:10px;padding:10px 12px}
     label{display:flex;gap:8px;align-items:center}
     .row{display:flex;gap:8px;flex-wrap:wrap}
     .row > button{flex:1}
@@ -21,6 +21,8 @@
     .log.warn{border-color:rgba(255,196,89,.24)}
     .meta{font-size:11px;color:#9fb1c7}
     .msg{font-size:12px;margin-top:2px}
+  button:focus-visible,input:focus-visible{outline:2px solid #8bb8ff;outline-offset:2px}
+    @media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
   </style>
 </head>
 <body>
@@ -58,8 +60,8 @@
       <label><input id="autoCollectLight" type="checkbox"> Light auto collect</label>
     </div>
 
-    <pre id="status">Ready.</pre>
-    <div id="logs" class="logs"><div class="meta">No logs yet.</div></div>
+    <pre id="status" role="status" aria-live="polite">Ready.</pre>
+    <div id="logs" class="logs" aria-live="polite" aria-label="Diagnostic logs"><div class="meta">No logs yet.</div></div>
   </main>
   <script src="scripts/common.js"></script>
   <script src="popup.js"></script>

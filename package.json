@@ -89,7 +89,9 @@
     "test:extensions:architecture": "node --test tools/tests/extensions-architecture.test.mjs",
     "check:extensions": "npm run test:extensions:architecture && npm run build:extensions",
     "test:extension:telegram": "node --test tools/tests/telegram-extension-runtime.test.mjs",
-    "seal:extension:telegram": "npm run test:extension:telegram && npm run build:extension:telegram"
+    "seal:extension:telegram": "npm run test:extension:telegram && npm run build:extension:telegram",
+    "test:extensions:release": "node --test tools/tests/extensions-release-seal.test.mjs",
+    "seal:extensions": "node tools/extensions-release-seal.mjs"
   },
   "engines": {
     "node": ">=20"

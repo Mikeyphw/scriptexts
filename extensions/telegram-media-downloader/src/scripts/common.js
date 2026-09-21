@@ -24,7 +24,7 @@
   };
 
   const CONFIG = {
-    version: "3.5.0",
+    version: "3.5.1",
     storage: {
       settings: "tmd:settings",
       logs: "tmd:logs",

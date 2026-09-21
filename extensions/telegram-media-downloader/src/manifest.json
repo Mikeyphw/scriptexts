@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Telegram Media Downloader",
-  "version": "3.5.0",
+  "version": "3.5.1",
   "description": "Telegram Web media tools with resilient, cancellable downloads, popup, media browser, and diagnostics.",
   "permissions": [
     "storage",

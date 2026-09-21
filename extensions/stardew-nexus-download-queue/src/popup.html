@@ -14,7 +14,7 @@
         <h1>Stardew Nexus Queue</h1>
         <p>Queue and manage Stardew Valley Nexus downloads.</p>
       </div>
-      <button id="refreshBtn" class="icon-btn" title="Refresh">↻</button>
+      <button id="refreshBtn" class="icon-btn" title="Refresh" aria-label="Refresh queue">↻</button>
     </header>
 
     <section class="panel">
@@ -25,7 +25,7 @@
           <button id="clearBtn" class="secondary">Clear finished</button>
         </div>
       </div>
-      <div id="queueList" class="queue-list"></div>
+      <div id="queueList" class="queue-list" aria-live="polite" aria-label="Download queue"></div>
     </section>
 
     <section class="panel">
@@ -68,7 +68,7 @@
           <button id="clearLogsBtn" class="secondary">Clear logs</button>
         </div>
       </div>
-      <div id="debugStatus" class="footer-note">Waiting for logs…</div>
+      <div id="debugStatus" class="footer-note" role="status" aria-live="polite">Waiting for logs…</div>
       <pre id="debugPanel" class="debug-panel"></pre>
     </section>
   </main>
