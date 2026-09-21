@@ -92,7 +92,11 @@
     "seal:extension:telegram": "npm run test:extension:telegram && npm run build:extension:telegram",
     "test:extensions:release": "node --test tools/tests/extensions-release-seal.test.mjs",
     "seal:extensions": "node tools/extensions-release-seal.mjs",
-    "build:extensions:chromium": "python3 tools/build-chromium-extensions.py"
+    "build:extensions:chromium": "python3 tools/build-chromium-extensions.py",
+    "build:coomer-gallery": "npm --prefix userscripts/builders/media-gallery run build:coomer",
+    "check:coomer-gallery": "npm --prefix userscripts/builders/media-gallery run check:coomer",
+    "test:media-gallery": "npm --prefix userscripts/builders/media-gallery test",
+    "seal:media-gallery": "npm --prefix userscripts/builders/media-gallery run seal"
   },
   "engines": {
     "node": ">=20"

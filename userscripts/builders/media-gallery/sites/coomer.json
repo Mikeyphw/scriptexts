@@ -1,0 +1,18 @@
+{
+  "id": "coomer",
+  "label": "Coomer",
+  "output": "../../standalone/coomer-media-gallery/coomer-media-gallery.user.js",
+  "adapter": {
+    "engine": "coomer-profile",
+    "profileSelector": ".post-card.post-card--preview",
+    "postLinkSelector": ".post-card a[href*='/post/']",
+    "pagination": "offset-50",
+    "media": [
+      "post-images",
+      "post-attachments",
+      "post-videos"
+    ],
+    "archiveNaming": "service-user"
+  },
+  "source": "src/coomer-runtime.js"
+}

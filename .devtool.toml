@@ -75,3 +75,9 @@ root = "."
 build_command = "node --check userscripts/standalone/telegram-media-downloader/telegram-media-downloader.user.js"
 test_command = "node --test userscripts/standalone/telegram-media-downloader/test/*.test.mjs"
 
+
+[targets.coomer-media-gallery]
+type = "node"
+root = "userscripts/builders/media-gallery"
+build_command = "npm run check:coomer"
+test_command = "npm test"
