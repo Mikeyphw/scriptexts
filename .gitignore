@@ -28,3 +28,19 @@ smoke-results/
 
 # Derived release bundles
 release/
+
+# Generated builder/package outputs
+userscripts/builders/*/dist/
+extensions/*/dist/
+
+# Python bytecode
+__pycache__/
+*.py[cod]
+
+# Local migration/backup artifacts
+*.backup-*
+*.backup
+
+# Devtool local artifact ledger (runtime state, not source)
+.devtool/artifacts.json
+.devtool/artifacts.d/
