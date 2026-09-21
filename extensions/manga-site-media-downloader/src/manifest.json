@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Manga Site Media Downloader",
-  "version": "1.10.4",
+  "version": "1.11.0",
   "description": "Download galleries from MyReadingManga, MangaLotus, BaraMangaOnline, YaoiMangaOnline, and nhentai.",
   "author": "nyt92",
   "permissions": [

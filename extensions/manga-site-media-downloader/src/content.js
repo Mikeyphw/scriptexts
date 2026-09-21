@@ -1703,6 +1703,21 @@ const queueProgressState = new Map();
     if (!files.some(Boolean)) {
       throw new Error(`All ${images.length} image fetches failed.`);
     }
+    const archiveManifest = {
+      schemaVersion: 1,
+      sourceUrl: String(payload.url || location.href),
+      title: String(payload.title || document.title || ""),
+      requestedImages: images.length,
+      downloadedImages: completed,
+      failedImages: failedImages.map((item) => ({ ...item })),
+      entries: files.map((file, index) => file ? ({ index: index + 1, name: file.name, sourceUrl: images[index] || "" }) : null).filter(Boolean),
+      complete: failedImages.length === 0,
+    };
+    files.push({
+      name: "_DOWNLOAD_MANIFEST.json",
+      data: JSON.stringify(archiveManifest, null, 2),
+    });
+
     if (failedImages.length) {
       files.push({
         name: "_FAILED_IMAGES.txt",

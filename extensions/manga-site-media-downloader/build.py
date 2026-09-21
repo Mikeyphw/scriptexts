@@ -9,7 +9,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent
 SRC = ROOT / "src"
 DIST = ROOT / "dist"
-
+ZIP_EPOCH = (1980, 1, 1, 0, 0, 0)
 
 def iter_files():
     for path in sorted(SRC.rglob("*")):
@@ -19,7 +19,6 @@ def iter_files():
                 continue
             yield path, rel
 
-
 def main() -> None:
     manifest = json.loads((SRC / "manifest.json").read_text(encoding="utf-8"))
     name = ROOT.name
@@ -28,13 +27,16 @@ def main() -> None:
     for old in DIST.glob("*.xpi"):
         old.unlink()
     out = DIST / f"{name}-{version}.xpi"
-    with zipfile.ZipFile(out, "w", compression=zipfile.ZIP_DEFLATED) as archive:
+    with zipfile.ZipFile(out, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=9) as archive:
         for path, rel in iter_files():
-            archive.write(path, rel.as_posix())
+            info = zipfile.ZipInfo(rel.as_posix(), date_time=ZIP_EPOCH)
+            info.compress_type = zipfile.ZIP_DEFLATED
+            info.external_attr = 0o100644 << 16
+            info.create_system = 3
+            archive.writestr(info, path.read_bytes(), compress_type=zipfile.ZIP_DEFLATED, compresslevel=9)
     digest = hashlib.sha256(out.read_bytes()).hexdigest()
     (DIST / "SHA256SUMS").write_text(f"{digest}  {out.name}\n", encoding="utf-8")
     print(f"built {out.relative_to(ROOT)}")
-
 
 if __name__ == "__main__":
     main()
