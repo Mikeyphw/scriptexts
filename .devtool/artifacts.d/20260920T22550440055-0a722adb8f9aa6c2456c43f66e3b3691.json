@@ -1,0 +1,206 @@
+{
+  "schema_version": 3,
+  "applied_at": "2026-09-20T22:55:04.400559Z",
+  "artifact": "/storage/emulated/0/Download/telegram_downloader_runtime_v2_ov02_v5.zip",
+  "artifact_name": "telegram_downloader_runtime_v2_ov02_v5.zip",
+  "type": "overlay",
+  "sha256": "8366740516403401d3132edc1d783b03dfea336a714aa10b729c3252d71827db",
+  "content_identity": {
+    "sha256": "8366740516403401d3132edc1d783b03dfea336a714aa10b729c3252d71827db",
+    "size": 19475
+  },
+  "status": "rolled-back",
+  "validation_status": "ok",
+  "commit_message": "feat(telegram): harden downloader runtime",
+  "commit_hash": "",
+  "file_count": 8,
+  "change_counts": {
+    "add": 3,
+    "add-dir": 2,
+    "delete": 4,
+    "modify": 5
+  },
+  "manifest": {
+    "schema_version": 2,
+    "type": "overlay",
+    "name": "Telegram downloader runtime v2 OV02",
+    "description": "Replaces Telegram Web polling with targeted MutationObserver discovery, unifies cancellable audio/video transfer, hardens HTTP Range/retry handling, adds memory guards and permanent WebK/WebZ regression tests.",
+    "repository": {
+      "name": "scriptexts",
+      "remote": "git@github.com:Mikeyphw/scriptexts.git",
+      "branch": "main"
+    },
+    "target": "root",
+    "inventory": {
+      "format": 1,
+      "entries": [
+        {
+          "path": "package.json",
+          "action": "modify",
+          "sha256": "f41ceadd11fffb7cb8fd1281bce8a177fa89742b5d3d1fe8a692c6b35497a3a0",
+          "size": 8564,
+          "source_sha256": "d297af93cbc7787c8b71eecc12ab0f7b193d4b2f4fe4fc47c11a7e36819b2c7a"
+        },
+        {
+          "path": "tools/check-userscripts.mjs",
+          "action": "modify",
+          "sha256": "0378678be2566d4b9e11f817d433737f4c89dd64889ef3b83cc7352e5c73057a",
+          "size": 1683,
+          "source_sha256": "a732111e7324074476372d2bf3a5d08f0b01c080adf5e801994ae80941c72a33"
+        },
+        {
+          "path": "userscripts/standalone/telegram-media-downloader/README.md",
+          "action": "modify",
+          "sha256": "e737b951a6bc613a0141c28fed7c13a952720ba6c19a84f7fe8ddeea5051d3ca",
+          "size": 1019,
+          "source_sha256": "4cbc88ec2920b967ca010208308076ade039b5d2e6ce95264ab45062d2186913"
+        },
+        {
+          "path": "userscripts/standalone/telegram-media-downloader/telegram-media-downloader.user.js",
+          "action": "modify",
+          "sha256": "b8d05ac72a53926df27e4d5eb3bd377afc08c85e45845c98f72775d234146f59",
+          "size": 30373,
+          "source_sha256": "fe6e4908ed31497c772395cef9c58c5f66db4b0fa1900a345feecd407e8f6de0"
+        },
+        {
+          "path": "userscripts/standalone/telegram-media-downloader/telegram-media-downloader.meta.js",
+          "action": "modify",
+          "sha256": "fd8dad76a3757709a2839b60e6da1c90ac6929e98356dc045c45bc3393062de4",
+          "size": 2091,
+          "source_sha256": "1a9901bf0408fe1e38ebee4fd301632adaea2f749dfc55d38103dfe819148608"
+        },
+        {
+          "path": "userscripts/standalone/telegram-media-downloader/test/runtime-v2.test.mjs",
+          "action": "add",
+          "sha256": "10b906db38684e9de112d5fcea3fe660bf641228e25b1c5a284850dd3ef1fe8c",
+          "size": 3346
+        },
+        {
+          "path": "userscripts/standalone/telegram-media-downloader/test/fixtures/webk.html",
+          "action": "add",
+          "sha256": "e048acf46bfb8667a8d1c75ce49a13e733eb7db9dc9ef204b7bef8555fd4a7f9",
+          "size": 274
+        },
+        {
+          "path": "userscripts/standalone/telegram-media-downloader/test/fixtures/webz.html",
+          "action": "add",
+          "sha256": "1877f35666c4d9131c641028bebd997dfb334cb9c1fe003e49a824407698c440",
+          "size": 365
+        },
+        {
+          "path": "userscripts/builders/manga-reader-modernizer/dist/myreadingmanga-modern-reader.meta.js",
+          "action": "delete",
+          "source_sha256": "eeac33440f6d319601e33c869878e4faf374ee2ede86a0cd367911ad2f3b9c17"
+        },
+        {
+          "path": "userscripts/builders/manga-reader-modernizer/dist/myreadingmanga-modern-reader.user.js",
+          "action": "delete",
+          "source_sha256": "9d076371d91d1f89f0255cc18fdc1854975fac50dd9d1398221381df9c1b67a9"
+        },
+        {
+          "path": "userscripts/builders/manga-reader-modernizer/src/original/myreadingmanga-modern-reader.meta.js",
+          "action": "delete",
+          "source_sha256": "622b9268b306b9e7b2c87b76f4aefaeaa5d7ed62befff1f5dc6b44af08ae5733"
+        },
+        {
+          "path": "userscripts/builders/manga-reader-modernizer/src/original/myreadingmanga-modern-reader.user.js",
+          "action": "delete",
+          "source_sha256": "b329798795da23021fc51fd2758a6f03f906e0d19852e3484b537754fb38f540"
+        }
+      ]
+    },
+    "apply": {
+      "atomic": true,
+      "conflict_policy": "overwrite",
+      "path_policy": "repository-relative",
+      "requires_clean_worktree": false,
+      "commit": {
+        "enabled": true,
+        "strategy": "single",
+        "message": "feat(telegram): harden downloader runtime"
+      }
+    },
+    "preflight": {
+      "phases": [
+        "before_extract"
+      ],
+      "write_paths": [],
+      "capabilities": [],
+      "script": {
+        "path": ".devtool-artifact/preflight.sh",
+        "runner": "bash",
+        "protocol": "json-v1",
+        "sha256": "149a89b4c0c432705605363c1ef794f180828aa0c005b63f9f07d01f9748d107",
+        "timeout_seconds": 30
+      }
+    },
+    "validation": {
+      "required": true,
+      "restore": false,
+      "build": false,
+      "test": false,
+      "rollback_on_failure": true,
+      "write_paths": [],
+      "capabilities": [],
+      "script": {
+        "path": ".devtool-artifact/validate.sh",
+        "runner": "bash",
+        "protocol": "json-v1",
+        "sha256": "52ae655836a3e85e8010a1cc1e80130d9f2ef27ba5f3efcad88065d22133c5ed",
+        "timeout_seconds": 300
+      },
+      "expected": {
+        "maximum_warnings": 0
+      }
+    },
+    "finalize": {
+      "phases": [
+        "before_commit"
+      ],
+      "write_paths": [],
+      "capabilities": [],
+      "script": {
+        "path": ".devtool-artifact/finalize.sh",
+        "runner": "bash",
+        "protocol": "json-v1",
+        "sha256": "154faecf9244a8a1599494981a49793b7725c50bedf14819426bea57a83b23bb",
+        "timeout_seconds": 30
+      }
+    },
+    "notes": [
+      "Overlay 2 of 6.",
+      "Uses artifact-v2 preflight, json-v1 validation evidence, and before-commit finalization.",
+      "Telegram regression tests are permanently wired into root npm run check.",
+      "Fallback buffering is capped at 256 MiB; File System Access streams directly when available.",
+      "v5 repairs legacy MRM retirement drift observed on the real post-OV01 repository and does not incorrectly require native test evidence when tests run inside the artifact validation script."
+    ]
+  },
+  "operation_id": "d14fead37f624708b2d0aa2dea561b90",
+  "history_id": "0a722adb8f9aa6c2456c43f66e3b3691",
+  "rollback_status": "rolled-back",
+  "child_outcomes": [
+    {
+      "name": "apply-overlay",
+      "returncode": 1,
+      "skipped": false,
+      "failure_kind": "preflight_failure",
+      "overlay_id": "",
+      "overlay_index": 1,
+      "target": ""
+    },
+    {
+      "name": "apply-rollback",
+      "returncode": 0,
+      "skipped": false,
+      "failure_kind": "rollback",
+      "overlay_id": "",
+      "overlay_index": 1,
+      "target": ""
+    }
+  ],
+  "transaction": {
+    "id": "20260920T225502Z-05af97a8f1c9",
+    "status": "rolled-back"
+  },
+  "validation_plan": {}
+}

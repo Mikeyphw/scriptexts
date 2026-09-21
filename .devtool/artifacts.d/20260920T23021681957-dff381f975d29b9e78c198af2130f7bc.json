@@ -1,0 +1,445 @@
+{
+  "schema_version": 3,
+  "applied_at": "2026-09-20T23:02:16.819573Z",
+  "artifact": "/storage/emulated/0/Download/telegram_downloader_runtime_v2_ov02_v7.zip",
+  "artifact_name": "telegram_downloader_runtime_v2_ov02_v7.zip",
+  "type": "overlay",
+  "sha256": "4bf4e620b2de1578983392fe4ac0b2bf610b36a395af517b4a66fffa6235faa7",
+  "content_identity": {
+    "sha256": "4bf4e620b2de1578983392fe4ac0b2bf610b36a395af517b4a66fffa6235faa7",
+    "size": 19481
+  },
+  "status": "rolled-back",
+  "validation_status": "ok",
+  "commit_message": "feat(telegram): harden downloader runtime",
+  "commit_hash": "",
+  "file_count": 8,
+  "change_counts": {
+    "add": 3,
+    "add-dir": 2,
+    "delete": 4,
+    "modify": 5
+  },
+  "manifest": {
+    "schema_version": 2,
+    "type": "overlay",
+    "name": "Telegram downloader runtime v2 OV02",
+    "description": "Replaces Telegram Web polling with targeted MutationObserver discovery, unifies cancellable audio/video transfer, hardens HTTP Range/retry handling, adds memory guards and permanent WebK/WebZ regression tests.",
+    "repository": {
+      "name": "scriptexts",
+      "remote": "git@github.com:Mikeyphw/scriptexts.git",
+      "branch": "main"
+    },
+    "target": "root",
+    "inventory": {
+      "format": 1,
+      "entries": [
+        {
+          "path": "package.json",
+          "action": "modify",
+          "sha256": "f41ceadd11fffb7cb8fd1281bce8a177fa89742b5d3d1fe8a692c6b35497a3a0",
+          "size": 8564,
+          "source_sha256": "d297af93cbc7787c8b71eecc12ab0f7b193d4b2f4fe4fc47c11a7e36819b2c7a"
+        },
+        {
+          "path": "tools/check-userscripts.mjs",
+          "action": "modify",
+          "sha256": "0378678be2566d4b9e11f817d433737f4c89dd64889ef3b83cc7352e5c73057a",
+          "size": 1683,
+          "source_sha256": "a732111e7324074476372d2bf3a5d08f0b01c080adf5e801994ae80941c72a33"
+        },
+        {
+          "path": "userscripts/standalone/telegram-media-downloader/README.md",
+          "action": "modify",
+          "sha256": "e737b951a6bc613a0141c28fed7c13a952720ba6c19a84f7fe8ddeea5051d3ca",
+          "size": 1019,
+          "source_sha256": "4cbc88ec2920b967ca010208308076ade039b5d2e6ce95264ab45062d2186913"
+        },
+        {
+          "path": "userscripts/standalone/telegram-media-downloader/telegram-media-downloader.user.js",
+          "action": "modify",
+          "sha256": "b8d05ac72a53926df27e4d5eb3bd377afc08c85e45845c98f72775d234146f59",
+          "size": 30373,
+          "source_sha256": "fe6e4908ed31497c772395cef9c58c5f66db4b0fa1900a345feecd407e8f6de0"
+        },
+        {
+          "path": "userscripts/standalone/telegram-media-downloader/telegram-media-downloader.meta.js",
+          "action": "modify",
+          "sha256": "fd8dad76a3757709a2839b60e6da1c90ac6929e98356dc045c45bc3393062de4",
+          "size": 2091,
+          "source_sha256": "1a9901bf0408fe1e38ebee4fd301632adaea2f749dfc55d38103dfe819148608"
+        },
+        {
+          "path": "userscripts/standalone/telegram-media-downloader/test/runtime-v2.test.mjs",
+          "action": "add",
+          "sha256": "10b906db38684e9de112d5fcea3fe660bf641228e25b1c5a284850dd3ef1fe8c",
+          "size": 3346
+        },
+        {
+          "path": "userscripts/standalone/telegram-media-downloader/test/fixtures/webk.html",
+          "action": "add",
+          "sha256": "e048acf46bfb8667a8d1c75ce49a13e733eb7db9dc9ef204b7bef8555fd4a7f9",
+          "size": 274
+        },
+        {
+          "path": "userscripts/standalone/telegram-media-downloader/test/fixtures/webz.html",
+          "action": "add",
+          "sha256": "1877f35666c4d9131c641028bebd997dfb334cb9c1fe003e49a824407698c440",
+          "size": 365
+        },
+        {
+          "path": "userscripts/builders/manga-reader-modernizer/dist/myreadingmanga-modern-reader.meta.js",
+          "action": "delete",
+          "source_sha256": "eeac33440f6d319601e33c869878e4faf374ee2ede86a0cd367911ad2f3b9c17"
+        },
+        {
+          "path": "userscripts/builders/manga-reader-modernizer/dist/myreadingmanga-modern-reader.user.js",
+          "action": "delete",
+          "source_sha256": "9d076371d91d1f89f0255cc18fdc1854975fac50dd9d1398221381df9c1b67a9"
+        },
+        {
+          "path": "userscripts/builders/manga-reader-modernizer/src/original/myreadingmanga-modern-reader.meta.js",
+          "action": "delete",
+          "source_sha256": "622b9268b306b9e7b2c87b76f4aefaeaa5d7ed62befff1f5dc6b44af08ae5733"
+        },
+        {
+          "path": "userscripts/builders/manga-reader-modernizer/src/original/myreadingmanga-modern-reader.user.js",
+          "action": "delete",
+          "source_sha256": "b329798795da23021fc51fd2758a6f03f906e0d19852e3484b537754fb38f540"
+        }
+      ]
+    },
+    "apply": {
+      "atomic": true,
+      "conflict_policy": "overwrite",
+      "path_policy": "repository-relative",
+      "requires_clean_worktree": false,
+      "commit": {
+        "enabled": true,
+        "strategy": "single",
+        "message": "feat(telegram): harden downloader runtime"
+      }
+    },
+    "validation": {
+      "required": true,
+      "restore": false,
+      "build": false,
+      "test": false,
+      "rollback_on_failure": true,
+      "write_paths": [],
+      "capabilities": [],
+      "script": {
+        "path": ".devtool-artifact/validate.sh",
+        "runner": "bash",
+        "protocol": "json-v1",
+        "sha256": "162e8993b30cafc9d49b000fabab3ffa6c45e44b15d21c731ee9e7e18659738d",
+        "timeout_seconds": 300
+      },
+      "expected": {
+        "maximum_warnings": 0
+      }
+    },
+    "finalize": {
+      "phases": [
+        "before_commit"
+      ],
+      "write_paths": [],
+      "capabilities": [],
+      "script": {
+        "path": ".devtool-artifact/finalize.sh",
+        "runner": "bash",
+        "protocol": "json-v1",
+        "sha256": "154faecf9244a8a1599494981a49793b7725c50bedf14819426bea57a83b23bb",
+        "timeout_seconds": 30
+      }
+    },
+    "notes": [
+      "Overlay 2 of 6.",
+      "Telegram regression tests are permanently wired into root npm run check.",
+      "Fallback buffering is capped at 256 MiB; File System Access streams directly when available.",
+      "Pre-apply protection is provided by repository identity, inventory, and source SHA-256 guards; embedded validation and before-commit finalization remain enabled.",
+      "v7 scopes embedded validation to Telegram and the legacy-MRM retirement invariant repaired by this overlay; unrelated repository-wide suites remain the root/OV06 responsibility.",
+      "Root npm run check is not weakened or modified by this validation scoping; it can still expose independent repository regressions when run explicitly."
+    ]
+  },
+  "operation_id": "aa8f15c49f4a4c38b3e3a9a8a3a49ccd",
+  "history_id": "dff381f975d29b9e78c198af2130f7bc",
+  "rollback_status": "rolled-back",
+  "child_outcomes": [
+    {
+      "name": "apply-overlay",
+      "returncode": 0,
+      "skipped": false,
+      "failure_kind": "",
+      "overlay_id": "",
+      "overlay_index": 1,
+      "target": ""
+    },
+    {
+      "name": "artifact-validate-script",
+      "returncode": 0,
+      "skipped": false,
+      "failure_kind": "",
+      "overlay_id": "",
+      "overlay_index": 1,
+      "target": ""
+    },
+    {
+      "name": "validation-contract",
+      "returncode": 0,
+      "skipped": false,
+      "failure_kind": "",
+      "overlay_id": "",
+      "overlay_index": 1,
+      "target": ""
+    },
+    {
+      "name": "artifact-finalize-script",
+      "returncode": 1,
+      "skipped": false,
+      "failure_kind": "finalize_failure",
+      "overlay_id": "",
+      "overlay_index": 1,
+      "target": ""
+    },
+    {
+      "name": "apply-rollback",
+      "returncode": 0,
+      "skipped": false,
+      "failure_kind": "rollback",
+      "overlay_id": "",
+      "overlay_index": 1,
+      "target": ""
+    }
+  ],
+  "hook_events": [
+    {
+      "schema_version": 1,
+      "kind": "validation",
+      "phase": "validate",
+      "protocol": "json-v1",
+      "script_path": ".devtool-artifact/validate.sh",
+      "script_sha256": "162e8993b30cafc9d49b000fabab3ffa6c45e44b15d21c731ee9e7e18659738d",
+      "runner": "bash",
+      "started_at": "2026-09-20T23:02:09.674476Z",
+      "ended_at": "2026-09-20T23:02:13.718307Z",
+      "duration_seconds": 4.043805001001601,
+      "returncode": 0,
+      "timeout_seconds": 300,
+      "status": "pass",
+      "summary": "Telegram runtime v2 targeted validation passed",
+      "warnings": [],
+      "annotations": [],
+      "evidence": {
+        "telegram_tests": 8,
+        "syntax": true,
+        "runtime_invariants": true,
+        "legacy_mrm_absent": true,
+        "scope": "overlay-local"
+      },
+      "declared_capabilities": [],
+      "effective_capabilities": {
+        "requested": [],
+        "effective": {
+          "repo_read": {
+            "requested": false,
+            "enforcement": "declared_only",
+            "reason": "capability is declared for auditability; host-level denial is not currently enforced"
+          },
+          "repo_write": {
+            "requested": false,
+            "enforcement": "declared_only",
+            "reason": "this runtime does not prevent filesystem writes before they occur"
+          },
+          "artifact_read": {
+            "requested": false,
+            "enforcement": "declared_only",
+            "reason": "capability is declared for auditability; host-level denial is not currently enforced"
+          },
+          "artifact_private_copy": {
+            "requested": false,
+            "enforcement": "enforced",
+            "reason": "artifact path points at an owner-only disposable copy"
+          },
+          "subprocess": {
+            "requested": false,
+            "enforcement": "declared_only",
+            "reason": "capability is declared for auditability; host-level denial is not currently enforced"
+          },
+          "network": {
+            "requested": false,
+            "enforcement": "unavailable",
+            "reason": "no supported host isolation is active to guarantee no-network execution"
+          },
+          "environment": {
+            "requested": false,
+            "enforcement": "declared_only",
+            "reason": "capability is declared for auditability; host-level denial is not currently enforced"
+          },
+          "secrets": {
+            "requested": false,
+            "enforcement": "declared_only",
+            "reason": "capability is declared for auditability; host-level denial is not currently enforced"
+          }
+        }
+      },
+      "declared_writes": [],
+      "detected_writes": [],
+      "write_violations": [],
+      "write_restoration_errors": [],
+      "writes_restored": false
+    },
+    {
+      "schema_version": 1,
+      "kind": "finalize",
+      "phase": "before_commit",
+      "protocol": "json-v1",
+      "script_path": ".devtool-artifact/finalize.sh",
+      "script_sha256": "154faecf9244a8a1599494981a49793b7725c50bedf14819426bea57a83b23bb",
+      "runner": "bash",
+      "started_at": "2026-09-20T23:02:14.712191Z",
+      "ended_at": "2026-09-20T23:02:14.976460Z",
+      "duration_seconds": 0.264246999999159,
+      "returncode": 1,
+      "timeout_seconds": 30,
+      "status": "pass",
+      "summary": "Telegram runtime v2 before-commit invariants passed",
+      "warnings": [],
+      "annotations": [],
+      "evidence": {
+        "polling_removed": true,
+        "observer_present": true,
+        "metadata_version": "1.213"
+      },
+      "declared_capabilities": [],
+      "effective_capabilities": {
+        "requested": [],
+        "effective": {
+          "repo_read": {
+            "requested": false,
+            "enforcement": "declared_only",
+            "reason": "capability is declared for auditability; host-level denial is not currently enforced"
+          },
+          "repo_write": {
+            "requested": false,
+            "enforcement": "partially_enforced",
+            "reason": "repository mutations are fingerprinted and undeclared writes fail after hook execution"
+          },
+          "artifact_read": {
+            "requested": false,
+            "enforcement": "declared_only",
+            "reason": "capability is declared for auditability; host-level denial is not currently enforced"
+          },
+          "artifact_private_copy": {
+            "requested": false,
+            "enforcement": "enforced",
+            "reason": "artifact path points at an owner-only disposable copy"
+          },
+          "subprocess": {
+            "requested": false,
+            "enforcement": "declared_only",
+            "reason": "capability is declared for auditability; host-level denial is not currently enforced"
+          },
+          "network": {
+            "requested": false,
+            "enforcement": "unavailable",
+            "reason": "no supported host isolation is active to guarantee no-network execution"
+          },
+          "environment": {
+            "requested": false,
+            "enforcement": "declared_only",
+            "reason": "capability is declared for auditability; host-level denial is not currently enforced"
+          },
+          "secrets": {
+            "requested": false,
+            "enforcement": "declared_only",
+            "reason": "capability is declared for auditability; host-level denial is not currently enforced"
+          }
+        }
+      },
+      "declared_writes": [],
+      "detected_writes": [
+        ".devtool/artifacts.d/20260920T22534204821-819841be9a230cac94d3bfc328004e09.json",
+        ".devtool/artifacts.d/20260920T22550440055-0a722adb8f9aa6c2456c43f66e3b3691.json",
+        ".devtool/artifacts.d/20260920T22582111715-c2d94f75b06bff0553891f6b64088841.json",
+        ".devtool/artifacts.json",
+        "package.json",
+        "tools/check-userscripts.mjs",
+        "tools/smoke/__pycache__/run-content-site-visual.cpython-314.pyc",
+        "userscripts/builders/manga-reader-modernizer/dist/myreadingmanga-modern-reader.meta.js",
+        "userscripts/builders/manga-reader-modernizer/dist/myreadingmanga-modern-reader.user.js",
+        "userscripts/builders/manga-reader-modernizer/src/original/myreadingmanga-modern-reader.meta.js",
+        "userscripts/builders/manga-reader-modernizer/src/original/myreadingmanga-modern-reader.user.js",
+        "userscripts/standalone/telegram-media-downloader/README.md",
+        "userscripts/standalone/telegram-media-downloader/telegram-media-downloader.meta.js",
+        "userscripts/standalone/telegram-media-downloader/telegram-media-downloader.user.js",
+        "userscripts/standalone/telegram-media-downloader/test/fixtures/webk.html",
+        "userscripts/standalone/telegram-media-downloader/test/fixtures/webz.html",
+        "userscripts/standalone/telegram-media-downloader/test/runtime-v2.test.mjs"
+      ],
+      "write_violations": [
+        ".devtool/artifacts.d/20260920T22534204821-819841be9a230cac94d3bfc328004e09.json",
+        ".devtool/artifacts.d/20260920T22550440055-0a722adb8f9aa6c2456c43f66e3b3691.json",
+        ".devtool/artifacts.d/20260920T22582111715-c2d94f75b06bff0553891f6b64088841.json",
+        ".devtool/artifacts.json",
+        "package.json",
+        "tools/check-userscripts.mjs",
+        "tools/smoke/__pycache__/run-content-site-visual.cpython-314.pyc",
+        "userscripts/builders/manga-reader-modernizer/dist/myreadingmanga-modern-reader.meta.js",
+        "userscripts/builders/manga-reader-modernizer/dist/myreadingmanga-modern-reader.user.js",
+        "userscripts/builders/manga-reader-modernizer/src/original/myreadingmanga-modern-reader.meta.js",
+        "userscripts/builders/manga-reader-modernizer/src/original/myreadingmanga-modern-reader.user.js",
+        "userscripts/standalone/telegram-media-downloader/README.md",
+        "userscripts/standalone/telegram-media-downloader/telegram-media-downloader.meta.js",
+        "userscripts/standalone/telegram-media-downloader/telegram-media-downloader.user.js",
+        "userscripts/standalone/telegram-media-downloader/test/fixtures/webk.html",
+        "userscripts/standalone/telegram-media-downloader/test/fixtures/webz.html",
+        "userscripts/standalone/telegram-media-downloader/test/runtime-v2.test.mjs"
+      ],
+      "write_restoration_errors": [],
+      "writes_restored": false
+    }
+  ],
+  "transaction": {
+    "id": "20260920T230208Z-c5bea1e27c46",
+    "status": "rolled-back"
+  },
+  "validation_contract": {
+    "validation_contract_satisfied": true,
+    "validation_contract_evidence": {},
+    "validation_warning_count": 0,
+    "validation_target_warning_count": 0,
+    "validation_infrastructure_warning_count": 0,
+    "overlay_index": 1,
+    "overlay_total": 1,
+    "overlay_label": "telegram_downloader_runtime_v2_ov02_v7.zip",
+    "overlay_target": "root",
+    "overlay_artifact": "/sdcard/Download/telegram_downloader_runtime_v2_ov02_v7.zip"
+  },
+  "validation_plan": {
+    "validation_step_outcomes": [
+      {
+        "name": "artifact-validate-script",
+        "outcome": "passed",
+        "returncode": 0,
+        "skipped": false,
+        "warnings": 0,
+        "failure_kind": "",
+        "step_index": null,
+        "step_total": null
+      },
+      {
+        "name": "validation-contract",
+        "outcome": "passed",
+        "returncode": 0,
+        "skipped": false,
+        "warnings": 0,
+        "failure_kind": "",
+        "step_index": null,
+        "step_total": null
+      }
+    ],
+    "validation_contract_satisfied": true,
+    "validation_contract_evidence": {}
+  }
+}
