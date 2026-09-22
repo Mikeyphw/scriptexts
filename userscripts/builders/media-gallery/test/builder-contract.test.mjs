@@ -81,3 +81,17 @@ test("Coomer profile fixture provides post-card previews and human labels",()=>{
   assert.match(coomerFixture,/post-card__image/);
   assert.match(coomerFixture,/post-card__header/);
 });
+
+
+test("Coomer video previews are lazy and never eagerly download full videos",()=>{
+  for(const token of ['class="mg-video-preview"','preload="none"','video.preload="metadata"','video.load()','playsinline','muted']) assert.ok(coomerSource.includes(token),token);
+  assert.ok(coomerSource.includes('class="mg-play"'));
+});
+test("Coomer video fallback order is poster then explicit metadata preview then unavailable state",()=>{
+  for(const token of ['class="mg-poster"','Video preview unavailable','poster.hidden=true','failed.hidden=true','video.play().catch']) assert.ok(coomerSource.includes(token),token);
+});
+test("Coomer card titles stay outside preview controls and ZIP still uses originals",()=>{
+  assert.ok(coomerSource.includes('<article class="mg-card'));
+  assert.ok(coomerSource.includes('</div><small title='));
+  assert.ok(coomerSource.includes('request(x.url,ac.signal,"blob")'));
+});
