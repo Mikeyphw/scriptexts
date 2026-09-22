@@ -56,7 +56,7 @@ test("Coomer original extraction is CDN-host agnostic inside allowed coomer.st s
 
 
 test("Coomer discovery uses the current post API before HTML fallback",()=>{
-  for(const token of ["/api/v1/","responseType:\"json\"","Accept:\"text/css\"","mediaFromApi","mediaForPost(post,ac.signal)","Post API fallback to HTML"]) assert.ok(coomerSource.includes(token),token);
+  for(const token of ["/api/v1/","responseType:\"json\"","Accept:\"text/css\"","mediaFromApi","mediaForPost(post,ac.signal,entry)","Post API fallback to HTML"]) assert.ok(coomerSource.includes(token),token);
 });
 test("Coomer API extraction covers main file, attachments, server URLs and original names",()=>{
   for(const token of ["post.file","post.attachments","file.server","/data/","file.name||undefined"]) assert.ok(coomerSource.includes(token),token);
@@ -65,4 +65,19 @@ test("Coomer API extraction covers main file, attachments, server URLs and origi
 
 test("generated Coomer userscript is valid JavaScript, not only contract-shaped text",()=>{
   assert.doesNotThrow(()=>new Function(coomerSource),"coomer-runtime.js must parse as JavaScript");
+});
+
+test("Coomer keeps listing previews separate from original download URLs",()=>{
+  for(const token of ["function postEntries(doc)","post-card__header","data-src","preview:context.preview||url","mediaForPost(post,ac.signal,entry)"]) assert.ok(coomerSource.includes(token),token);
+  assert.match(coomerSource,/x\.url/); // originals remain the archive identity/download source
+});
+test("Coomer preview cards degrade gracefully without changing ZIP originals",()=>{
+  for(const token of ["data-fallback","Preview unavailable","img.onerror","x.type===\"image\"?x.url",'x.filename||filename(x.url,i)']) assert.ok(coomerSource.includes(token),token);
+});
+test("Coomer completed scans have a terminal UI state and useful card labels",()=>{
+  for(const token of ['s.complete?"Scan complete"','state.scan.complete=true','x.label||x.filename||`Media ${i+1}`']) assert.ok(coomerSource.includes(token),token);
+});
+test("Coomer profile fixture provides post-card previews and human labels",()=>{
+  assert.match(coomerFixture,/post-card__image/);
+  assert.match(coomerFixture,/post-card__header/);
 });
