@@ -57,42 +57,108 @@ inputs = [
 [targets.root]
 type = "node"
 root = "."
+inputs = [
+    "package.json",
+    "package-lock.json",
+    "userscripts/**",
+    "extensions/**",
+    "tools/**",
+    ".devtool.toml",
+]
+outputs = [
+    "dist/**",
+    "userscripts/**/dist/**",
+    "extensions/**/dist/**",
+]
 
 [targets.content-site-modernizer]
 type = "node"
 root = "userscripts/builders/content-site-modernizer"
+inputs = [
+    "userscripts/builders/content-site-modernizer/**",
+    "tools/**",
+]
+outputs = [
+    "userscripts/builders/content-site-modernizer/dist/**",
+]
 
 [targets.manga-reader-modernizer]
 type = "node"
 root = "userscripts/builders/manga-reader-modernizer"
+inputs = [
+    "userscripts/builders/manga-reader-modernizer/**",
+]
+outputs = [
+    "userscripts/builders/manga-reader-modernizer/dist/**",
+]
 
 
 [targets.myreadingmanga-reimagined]
 type = "node"
 root = "userscripts/builders/myreadingmanga-reimagined"
+inputs = [
+    "userscripts/builders/myreadingmanga-reimagined/**",
+]
+outputs = [
+    "userscripts/builders/myreadingmanga-reimagined/dist/**",
+]
 
 [targets.sims-cc-download-basket]
 type = "node"
 root = "userscripts/builders/sims-cc-download-basket"
+inputs = [
+    "userscripts/builders/sims-cc-download-basket/**",
+]
+outputs = [
+    "userscripts/builders/sims-cc-download-basket/dist/**",
+]
 
 [targets.manga-site-media-downloader]
 type = "command"
 root = "extensions/manga-site-media-downloader"
 build_command = "python3 build.py"
+inputs = [
+    "extensions/manga-site-media-downloader/**",
+]
+outputs = [
+    "extensions/manga-site-media-downloader/dist/**",
+    "extensions/manga-site-media-downloader/build/**",
+]
 
 [targets.stardew-nexus-download-queue]
 type = "command"
 root = "extensions/stardew-nexus-download-queue"
 build_command = "python3 build.py"
+inputs = [
+    "extensions/stardew-nexus-download-queue/**",
+]
+outputs = [
+    "extensions/stardew-nexus-download-queue/dist/**",
+    "extensions/stardew-nexus-download-queue/build/**",
+]
 
 [targets.telegram-media-downloader-extension]
 type = "command"
 root = "extensions/telegram-media-downloader"
 build_command = "python3 build.py"
+inputs = [
+    "extensions/telegram-media-downloader/**",
+]
+outputs = [
+    "extensions/telegram-media-downloader/dist/**",
+    "extensions/telegram-media-downloader/build/**",
+]
 
 [targets.smoke-python]
 type = "command"
 root = "."
+inputs = [
+    "tools/smoke/**",
+    "userscripts/builders/content-site-modernizer/**",
+]
+outputs = [
+    "userscripts/builders/content-site-modernizer/dist/**",
+]
 
 [targets.smoke-python.workflows]
 build = ["job:scriptexts-smoke-build-content-sites"]
@@ -109,21 +175,39 @@ validate = [
 [targets.lpsg-media-gallery-unlocker]
 type = "node"
 root = "userscripts/builders/lpsg-media-gallery-unlocker"
+inputs = [
+    "userscripts/builders/lpsg-media-gallery-unlocker/**",
+]
+outputs = [
+    "userscripts/builders/lpsg-media-gallery-unlocker/dist/**",
+]
 
 [targets.poast-timeline-metadata-reset]
 type = "node"
 root = "userscripts/builders/poast-timeline-metadata-reset"
+inputs = [
+    "userscripts/builders/poast-timeline-metadata-reset/**",
+]
+outputs = [
+    "userscripts/builders/poast-timeline-metadata-reset/dist/**",
+]
 
 [targets.search-engines-clean-dark-ui]
 type = "command"
 root = "."
 build_command = "node --check userscripts/standalone/search-engines-clean-dark-ui/search-engines-clean-dark-ui.user.js"
+inputs = [
+    "userscripts/standalone/search-engines-clean-dark-ui/**",
+]
 
 [targets.telegram-media-downloader-userscript]
 type = "command"
 root = "."
 build_command = "node --check userscripts/standalone/telegram-media-downloader/telegram-media-downloader.user.js"
 test_command = "node --test userscripts/standalone/telegram-media-downloader/test/*.test.mjs"
+inputs = [
+    "userscripts/standalone/telegram-media-downloader/**",
+]
 
 
 [targets.coomer-media-gallery]
@@ -131,3 +215,9 @@ type = "node"
 root = "userscripts/builders/media-gallery"
 build_command = "npm run check:coomer"
 test_command = "npm test"
+inputs = [
+    "userscripts/builders/media-gallery/**",
+]
+outputs = [
+    "userscripts/builders/media-gallery/dist/**",
+]
