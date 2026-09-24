@@ -2,12 +2,51 @@
 kind = "node"
 root = "."
 
+[workspace]
+default_target = "root"
+
 [node]
 manager = "npm"
 clean_install = false
 
 [build]
 max_workers = "auto"
+
+
+# -----------------------------------------------------------------------------
+# Devtool explicit smoke workflow convergence (OV03)
+# -----------------------------------------------------------------------------
+[jobs.scriptexts-smoke-build-content-sites]
+runner = "command"
+root = "."
+command = ["npm", "run", "build:content-sites"]
+inputs = [
+  "package.json",
+  "package-lock.json",
+  "userscripts/builders/content-site-modernizer/**",
+  "tools/smoke/**",
+]
+outputs = ["userscripts/builders/content-site-modernizer/dist/**"]
+
+[jobs.scriptexts-smoke-content-sites-check]
+runner = "python"
+root = "."
+command = ["python3", "tools/smoke/run-content-site-smoke.py", "--builder", "content-site-modernizer", "--check-config"]
+inputs = [
+  "tools/smoke/run-content-site-smoke.py",
+  "userscripts/builders/content-site-modernizer/smoke.config.json",
+  "userscripts/builders/content-site-modernizer/dist/**",
+]
+
+[jobs.scriptexts-smoke-content-sites-visual-check]
+runner = "python"
+root = "."
+command = ["python3", "tools/smoke/run-content-site-visual.py", "--builder", "content-site-modernizer", "--check-config"]
+inputs = [
+  "tools/smoke/run-content-site-visual.py",
+  "userscripts/builders/content-site-modernizer/smoke.config.json",
+  "userscripts/builders/content-site-modernizer/dist/**",
+]
 
 [targets.root]
 type = "node"
@@ -46,16 +85,21 @@ root = "extensions/telegram-media-downloader"
 build_command = "python3 build.py"
 
 [targets.smoke-python]
-type = "python"
+type = "command"
 root = "."
-test_command = "python tools/smoke/run-content-site-smoke.py --builder content-site-modernizer --check-config && python tools/smoke/run-content-site-visual.py --builder content-site-modernizer --check-config"
 
-[targets.smoke-python.python]
-manager = "uv"
-environment = ".venv-smoke"
-groups = ["smoke"]
-install_project = false
-offline = false
+[targets.smoke-python.workflows]
+build = ["job:scriptexts-smoke-build-content-sites"]
+test = [
+  "job:scriptexts-smoke-build-content-sites",
+  "job:scriptexts-smoke-content-sites-check",
+  "job:scriptexts-smoke-content-sites-visual-check",
+]
+validate = [
+  "job:scriptexts-smoke-build-content-sites",
+  "job:scriptexts-smoke-content-sites-check",
+  "job:scriptexts-smoke-content-sites-visual-check",
+]
 [targets.lpsg-media-gallery-unlocker]
 type = "node"
 root = "userscripts/builders/lpsg-media-gallery-unlocker"

@@ -41,6 +41,5 @@ __pycache__/
 *.backup-*
 *.backup
 
-# Devtool local artifact ledger (runtime state, not source)
-.devtool/artifacts.json
-.devtool/artifacts.d/
+# Devtool local runtime state
+.devtool/
