@@ -79,6 +79,19 @@ outputs = [
     "extensions/**/dist/**",
 ]
 
+[targets.root.artifacts]
+required = false
+verify = false
+directories = [
+    "dist",
+    "userscripts",
+    "extensions",
+]
+patterns = [
+    "*.user.js",
+    "*.zip",
+]
+recursive = true
 [targets.content-site-modernizer]
 type = "node"
 root = "userscripts/builders/content-site-modernizer"
@@ -133,6 +146,14 @@ outputs = [
     "extensions/manga-site-media-downloader/build/**",
 ]
 
+[targets.manga-site-media-downloader.artifacts]
+required = false
+verify = false
+directories = [
+    "extensions/manga-site-media-downloader/dist",
+    "extensions/manga-site-media-downloader/build",
+]
+recursive = true
 [targets.stardew-nexus-download-queue]
 type = "command"
 root = "extensions/stardew-nexus-download-queue"
@@ -145,6 +166,14 @@ outputs = [
     "extensions/stardew-nexus-download-queue/build/**",
 ]
 
+[targets.stardew-nexus-download-queue.artifacts]
+required = false
+verify = false
+directories = [
+    "extensions/stardew-nexus-download-queue/dist",
+    "extensions/stardew-nexus-download-queue/build",
+]
+recursive = true
 [targets.telegram-media-downloader-extension]
 type = "command"
 root = "extensions/telegram-media-downloader"
@@ -157,6 +186,14 @@ outputs = [
     "extensions/telegram-media-downloader/build/**",
 ]
 
+[targets.telegram-media-downloader-extension.artifacts]
+required = false
+verify = false
+directories = [
+    "extensions/telegram-media-downloader/dist",
+    "extensions/telegram-media-downloader/build",
+]
+recursive = true
 [targets.smoke-python]
 type = "command"
 root = "."
