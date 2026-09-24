@@ -1,6 +1,7 @@
 [project]
-kind = "node"
 root = "."
+runner = "node"
+platform = "cli"
 
 [workspace]
 default_target = "root"
@@ -63,7 +64,6 @@ inputs = [
 outputs = []
 
 [targets.root]
-type = "node"
 root = "."
 inputs = [
     "package.json",
@@ -78,6 +78,8 @@ outputs = [
     "userscripts/**/dist/**",
     "extensions/**/dist/**",
 ]
+runner = "node"
+platform = "web"
 
 [targets.root.artifacts]
 required = false
@@ -93,7 +95,6 @@ patterns = [
 ]
 recursive = true
 [targets.content-site-modernizer]
-type = "node"
 root = "userscripts/builders/content-site-modernizer"
 inputs = [
     "userscripts/builders/content-site-modernizer/**",
@@ -102,9 +103,10 @@ inputs = [
 outputs = [
     "userscripts/builders/content-site-modernizer/dist/**",
 ]
+runner = "node"
+platform = "web"
 
 [targets.manga-reader-modernizer]
-type = "node"
 root = "userscripts/builders/manga-reader-modernizer"
 inputs = [
     "userscripts/builders/manga-reader-modernizer/**",
@@ -112,10 +114,11 @@ inputs = [
 outputs = [
     "userscripts/builders/manga-reader-modernizer/dist/**",
 ]
+runner = "node"
+platform = "web"
 
 
 [targets.myreadingmanga-reimagined]
-type = "node"
 root = "userscripts/builders/myreadingmanga-reimagined"
 inputs = [
     "userscripts/builders/myreadingmanga-reimagined/**",
@@ -123,9 +126,10 @@ inputs = [
 outputs = [
     "userscripts/builders/myreadingmanga-reimagined/dist/**",
 ]
+runner = "node"
+platform = "web"
 
 [targets.sims-cc-download-basket]
-type = "node"
 root = "userscripts/builders/sims-cc-download-basket"
 inputs = [
     "userscripts/builders/sims-cc-download-basket/**",
@@ -133,9 +137,10 @@ inputs = [
 outputs = [
     "userscripts/builders/sims-cc-download-basket/dist/**",
 ]
+runner = "node"
+platform = "web"
 
 [targets.manga-site-media-downloader]
-type = "command"
 root = "extensions/manga-site-media-downloader"
 build_command = "python3 build.py"
 inputs = [
@@ -145,6 +150,8 @@ outputs = [
     "extensions/manga-site-media-downloader/dist/**",
     "extensions/manga-site-media-downloader/build/**",
 ]
+runner = "command"
+platform = "cli"
 
 [targets.manga-site-media-downloader.artifacts]
 required = false
@@ -155,7 +162,6 @@ directories = [
 ]
 recursive = true
 [targets.stardew-nexus-download-queue]
-type = "command"
 root = "extensions/stardew-nexus-download-queue"
 build_command = "python3 build.py"
 inputs = [
@@ -165,6 +171,8 @@ outputs = [
     "extensions/stardew-nexus-download-queue/dist/**",
     "extensions/stardew-nexus-download-queue/build/**",
 ]
+runner = "command"
+platform = "cli"
 
 [targets.stardew-nexus-download-queue.artifacts]
 required = false
@@ -175,7 +183,6 @@ directories = [
 ]
 recursive = true
 [targets.telegram-media-downloader-extension]
-type = "command"
 root = "extensions/telegram-media-downloader"
 build_command = "python3 build.py"
 inputs = [
@@ -185,6 +192,8 @@ outputs = [
     "extensions/telegram-media-downloader/dist/**",
     "extensions/telegram-media-downloader/build/**",
 ]
+runner = "command"
+platform = "cli"
 
 [targets.telegram-media-downloader-extension.artifacts]
 required = false
@@ -195,7 +204,6 @@ directories = [
 ]
 recursive = true
 [targets.smoke-python]
-type = "command"
 root = "."
 inputs = [
     "tools/smoke/**",
@@ -204,6 +212,8 @@ inputs = [
 outputs = [
     "userscripts/builders/content-site-modernizer/dist/**",
 ]
+runner = "command"
+platform = "cli"
 
 [targets.smoke-python.workflows]
 build = ["job:scriptexts-smoke-build-content-sites"]
@@ -218,7 +228,6 @@ validate = [
     {id = "visual_config", ref = "job:scriptexts-smoke-content-sites-visual-check", depends_on = ["build_content_sites"]},
 ]
 [targets.lpsg-media-gallery-unlocker]
-type = "node"
 root = "userscripts/builders/lpsg-media-gallery-unlocker"
 inputs = [
     "userscripts/builders/lpsg-media-gallery-unlocker/**",
@@ -226,9 +235,10 @@ inputs = [
 outputs = [
     "userscripts/builders/lpsg-media-gallery-unlocker/dist/**",
 ]
+runner = "node"
+platform = "web"
 
 [targets.poast-timeline-metadata-reset]
-type = "node"
 root = "userscripts/builders/poast-timeline-metadata-reset"
 inputs = [
     "userscripts/builders/poast-timeline-metadata-reset/**",
@@ -236,27 +246,30 @@ inputs = [
 outputs = [
     "userscripts/builders/poast-timeline-metadata-reset/dist/**",
 ]
+runner = "node"
+platform = "web"
 
 [targets.search-engines-clean-dark-ui]
-type = "command"
 root = "."
 build_command = "node --check userscripts/standalone/search-engines-clean-dark-ui/search-engines-clean-dark-ui.user.js"
 inputs = [
     "userscripts/standalone/search-engines-clean-dark-ui/**",
 ]
+runner = "command"
+platform = "cli"
 
 [targets.telegram-media-downloader-userscript]
-type = "command"
 root = "."
 build_command = "node --check userscripts/standalone/telegram-media-downloader/telegram-media-downloader.user.js"
 test_command = "node --test userscripts/standalone/telegram-media-downloader/test/*.test.mjs"
 inputs = [
     "userscripts/standalone/telegram-media-downloader/**",
 ]
+runner = "command"
+platform = "cli"
 
 
 [targets.coomer-media-gallery]
-type = "node"
 root = "userscripts/builders/media-gallery"
 build_command = "npm run check:coomer"
 test_command = "npm test"
@@ -266,3 +279,5 @@ inputs = [
 outputs = [
     "userscripts/builders/media-gallery/dist/**",
 ]
+runner = "node"
+platform = "web"
