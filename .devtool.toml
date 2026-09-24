@@ -11,6 +11,12 @@ extensions = ["manga-site-media-downloader", "stardew-nexus-download-queue", "te
 userscripts = ["search-engines-clean-dark-ui", "telegram-media-downloader-userscript"]
 smoke = ["smoke-python"]
 all = ["root", "@builders", "@extensions", "@userscripts", "@smoke"]
+
+[workspace.scheduler]
+parallel = true
+max_parallel_nodes = 3
+max_gradle_nodes = 1
+max_dotnet_nodes = 1
 [node]
 manager = "npm"
 clean_install = false
@@ -43,6 +49,7 @@ inputs = [
   "userscripts/builders/content-site-modernizer/smoke.config.json",
   "userscripts/builders/content-site-modernizer/dist/**",
 ]
+outputs = []
 
 [jobs.scriptexts-smoke-content-sites-visual-check]
 runner = "python"
@@ -53,6 +60,7 @@ inputs = [
   "userscripts/builders/content-site-modernizer/smoke.config.json",
   "userscripts/builders/content-site-modernizer/dist/**",
 ]
+outputs = []
 
 [targets.root]
 type = "node"
@@ -163,14 +171,14 @@ outputs = [
 [targets.smoke-python.workflows]
 build = ["job:scriptexts-smoke-build-content-sites"]
 test = [
-  "job:scriptexts-smoke-build-content-sites",
-  "job:scriptexts-smoke-content-sites-check",
-  "job:scriptexts-smoke-content-sites-visual-check",
+    {id = "build_content_sites", ref = "job:scriptexts-smoke-build-content-sites", depends_on = []},
+    {id = "smoke_config", ref = "job:scriptexts-smoke-content-sites-check", depends_on = ["build_content_sites"]},
+    {id = "visual_config", ref = "job:scriptexts-smoke-content-sites-visual-check", depends_on = ["build_content_sites"]},
 ]
 validate = [
-  "job:scriptexts-smoke-build-content-sites",
-  "job:scriptexts-smoke-content-sites-check",
-  "job:scriptexts-smoke-content-sites-visual-check",
+    {id = "build_content_sites", ref = "job:scriptexts-smoke-build-content-sites", depends_on = []},
+    {id = "smoke_config", ref = "job:scriptexts-smoke-content-sites-check", depends_on = ["build_content_sites"]},
+    {id = "visual_config", ref = "job:scriptexts-smoke-content-sites-visual-check", depends_on = ["build_content_sites"]},
 ]
 [targets.lpsg-media-gallery-unlocker]
 type = "node"
