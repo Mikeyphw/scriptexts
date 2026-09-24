@@ -5,6 +5,12 @@ root = "."
 [workspace]
 default_target = "root"
 
+[workspace.groups]
+builders = ["content-site-modernizer", "manga-reader-modernizer", "myreadingmanga-reimagined", "sims-cc-download-basket", "lpsg-media-gallery-unlocker", "poast-timeline-metadata-reset", "coomer-media-gallery"]
+extensions = ["manga-site-media-downloader", "stardew-nexus-download-queue", "telegram-media-downloader-extension"]
+userscripts = ["search-engines-clean-dark-ui", "telegram-media-downloader-userscript"]
+smoke = ["smoke-python"]
+all = ["root", "@builders", "@extensions", "@userscripts", "@smoke"]
 [node]
 manager = "npm"
 clean_install = false
