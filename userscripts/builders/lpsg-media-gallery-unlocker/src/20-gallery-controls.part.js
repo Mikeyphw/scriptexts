@@ -287,12 +287,12 @@
                     <div class="pg-title-wrap">
                         <div class="pg-title">Media Gallery</div>
                         <div class="pg-desktop-subtitle" id="pg-desktop-status">Use search, sorting, quick actions, and keyboard shortcuts.</div>
-                        <div class="pg-mobile-subtitle" id="pg-mobile-status">Tap to open. Long-press to select.</div>
+                        <div class="pg-mobile-subtitle" id="pg-mobile-status">Tap to open. Hold Images/Videos to select all of that type.</div>
                     </div>
                     <div class="pg-filter-segment" role="tablist" aria-label="Media filter">
                         <button class="pg-filter-btn active" data-filter="all">All (<span id="pg-count-all">0</span>)</button>
-                        <button class="pg-filter-btn" data-filter="image">Images (<span id="pg-count-image">0</span>)</button>
-                        <button class="pg-filter-btn" data-filter="video">Videos (<span id="pg-count-video">0</span>)</button>
+                        <button class="pg-filter-btn" data-filter="image" title="Tap to filter. Hold to select/deselect all images.">Images (<span id="pg-count-image">0</span>)</button>
+                        <button class="pg-filter-btn" data-filter="video" title="Tap to filter. Hold to select/deselect all videos.">Videos (<span id="pg-count-video">0</span>)</button>
                     </div>
                     <button class="pg-action-btn pg-mobile-more" id="pg-gallery-more" type="button" aria-haspopup="dialog">More</button>
                     <button class="pg-close" aria-label="Close gallery">✖</button>
@@ -370,6 +370,17 @@
                     <div class="pg-progress-fill" id="pg-progress-fill"></div>
                 </div>
             </div>
+
+            <section class="pg-zip-job-summary" id="pg-zip-job-summary" aria-live="polite" aria-hidden="true" hidden>
+                <div class="pg-zip-job-title" data-pg-job-title>Creating ZIP</div>
+                <div class="pg-zip-job-count" data-pg-job-count>0 / 0 completed</div>
+                <div class="pg-zip-job-meta" data-pg-job-meta></div>
+                <div class="pg-zip-job-problems" data-pg-job-problems hidden></div>
+                <div class="pg-zip-job-actions">
+                    <button type="button" id="pg-zip-job-debug">Diagnostics</button>
+                    <button type="button" id="pg-zip-job-hide">Hide</button>
+                </div>
+            </section>
 
             <div class="pg-desktop-overview" id="pg-desktop-overview" aria-live="polite">
                 <div class="pg-stat-card">
@@ -515,13 +526,6 @@
                 </div>
             </div>
 
-            <section class="pg-zip-job-summary" id="pg-zip-job-summary" aria-live="polite" hidden>
-                <div class="pg-zip-job-title" data-pg-job-title>Creating ZIP</div>
-                <div class="pg-zip-job-count" data-pg-job-count>0 / 0 completed</div>
-                <div class="pg-zip-job-meta" data-pg-job-meta></div>
-                <div class="pg-zip-job-problems" data-pg-job-problems hidden></div>
-            </section>
-
             <div id="pg-debug-panel" aria-live="polite">
                 <div class="pg-debug-header">
                     <div class="pg-debug-title">Gallery Debug</div>
@@ -581,12 +585,72 @@
         restoreZipJobSummary();
 
         container.querySelectorAll(".pg-filter-btn").forEach(button => {
+            const filterType = button.dataset.filter || "all";
+            let longPressTimer = null;
+            let startX = 0;
+            let startY = 0;
+
+            const cancelLongPress = () => {
+                if (longPressTimer) {
+                    clearTimeout(longPressTimer);
+                    longPressTimer = null;
+                }
+            };
+
             button.addEventListener("click", event => {
+                if (
+                    state.filterLongPressType === filterType &&
+                    performance.now() < state.filterLongPressSuppressClickUntil
+                ) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    state.filterLongPressType = "";
+                    state.filterLongPressSuppressClickUntil = 0;
+                    return;
+                }
+
                 container.querySelectorAll(".pg-filter-btn").forEach(item => item.classList.remove("active"));
                 event.currentTarget.classList.add("active");
-                state.filter = event.currentTarget.dataset.filter;
+                state.filter = filterType;
                 renderGrid();
             });
+
+            if (filterType === "image" || filterType === "video") {
+                button.addEventListener("pointerdown", event => {
+                    if (!isMobileLayout() || (Number.isFinite(event.button) && event.button > 0)) {
+                        return;
+                    }
+
+                    cancelLongPress();
+                    startX = event.clientX;
+                    startY = event.clientY;
+                    longPressTimer = setTimeout(() => {
+                        longPressTimer = null;
+                        state.filterLongPressType = filterType;
+                        state.filterLongPressSuppressClickUntil = performance.now() + 900;
+                        button.classList.add("pg-long-press-active");
+                        setTimeout(() => button.classList.remove("pg-long-press-active"), 220);
+                        try { navigator.vibrate?.(18); } catch {}
+                        toggleMediaTypeSelection(filterType);
+                    }, config.mobileLongPressMs);
+                }, { passive: true });
+
+                button.addEventListener("pointermove", event => {
+                    if (Math.hypot(event.clientX - startX, event.clientY - startY) > 14) {
+                        cancelLongPress();
+                    }
+                }, { passive: true });
+
+                ["pointerup", "pointercancel", "pointerleave"].forEach(type => {
+                    button.addEventListener(type, cancelLongPress, { passive: true });
+                });
+
+                button.addEventListener("contextmenu", event => {
+                    if (isMobileLayout()) {
+                        event.preventDefault();
+                    }
+                });
+            }
         });
 
         container.querySelector(".pg-close").addEventListener("click", closeGallery);
@@ -649,7 +713,9 @@
                 cancelScan();
             }
         });
-        container.querySelector("#pg-progress-details").addEventListener("click", () => { renderZipJobSummary(); const panel = document.getElementById("pg-zip-job-summary"); panel?.scrollIntoView?.({ block: "nearest", behavior: "smooth" }); });
+        container.querySelector("#pg-progress-details").addEventListener("click", toggleZipDetails);
+        container.querySelector("#pg-zip-job-debug").addEventListener("click", () => setDebugPanelVisible(true));
+        container.querySelector("#pg-zip-job-hide").addEventListener("click", () => setZipDetailsVisible(false));
         container.querySelector("#pg-more-scan-all").addEventListener("click", () => { closeGalleryMoreSheet(); void runManualRescan(); });
         container.querySelector("#pg-more-cancel-scan").addEventListener("click", cancelScan);
         container.querySelector("#pg-more-download-zip").addEventListener("click", () => { closeGalleryMoreSheet(); void downloadAllAsZip(); });
@@ -845,7 +911,7 @@
             } else if (selected > 0) {
                 mobileStatus.textContent = `${selected} included in ZIP · long-press to edit selection.`;
             } else if (total > 0) {
-                mobileStatus.textContent = `${total} media found. Tap to open. Long-press to select.`;
+                mobileStatus.textContent = `${total} media found. Tap to open · hold Images/Videos to select that type.`;
             } else {
                 mobileStatus.textContent = "Tap Scan all or wait for auto-scan.";
             }
@@ -1092,14 +1158,35 @@
         }
     }
 
+    function setZipDetailsVisible(visible) {
+        state.zipDetailsOpen = Boolean(visible && state.zipJobSummary);
+        renderZipJobSummary();
+        updateProgressDrawerControls();
+
+        if (state.zipDetailsOpen) {
+            const panel = document.getElementById("pg-zip-job-summary");
+            requestAnimationFrame(() => panel?.scrollIntoView?.({ block: "nearest", behavior: "smooth" }));
+        }
+    }
+
+    function toggleZipDetails() {
+        if (!state.zipJobSummary) {
+            showToast("zip-details", "ZIP details are not available yet.", { level: "info", timeout: 2200 });
+            return;
+        }
+
+        setZipDetailsVisible(!state.zipDetailsOpen);
+    }
+
     function updateProgressDrawerControls() {
         const actions = document.getElementById("pg-progress-actions");
         const pause = document.getElementById("pg-progress-pause");
         const cancel = document.getElementById("pg-progress-cancel");
         const details = document.getElementById("pg-progress-details");
         const hasJob = state.zipRunning || state.scanRunning;
+        const hasZipDetails = Boolean(state.zipJobSummary) && (state.zipRunning || state.zipDetailsOpen || state.lastFailedZipEntries.length > 0);
 
-        actions?.classList.toggle("visible", hasJob || Boolean(state.lastFailedZipEntries.length));
+        actions?.classList.toggle("visible", hasJob || hasZipDetails);
 
         if (pause) {
             pause.style.display = state.zipRunning ? "" : "none";
@@ -1112,7 +1199,10 @@
         }
 
         if (details) {
-            details.style.display = hasJob || Boolean(state.lastFailedZipEntries.length) ? "" : "none";
+            details.style.display = hasZipDetails ? "" : "none";
+            details.textContent = state.zipDetailsOpen ? "Hide details" : "Details";
+            details.setAttribute("aria-expanded", state.zipDetailsOpen ? "true" : "false");
+            details.setAttribute("aria-controls", "pg-zip-job-summary");
         }
     }
 
@@ -1324,24 +1414,45 @@
     }
 
 
+    function selectionChangeRequiresGridRender() {
+        return state.selectedOnly || getValidGallerySort(state.gallerySort) === "selected";
+    }
+
+    function syncRenderedSelectionState() {
+        document.querySelectorAll("#pg-grid .pg-item[data-media-id]").forEach(card => {
+            const selected = state.selectedMediaIds.has(card.dataset.mediaId || "");
+            card.classList.toggle("pg-selected", selected);
+            const checkbox = card.querySelector(".pg-select-wrap input");
+            if (checkbox) checkbox.checked = selected;
+        });
+    }
+
+    function commitBulkSelection() {
+        invalidateSelectionCaches();
+
+        if (selectionChangeRequiresGridRender()) {
+            renderGrid();
+            return;
+        }
+
+        syncRenderedSelectionState();
+        updateSelectionSummary();
+    }
+
     function selectAllMedia() {
         getAllMedia().forEach(item => state.selectedMediaIds.add(item.id));
         state.autoSelectNewMedia = true;
         if (isMobileLayout()) {
             state.selectionMode = true;
         }
-        invalidateSelectionCaches();
-        renderGrid();
-        updateSelectionSummary();
+        commitBulkSelection();
     }
 
     function deselectAllMedia() {
         state.selectedMediaIds.clear();
         state.autoSelectNewMedia = false;
         state.selectionMode = false;
-        invalidateSelectionCaches();
-        renderGrid();
-        updateSelectionSummary();
+        commitBulkSelection();
     }
 
     function selectVisibleMedia() {
@@ -1349,17 +1460,13 @@
         if (isMobileLayout()) {
             state.selectionMode = true;
         }
-        invalidateSelectionCaches();
-        renderGrid();
-        updateSelectionSummary();
+        commitBulkSelection();
     }
 
     function deselectVisibleMedia() {
         state.filteredMedia.forEach(item => state.selectedMediaIds.delete(item.id));
         state.autoSelectNewMedia = false;
-        invalidateSelectionCaches();
-        renderGrid();
-        updateSelectionSummary();
+        commitBulkSelection();
     }
 
     function selectByPredicate(predicate) {
@@ -1374,9 +1481,36 @@
         if (isMobileLayout() && getSelectedMedia().length > 0) {
             state.selectionMode = true;
         }
-        invalidateSelectionCaches();
-        renderGrid();
-        updateSelectionSummary();
+        commitBulkSelection();
+    }
+
+    function toggleMediaTypeSelection(type) {
+        const normalizedType = type === "video" ? "video" : type === "image" ? "image" : "";
+        if (!normalizedType) return;
+
+        const items = getAllMedia().filter(item => item.type === normalizedType);
+        if (items.length === 0) {
+            showToast("selection-type", `No ${normalizedType}s found.`, { level: "info", timeout: 1800 });
+            return;
+        }
+
+        const shouldSelect = !items.every(item => state.selectedMediaIds.has(item.id));
+        items.forEach(item => {
+            if (shouldSelect) state.selectedMediaIds.add(item.id);
+            else state.selectedMediaIds.delete(item.id);
+        });
+
+        state.autoSelectNewMedia = false;
+        if (isMobileLayout()) {
+            state.selectionMode = state.selectedMediaIds.size > 0;
+        }
+
+        commitBulkSelection();
+        showToast(
+            "selection-type",
+            `${shouldSelect ? "Selected" : "Deselected"} all ${items.length} ${normalizedType}${items.length === 1 ? "" : "s"}.`,
+            { level: "info", timeout: 1800 }
+        );
     }
 
     function selectCurrentThreadPageMedia() {
@@ -1396,9 +1530,7 @@
         if (isMobileLayout() && getSelectedMedia().length > 0) {
             state.selectionMode = true;
         }
-        invalidateSelectionCaches();
-        renderGrid();
-        updateSelectionSummary();
+        commitBulkSelection();
     }
 
     function selectFailedMedia() {
@@ -1412,9 +1544,7 @@
         if (isMobileLayout() && getSelectedMedia().length > 0) {
             state.selectionMode = true;
         }
-        invalidateSelectionCaches();
-        renderGrid();
-        updateSelectionSummary();
+        commitBulkSelection();
     }
 
 
@@ -1430,7 +1560,7 @@
         }
 
         invalidateSelectionCaches();
-        if (getValidGallerySort(state.gallerySort) === "selected") {
+        if (selectionChangeRequiresGridRender()) {
             scheduleRenderGrid();
         }
         updateSelectionSummary();

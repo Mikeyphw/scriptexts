@@ -35,6 +35,10 @@ npm run check
 
 `npm run check` is the authoritative userscript validation gate: it runs every supported userscript builder's own check/test suite and then the repository-wide static/metadata checks. Use `npm run check:repo:static` only when you intentionally want the lightweight static layer.
 
+### Devtool wrapper
+
+The repository includes Devtool-managed `devtoolw` launchers for the LPSG target. `./devtoolw validate` is the normal LPSG validation entrypoint; it resolves through the repository wrapper into EXO target workflows backed by target-local jobs. Use `./devtoolw --help` for the stable command surface and see `docs/WRAPPER.md` for wrapper lifecycle, EXO/TLJ planning, and seal commands.
+
 ## Userscript source models
 
 - `userscripts/builders/content-site-modernizer` builds MenOfPorn Modern UI, Putinho Modern UI, Gayteam Modern UI, JustTheGays Modern UI, STR8UPGAYPORN Modern UI, Bleeding Cool Modern Reader, and AIPT Comics Modern Reader.

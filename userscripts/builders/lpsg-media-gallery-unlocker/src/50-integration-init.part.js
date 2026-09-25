@@ -197,7 +197,7 @@
         container?.classList.remove("pg-visible");
         container?.classList.add("pg-debug-only");
         setDebugPanelVisible(true);
-        showToast("Debug panel opened.", "info", 1600);
+        showToast("debug-open", "Debug panel opened.", { level: "info", timeout: 1600 });
     }
 
     function runFabAction(action) {

@@ -231,12 +231,104 @@ validate = [
 root = "userscripts/builders/lpsg-media-gallery-unlocker"
 inputs = [
     "userscripts/builders/lpsg-media-gallery-unlocker/**",
+    "userscripts/builders/media-gallery/build.mjs",
+    "userscripts/builders/media-gallery/sites/lpsg.json",
+    "userscripts/standalone/lpsg-media-gallery-unlocker/**",
 ]
 outputs = [
-    "userscripts/builders/lpsg-media-gallery-unlocker/dist/**",
+    "userscripts/standalone/lpsg-media-gallery-unlocker/lpsg-media-gallery-unlocker.user.js",
 ]
 runner = "node"
 platform = "web"
+
+# LPSG owns its execution units. Wrapper commands below resolve into these
+# target-local jobs through target workflows, preserving EXO/TLJ identity.
+[targets.lpsg-media-gallery-unlocker.jobs.build]
+runner = "command"
+command = ["node", "build.mjs"]
+inputs = [
+    "build.mjs",
+    "modules.json",
+    "src/**",
+    "../media-gallery/build.mjs",
+    "../media-gallery/sites/lpsg.json",
+]
+outputs = [
+    "../../standalone/lpsg-media-gallery-unlocker/lpsg-media-gallery-unlocker.user.js",
+]
+
+[targets.lpsg-media-gallery-unlocker.jobs.reproducibility]
+runner = "command"
+command = ["node", "build.mjs", "--check"]
+inputs = [
+    "build.mjs",
+    "modules.json",
+    "src/**",
+    "../media-gallery/build.mjs",
+    "../media-gallery/sites/lpsg.json",
+    "../../standalone/lpsg-media-gallery-unlocker/lpsg-media-gallery-unlocker.user.js",
+]
+outputs = []
+
+[targets.lpsg-media-gallery-unlocker.jobs.reproducibility.metadata]
+read_only = true
+
+[targets.lpsg-media-gallery-unlocker.jobs.syntax]
+runner = "command"
+command = ["node", "--check", "../../standalone/lpsg-media-gallery-unlocker/lpsg-media-gallery-unlocker.user.js"]
+inputs = [
+    "../../standalone/lpsg-media-gallery-unlocker/lpsg-media-gallery-unlocker.user.js",
+]
+outputs = []
+
+[targets.lpsg-media-gallery-unlocker.jobs.syntax.metadata]
+read_only = true
+
+[targets.lpsg-media-gallery-unlocker.jobs.regression]
+runner = "command"
+command = ["node", "--test", "test/lpsg.test.mjs", "test/release-seal.test.mjs"]
+inputs = [
+    "src/**",
+    "test/**",
+    "modules.json",
+    "../../standalone/lpsg-media-gallery-unlocker/lpsg-media-gallery-unlocker.user.js",
+]
+outputs = []
+
+[targets.lpsg-media-gallery-unlocker.jobs.regression.metadata]
+read_only = true
+
+[targets.lpsg-media-gallery-unlocker.jobs.seal]
+runner = "command"
+command = ["node", "release-seal.mjs", "--json"]
+inputs = [
+    "build.mjs",
+    "release-seal.mjs",
+    "modules.json",
+    "src/**",
+    "test/**",
+    "../media-gallery/build.mjs",
+    "../media-gallery/sites/lpsg.json",
+    "../../standalone/lpsg-media-gallery-unlocker/lpsg-media-gallery-unlocker.user.js",
+]
+outputs = []
+
+[targets.lpsg-media-gallery-unlocker.jobs.seal.metadata]
+read_only = true
+
+[targets.lpsg-media-gallery-unlocker.workflows]
+build = ["job:build"]
+check = [
+    { id = "reproducibility", ref = "job:reproducibility", depends_on = [] },
+    { id = "syntax", ref = "job:syntax", depends_on = [] },
+]
+test = ["job:regression"]
+seal = ["job:seal"]
+validate = [
+    { id = "reproducibility", ref = "job:reproducibility", depends_on = [] },
+    { id = "syntax", ref = "job:syntax", depends_on = [] },
+    { id = "regression", ref = "job:regression", depends_on = [] },
+]
 
 [targets.poast-timeline-metadata-reset]
 root = "userscripts/builders/poast-timeline-metadata-reset"
@@ -281,3 +373,41 @@ outputs = [
 ]
 runner = "node"
 platform = "web"
+
+
+# -----------------------------------------------------------------------------
+# Repository wrapper (WRAP / EXO bridge)
+# -----------------------------------------------------------------------------
+[wrapper]
+schema = 1
+default_command = "validate"
+
+[wrapper.commands.build]
+description = "Build the LPSG userscript from modular source"
+workflow = "build"
+target = "lpsg-media-gallery-unlocker"
+aliases = ["b"]
+
+[wrapper.commands.check]
+description = "Check LPSG reproducibility and generated userscript syntax"
+workflow = "check"
+target = "lpsg-media-gallery-unlocker"
+aliases = ["c"]
+
+[wrapper.commands.test]
+description = "Run the LPSG regression suite"
+workflow = "test"
+target = "lpsg-media-gallery-unlocker"
+aliases = ["t"]
+
+[wrapper.commands.seal]
+description = "Run the deterministic LPSG release seal"
+workflow = "seal"
+target = "lpsg-media-gallery-unlocker"
+aliases = ["s"]
+
+[wrapper.commands.validate]
+description = "Run the parallel-safe LPSG EXO/TLJ validation workflow"
+workflow = "validate"
+target = "lpsg-media-gallery-unlocker"
+aliases = ["v"]

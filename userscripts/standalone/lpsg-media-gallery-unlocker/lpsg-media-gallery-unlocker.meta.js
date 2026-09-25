@@ -5,7 +5,7 @@
 // @supportURL   https://github.com/Mikeyphw/scriptexts/issues
 // @updateURL    https://raw.githubusercontent.com/Mikeyphw/scriptexts/main/userscripts/standalone/lpsg-media-gallery-unlocker/lpsg-media-gallery-unlocker.meta.js
 // @downloadURL  https://raw.githubusercontent.com/Mikeyphw/scriptexts/main/userscripts/standalone/lpsg-media-gallery-unlocker/lpsg-media-gallery-unlocker.user.js
-// @version      6.7.3-optimized
+// @version      6.7.5-optimized
 // @description  Optimized LPSG media gallery with complete post-scoped discovery, streaming ZIPs, page-title archive names, mobile-safe defaults, smart source fallback, and lightweight optional resume caching.
 // @author       CurlyWurly
 // @match        https://www.lpsg.com/*

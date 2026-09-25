@@ -5,7 +5,7 @@
 // @supportURL   https://github.com/Mikeyphw/scriptexts/issues
 // @updateURL    https://raw.githubusercontent.com/Mikeyphw/scriptexts/main/userscripts/standalone/lpsg-media-gallery-unlocker/lpsg-media-gallery-unlocker.meta.js
 // @downloadURL  https://raw.githubusercontent.com/Mikeyphw/scriptexts/main/userscripts/standalone/lpsg-media-gallery-unlocker/lpsg-media-gallery-unlocker.user.js
-// @version      6.7.4-optimized
+// @version      6.7.5-optimized
 // @description  Optimized LPSG media gallery with complete post-scoped discovery, streaming ZIPs, page-title archive names, mobile-safe defaults, smart source fallback, and lightweight optional resume caching.
 // @author       CurlyWurly
 // @match        https://www.lpsg.com/*
@@ -60,6 +60,7 @@
         metadataSaveDebounceMs: 1500,
         searchDebounceMs: 120,
         hoverPreviewDelayMs: 360,
+        mobileLongPressMs: 460,
         debugMaxEntries: isMobileProfile ? 400 : 800,
         observerDebounceMs: 250,
         maxPages: 1000,
@@ -113,6 +114,7 @@
         debugPanelOpen: false,
         debugRunId: 0,
         zipJobSummary: null,
+        zipDetailsOpen: false,
         zipRunning: false,
         selectedMediaIds: new Set(),
         autoSelectNewMedia: true,
@@ -161,6 +163,8 @@
         cardLongPressTimer: null,
         cardLongPressMediaId: "",
         cardLongPressTriggered: false,
+        filterLongPressType: "",
+        filterLongPressSuppressClickUntil: 0,
     };
 
     const styles = `
@@ -448,6 +452,13 @@
             color: #fff;
         }
 
+        .pg-filter-btn.pg-long-press-active {
+            background: rgba(255, 215, 0, 0.28);
+            border-color: var(--pg-highlight);
+            color: #fff3a0;
+            transform: scale(0.97);
+        }
+
         .pg-action-btn:disabled {
             opacity: 0.45;
             cursor: wait;
@@ -465,12 +476,14 @@
         }
 
 
-        .pg-zip-job-summary { margin: 10px 16px; padding: 14px; border: var(--pg-border); border-radius: 16px; background: rgba(255,255,255,.055); }
+        .pg-zip-job-summary { margin: 10px 16px; padding: 14px; border: var(--pg-border); border-radius: 16px; background: rgba(255,255,255,.055); flex-shrink: 0; }
         .pg-zip-job-summary[hidden] { display:none; }
         .pg-zip-job-title { font-weight: 800; font-size: 16px; }
         .pg-zip-job-count { margin-top: 5px; font-size: 15px; }
         .pg-zip-job-meta, .pg-zip-job-problems { margin-top: 5px; color: var(--pg-muted); font-size: 13px; line-height: 1.4; }
         .pg-zip-job-problems { color: #ffcc66; }
+        .pg-zip-job-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+        .pg-zip-job-actions button { min-height: 36px; border: var(--pg-border); border-radius: 999px; background: rgba(255,255,255,.07); color: #fff; padding: 6px 12px; cursor: pointer; touch-action: manipulation; }
 
         .pg-progress {
             display: none;

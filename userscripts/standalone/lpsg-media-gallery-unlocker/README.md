@@ -27,7 +27,7 @@ npm run check
 
 ## Imported version
 
-`6.7.3-optimized`
+`6.7.5-optimized`
 
 ## License
 

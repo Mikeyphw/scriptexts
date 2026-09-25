@@ -494,7 +494,8 @@
         const summary = state.zipJobSummary;
         const panel = document.getElementById("pg-zip-job-summary");
         if (!panel || !summary) return;
-        panel.hidden = false;
+        panel.hidden = !state.zipDetailsOpen;
+        panel.setAttribute("aria-hidden", state.zipDetailsOpen ? "false" : "true");
         const completed = Number(summary.completed || 0);
         const total = Number(summary.total || 0);
         const failed = Number(summary.failed || 0);
@@ -547,6 +548,7 @@
 
         state.zipRunning = true;
         state.zipPaused = false;
+        state.zipDetailsOpen = false;
         saveZipJobSummary({ status: "running", completed: 0, total: items.length, failed: 0, parts: 0, archivedBytes: 0, archiveBaseName });
         state.currentZipJobId = jobId;
         state.zipAbortController = new AbortController();
@@ -655,7 +657,6 @@
                             url: result.url,
                             fromCache: Boolean(result.fromCache),
                         };
-            saveZipJobSummary({ status: "complete", completed, total: items.length, failed, parts: partNumber, archivedBytes });
         } catch (error) {
                         failed += 1;
                         failedEntries.push({
@@ -771,12 +772,16 @@
             }
 
             state.lastFailedZipEntries = failedEntries;
+            if (failedEntries.length > 0) {
+                state.zipDetailsOpen = true;
+            }
 
             if (archivedFiles === 0) {
                 throw new Error("No files could be fetched for ZIP.");
             }
 
             await closePart(grouping === "page" || partNumber === 1);
+            saveZipJobSummary({ status: "complete", completed, total: items.length, failed, parts: partNumber, archivedBytes });
             const elapsedMs = Math.round(performance.now() - startedAt);
             clearProgress(`ZIP complete. ${archivedFiles} file(s) added, ${failed} failed.`);
             showToast("zip", `ZIP complete: ${archivedFiles}/${items.length} added · ${failed} failed · ${partNumber} part(s).`, {
@@ -812,6 +817,9 @@
             }
 
             const cancelled = error?.name === "AbortError";
+            if (!cancelled) {
+                state.zipDetailsOpen = true;
+            }
             saveZipJobSummary({ status: cancelled ? "cancelled" : "failed", completed, total: items.length, failed, parts: partNumber, archivedBytes });
             clearProgress(cancelled ? "ZIP cancelled." : `ZIP failed. ${archivedFiles} file(s) added, ${failed} failed.`);
             showToast("zip", cancelled ? "ZIP cancelled." : "ZIP could not finish. Use Details for problems and diagnostics.", {
