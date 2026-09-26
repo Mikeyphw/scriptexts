@@ -37,7 +37,9 @@ npm run check
 
 ### Devtool wrapper
 
-The repository includes Devtool-managed `devtoolw` launchers for the LPSG target. `./devtoolw validate` is the normal LPSG validation entrypoint; it resolves through the repository wrapper into EXO target workflows backed by target-local jobs. Use `./devtoolw --help` for the stable command surface and see `docs/WRAPPER.md` for wrapper lifecycle, EXO/TLJ planning, and seal commands.
+The repository includes Devtool-managed `devtoolw` launchers for the entire workspace. `./devtoolw` defaults to the repo-wide `validate` DAG; it is **not** tied to LPSG. Component workflows are backed by EXO target-local jobs and composed through the `workspace` target, with safe parallel scheduling, affected-target selection, wrapper provenance, preflight/plan truth, and extension artifact evidence.
+
+Common entrypoints are `./devtoolw build`, `./devtoolw test`, `./devtoolw check`, `./devtoolw validate`, `./devtoolw seal`, `./devtoolw changed`, `./devtoolw userscripts`, and `./devtoolw extensions`. LPSG remains available as the explicit convenience command `./devtoolw lpsg`. See `docs/WRAPPER.md` for the complete wrapper, EXO/TLJ, groups, affected-selection, planning, preflight, artifact, and launcher lifecycle contract.
 
 ## Userscript source models
 

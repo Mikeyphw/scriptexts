@@ -52,9 +52,16 @@ async function* walk(dir) {
   }
 }
 
+function isInstallableUserscript(rel) {
+  if (!rel.endsWith('.user.js')) return false;
+  if (rel.startsWith('userscripts/standalone/')) return true;
+  return /^userscripts\/builders\/[^/]+\/dist\//.test(rel);
+}
+
 const files = [];
 for await (const path of walk(join(root, 'userscripts'))) {
-  if (path.endsWith('.user.js')) files.push(path);
+  const rel = relative(root, path).replaceAll('\\', '/');
+  if (isInstallableUserscript(rel)) files.push(path);
 }
 
 for (const path of files.sort()) {

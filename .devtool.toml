@@ -1,23 +1,35 @@
 [project]
 root = "."
 runner = "node"
-platform = "cli"
+platform = "repository"
 
 [workspace]
-default_target = "root"
+default_target = "workspace"
 
 [workspace.groups]
-builders = ["content-site-modernizer", "manga-reader-modernizer", "myreadingmanga-reimagined", "sims-cc-download-basket", "lpsg-media-gallery-unlocker", "poast-timeline-metadata-reset", "coomer-media-gallery"]
+builders = [
+  "content-site-modernizer",
+  "manga-reader-modernizer",
+  "myreadingmanga-reimagined",
+  "sims-cc-download-basket",
+  "lpsg-media-gallery-unlocker",
+  "poast-timeline-metadata-reset",
+  "coomer-media-gallery",
+]
+standalone = ["search-engines-clean-dark-ui", "telegram-media-downloader-userscript"]
 extensions = ["manga-site-media-downloader", "stardew-nexus-download-queue", "telegram-media-downloader-extension"]
-userscripts = ["search-engines-clean-dark-ui", "telegram-media-downloader-userscript"]
+userscripts = ["@builders", "@standalone"]
+release = ["@userscripts", "@extensions"]
+ci = ["root", "@release"]
 smoke = ["smoke-python"]
-all = ["root", "@builders", "@extensions", "@userscripts", "@smoke"]
+all = ["@ci", "@smoke"]
 
 [workspace.scheduler]
 parallel = true
 max_parallel_nodes = 3
 max_gradle_nodes = 1
 max_dotnet_nodes = 1
+
 [node]
 manager = "npm"
 clean_install = false
@@ -25,389 +37,968 @@ clean_install = false
 [build]
 max_workers = "auto"
 
-
 # -----------------------------------------------------------------------------
-# Devtool explicit smoke workflow convergence (OV03)
+# Workspace orchestrator
 # -----------------------------------------------------------------------------
-[jobs.scriptexts-smoke-build-content-sites]
+[targets.workspace]
+root = "tools/devtool-workspace"
 runner = "command"
-root = "."
-command = ["npm", "run", "build:content-sites"]
-inputs = [
-  "package.json",
-  "package-lock.json",
-  "userscripts/builders/content-site-modernizer/**",
-  "tools/smoke/**",
-]
-outputs = ["userscripts/builders/content-site-modernizer/dist/**"]
-
-[jobs.scriptexts-smoke-content-sites-check]
-runner = "python"
-root = "."
-command = ["python3", "tools/smoke/run-content-site-smoke.py", "--builder", "content-site-modernizer", "--check-config"]
-inputs = [
-  "tools/smoke/run-content-site-smoke.py",
-  "userscripts/builders/content-site-modernizer/smoke.config.json",
-  "userscripts/builders/content-site-modernizer/dist/**",
-]
+platform = "workspace"
+inputs = ["README.md"]
 outputs = []
 
-[jobs.scriptexts-smoke-content-sites-visual-check]
-runner = "python"
-root = "."
-command = ["python3", "tools/smoke/run-content-site-visual.py", "--builder", "content-site-modernizer", "--check-config"]
-inputs = [
-  "tools/smoke/run-content-site-visual.py",
-  "userscripts/builders/content-site-modernizer/smoke.config.json",
-  "userscripts/builders/content-site-modernizer/dist/**",
-]
-outputs = []
+[targets.workspace.jobs.restore]
+runner = "node"
+root = "../.."
+action = "restore"
+inputs = ["package.json", "package-lock.json", "userscripts/builders/*/package.json"]
+outputs = ["node_modules/**"]
 
+[targets.workspace.workflows]
+restore = ["job:restore"]
+build = [
+  { id = "content", ref = "target:content-site-modernizer#build", depends_on = [] },
+  { id = "manga", ref = "target:manga-reader-modernizer#build", depends_on = [] },
+  { id = "mrm", ref = "target:myreadingmanga-reimagined#build", depends_on = [] },
+  { id = "sims", ref = "target:sims-cc-download-basket#build", depends_on = [] },
+  { id = "lpsg", ref = "target:lpsg-media-gallery-unlocker#build", depends_on = [] },
+  { id = "poast", ref = "target:poast-timeline-metadata-reset#build", depends_on = [] },
+  { id = "coomer", ref = "target:coomer-media-gallery#build", depends_on = [] },
+  { id = "ext_manga", ref = "target:manga-site-media-downloader#build", depends_on = [] },
+  { id = "ext_stardew", ref = "target:stardew-nexus-download-queue#build", depends_on = [] },
+  { id = "ext_telegram", ref = "target:telegram-media-downloader-extension#build", depends_on = [] },
+  { id = "metadata", ref = "target:root#build", depends_on = ["content", "manga", "mrm", "sims", "lpsg", "poast", "coomer"] },
+]
+test = [
+  { id = "content", ref = "target:content-site-modernizer#test", depends_on = [] },
+  { id = "manga", ref = "target:manga-reader-modernizer#test", depends_on = [] },
+  { id = "mrm", ref = "target:myreadingmanga-reimagined#test", depends_on = [] },
+  { id = "sims", ref = "target:sims-cc-download-basket#test", depends_on = [] },
+  { id = "lpsg", ref = "target:lpsg-media-gallery-unlocker#test", depends_on = [] },
+  { id = "poast", ref = "target:poast-timeline-metadata-reset#test", depends_on = [] },
+  { id = "coomer", ref = "target:coomer-media-gallery#test", depends_on = [] },
+  { id = "telegram_user", ref = "target:telegram-media-downloader-userscript#test", depends_on = [] },
+  { id = "ext_telegram", ref = "target:telegram-media-downloader-extension#test", depends_on = [] },
+  { id = "root", ref = "target:root#test", depends_on = [] },
+]
+validate = [
+  { id = "content", ref = "target:content-site-modernizer#validate", depends_on = [] },
+  { id = "manga", ref = "target:manga-reader-modernizer#validate", depends_on = [] },
+  { id = "mrm", ref = "target:myreadingmanga-reimagined#validate", depends_on = [] },
+  { id = "sims", ref = "target:sims-cc-download-basket#validate", depends_on = [] },
+  { id = "lpsg", ref = "target:lpsg-media-gallery-unlocker#validate", depends_on = [] },
+  { id = "poast", ref = "target:poast-timeline-metadata-reset#validate", depends_on = [] },
+  { id = "coomer", ref = "target:coomer-media-gallery#validate", depends_on = [] },
+  { id = "search", ref = "target:search-engines-clean-dark-ui#validate", depends_on = [] },
+  { id = "telegram_user", ref = "target:telegram-media-downloader-userscript#validate", depends_on = [] },
+  { id = "ext_manga", ref = "target:manga-site-media-downloader#validate", depends_on = [] },
+  { id = "ext_stardew", ref = "target:stardew-nexus-download-queue#validate", depends_on = [] },
+  { id = "ext_telegram", ref = "target:telegram-media-downloader-extension#validate", depends_on = [] },
+  { id = "metadata", ref = "target:root#build", depends_on = ["content", "manga", "mrm", "sims", "lpsg", "poast", "coomer", "search", "telegram_user"] },
+  { id = "root_seal", ref = "target:root#seal", depends_on = ["metadata", "ext_manga", "ext_stardew", "ext_telegram"] },
+]
+seal = [
+  { id = "content", ref = "target:content-site-modernizer#seal", depends_on = [] },
+  { id = "manga", ref = "target:manga-reader-modernizer#seal", depends_on = [] },
+  { id = "mrm", ref = "target:myreadingmanga-reimagined#seal", depends_on = [] },
+  { id = "sims", ref = "target:sims-cc-download-basket#seal", depends_on = [] },
+  { id = "lpsg", ref = "target:lpsg-media-gallery-unlocker#seal", depends_on = [] },
+  { id = "poast", ref = "target:poast-timeline-metadata-reset#seal", depends_on = [] },
+  { id = "coomer", ref = "target:coomer-media-gallery#seal", depends_on = [] },
+  { id = "search", ref = "target:search-engines-clean-dark-ui#seal", depends_on = [] },
+  { id = "telegram_user", ref = "target:telegram-media-downloader-userscript#seal", depends_on = [] },
+  { id = "ext_manga", ref = "target:manga-site-media-downloader#seal", depends_on = [] },
+  { id = "ext_stardew", ref = "target:stardew-nexus-download-queue#seal", depends_on = [] },
+  { id = "ext_telegram", ref = "target:telegram-media-downloader-extension#seal", depends_on = [] },
+  { id = "metadata", ref = "target:root#build", depends_on = ["content", "manga", "mrm", "sims", "lpsg", "poast", "coomer", "search", "telegram_user"] },
+  { id = "root_seal", ref = "target:root#seal", depends_on = ["metadata", "ext_manga", "ext_stardew", "ext_telegram"] },
+]
+package = [
+  { id = "content", ref = "target:content-site-modernizer#package", depends_on = [] },
+  { id = "extensions", ref = "target:root#package", depends_on = [] },
+]
+smoke = [
+  { id = "smoke", ref = "target:smoke-python#validate", depends_on = [] },
+]
+
+# -----------------------------------------------------------------------------
+# Repository-level contracts and joins
+# -----------------------------------------------------------------------------
 [targets.root]
-root = "."
+root = "tools/devtool-root"
+runner = "command"
+platform = "repository"
 inputs = [
-    "package.json",
-    "package-lock.json",
-    "userscripts/**",
-    "extensions/**",
-    "tools/**",
-    ".devtool.toml",
+  "README.md",
+  "../../.devtool.toml",
+  "../../package.json",
+  "../../package-lock.json",
+  "../../repo-manifest.json",
+  "../../tools/check-repo.mjs",
+  "../../tools/tests/**",
+  "../../tools/generate-userscript-meta.mjs",
+]
+outputs = ["../../userscripts/**/*.meta.js", "../../release/**"]
+
+[targets.root.jobs.metadata]
+root = "../.."
+runner = "command"
+command = ["node", "tools/generate-userscript-meta.mjs"]
+inputs = [
+  "userscripts/standalone/**/*.user.js",
+  "userscripts/builders/*/dist/**/*.user.js",
+  "tools/generate-userscript-meta.mjs",
 ]
 outputs = [
-    "dist/**",
-    "userscripts/**/dist/**",
-    "extensions/**/dist/**",
+  "userscripts/standalone/**/*.user.js",
+  "userscripts/standalone/**/*.meta.js",
+  "userscripts/builders/*/dist/**/*.user.js",
+  "userscripts/builders/*/dist/**/*.meta.js",
 ]
-runner = "node"
-platform = "web"
 
-[targets.root.artifacts]
-required = false
-verify = false
-directories = [
-    "dist",
-    "userscripts",
-    "extensions",
+[targets.root.jobs.contract]
+root = "../.."
+runner = "command"
+command = ["node", "--test", "tools/tests/devtool-target-coverage.test.mjs"]
+inputs = [".devtool.toml", "tools/tests/devtool-target-coverage.test.mjs"]
+outputs = []
+[targets.root.jobs.contract.metadata]
+read_only = true
+
+[targets.root.jobs.tool-tests]
+root = "../.."
+runner = "command"
+command = ["node", "--test", "tools/tests/*.test.mjs"]
+inputs = ["tools/tests/**", "userscripts/**", "extensions/**", "repo-manifest.json"]
+outputs = []
+[targets.root.jobs.tool-tests.metadata]
+read_only = true
+
+[targets.root.jobs.repo-check]
+root = "../.."
+runner = "command"
+command = ["node", "tools/check-repo.mjs"]
+inputs = ["tools/check-repo.mjs", "repo-manifest.json", "userscripts/**", "extensions/**"]
+outputs = []
+[targets.root.jobs.repo-check.metadata]
+read_only = true
+
+[targets.root.jobs.inventory]
+root = "../.."
+runner = "command"
+command = ["node", "tools/inventory.mjs"]
+inputs = ["tools/inventory.mjs", "repo-manifest.json", "userscripts/**", "extensions/**"]
+outputs = []
+[targets.root.jobs.inventory.metadata]
+read_only = true
+
+[targets.root.jobs.chromium]
+root = "../.."
+runner = "command"
+command = ["python3", "tools/build-chromium-extensions.py"]
+inputs = ["tools/build-chromium-extensions.py", "extensions/**"]
+outputs = ["extensions/*/dist/**"]
+
+[targets.root.workflows]
+build = ["job:metadata"]
+test = ["job:contract"]
+lint = ["job:contract"]
+validate = ["job:contract"]
+seal = [
+  { id = "tests", ref = "job:tool-tests", depends_on = [] },
+  { id = "repo", ref = "job:repo-check", depends_on = [] },
+  { id = "inventory", ref = "job:inventory", depends_on = [] },
 ]
-patterns = [
-    "*.user.js",
-    "*.zip",
-]
-recursive = true
+package = ["job:chromium"]
+
+# -----------------------------------------------------------------------------
+# Userscript builders
+# -----------------------------------------------------------------------------
 [targets.content-site-modernizer]
 root = "userscripts/builders/content-site-modernizer"
-inputs = [
-    "userscripts/builders/content-site-modernizer/**",
-    "tools/**",
-]
-outputs = [
-    "userscripts/builders/content-site-modernizer/dist/**",
-]
 runner = "node"
-platform = "web"
+platform = "userscript-builder"
+inputs = ["**", "../../../tools/content-sites/**", "../../../repo-manifest.json"]
+outputs = ["dist/**", "../../../release/content-site-modernizer/**"]
+
+[targets.content-site-modernizer.artifacts]
+directories = ["dist"]
+patterns = ["*.user.js", "*.meta.js"]
+recursive = true
+verify = true
+
+[targets.content-site-modernizer.jobs.build]
+runner = "command"
+command = ["node", "build.mjs"]
+inputs = ["build.mjs", "src/**", "package.json"]
+outputs = ["dist/**"]
+
+[targets.content-site-modernizer.jobs.reproducibility]
+runner = "command"
+command = ["node", "build.mjs", "--check"]
+inputs = ["build.mjs", "src/**", "dist/**"]
+outputs = []
+[targets.content-site-modernizer.jobs.reproducibility.metadata]
+read_only = true
+
+[targets.content-site-modernizer.jobs.syntax]
+runner = "command"
+command = ["node", "--check", "src/core/runtime.template.js"]
+inputs = ["src/core/runtime.template.js"]
+outputs = []
+[targets.content-site-modernizer.jobs.syntax.metadata]
+read_only = true
+
+[targets.content-site-modernizer.jobs.test]
+runner = "command"
+command = ["node", "--test", "test/*.test.mjs"]
+inputs = ["src/**", "test/**"]
+outputs = []
+[targets.content-site-modernizer.jobs.test.metadata]
+read_only = true
+
+[targets.content-site-modernizer.jobs.profiles]
+runner = "command"
+command = ["node", "tools/check-profiles.mjs"]
+inputs = ["src/profiles/**", "src/core/profile-schema.mjs", "tools/check-profiles.mjs"]
+outputs = []
+[targets.content-site-modernizer.jobs.profiles.metadata]
+read_only = true
+
+[targets.content-site-modernizer.jobs.seal]
+runner = "command"
+command = ["node", "../../../tools/content-sites/final-seal.mjs", "--builder", "content-site-modernizer", "--skip-build-check"]
+inputs = ["src/**", "test/**", "dist/**", "smoke.config.json", "../../../tools/content-sites/**", "../../../repo-manifest.json"]
+outputs = []
+[targets.content-site-modernizer.jobs.seal.metadata]
+read_only = true
+
+[targets.content-site-modernizer.jobs.package]
+runner = "command"
+command = ["node", "../../../tools/content-sites/release-pack.mjs", "--builder", "content-site-modernizer"]
+inputs = ["dist/**", "../../../tools/content-sites/release-pack.mjs"]
+outputs = ["../../../release/content-site-modernizer/**"]
+
+[targets.content-site-modernizer.workflows]
+build = ["job:build"]
+test = ["job:test"]
+lint = [
+  { id = "repro", ref = "job:reproducibility", depends_on = [] },
+  { id = "syntax", ref = "job:syntax", depends_on = [] },
+  { id = "profiles", ref = "job:profiles", depends_on = [] },
+]
+validate = [
+  { id = "build", ref = "job:build", depends_on = [] },
+  { id = "repro", ref = "job:reproducibility", depends_on = ["build"] },
+  { id = "syntax", ref = "job:syntax", depends_on = ["build"] },
+  { id = "test", ref = "job:test", depends_on = ["build"] },
+  { id = "profiles", ref = "job:profiles", depends_on = ["build"] },
+  { id = "seal", ref = "job:seal", depends_on = ["build"] },
+]
+seal = [
+  { id = "build", ref = "job:build", depends_on = [] },
+  { id = "seal", ref = "job:seal", depends_on = ["build"] },
+]
+package = [
+  { id = "build", ref = "job:build", depends_on = [] },
+  { id = "package", ref = "job:package", depends_on = ["build"] },
+]
 
 [targets.manga-reader-modernizer]
 root = "userscripts/builders/manga-reader-modernizer"
-inputs = [
-    "userscripts/builders/manga-reader-modernizer/**",
-]
-outputs = [
-    "userscripts/builders/manga-reader-modernizer/dist/**",
-]
 runner = "node"
-platform = "web"
+platform = "userscript-builder"
+inputs = ["**"]
+outputs = ["dist/**"]
 
+[targets.manga-reader-modernizer.artifacts]
+directories = ["dist"]
+patterns = ["*.user.js", "*.meta.js"]
+recursive = true
+verify = true
+
+[targets.manga-reader-modernizer.jobs.build]
+runner = "command"
+command = ["node", "build.mjs"]
+inputs = ["build.mjs", "src/**", "package.json"]
+outputs = ["dist/**"]
+
+[targets.manga-reader-modernizer.jobs.reproducibility]
+runner = "command"
+command = ["node", "build.mjs", "--check"]
+inputs = ["build.mjs", "src/**", "dist/**"]
+outputs = []
+[targets.manga-reader-modernizer.jobs.reproducibility.metadata]
+read_only = true
+
+[targets.manga-reader-modernizer.jobs.test]
+runner = "command"
+command = ["node", "--test", "test/*.test.mjs"]
+inputs = ["src/**", "test/**"]
+outputs = []
+[targets.manga-reader-modernizer.jobs.test.metadata]
+read_only = true
+
+[targets.manga-reader-modernizer.jobs.syntax]
+runner = "command"
+command = ["node", "../../../tools/devtool-workspace/check-js-syntax.mjs", "dist/yaoimangaonline-modern-reader.user.js", "dist/baramangaonline-modern-reader.user.js"]
+inputs = ["dist/*.user.js", "../../../tools/devtool-workspace/check-js-syntax.mjs"]
+outputs = []
+[targets.manga-reader-modernizer.jobs.syntax.metadata]
+read_only = true
+
+[targets.manga-reader-modernizer.jobs.seal]
+runner = "command"
+command = ["node", "release-seal.mjs"]
+inputs = ["build.mjs", "release-seal.mjs", "src/**", "test/**", "dist/**"]
+outputs = []
+[targets.manga-reader-modernizer.jobs.seal.metadata]
+read_only = true
+
+[targets.manga-reader-modernizer.workflows]
+build = ["job:build"]
+test = ["job:test"]
+lint = [
+  { id = "repro", ref = "job:reproducibility", depends_on = [] },
+  { id = "syntax", ref = "job:syntax", depends_on = [] },
+  { id = "test", ref = "job:test", depends_on = [] },
+]
+validate = [
+  { id = "build", ref = "job:build", depends_on = [] },
+  { id = "repro", ref = "job:reproducibility", depends_on = ["build"] },
+  { id = "syntax", ref = "job:syntax", depends_on = ["build"] },
+  { id = "test", ref = "job:test", depends_on = ["build"] },
+]
+seal = [
+  { id = "build", ref = "job:build", depends_on = [] },
+  { id = "seal", ref = "job:seal", depends_on = ["build"] },
+]
 
 [targets.myreadingmanga-reimagined]
 root = "userscripts/builders/myreadingmanga-reimagined"
-inputs = [
-    "userscripts/builders/myreadingmanga-reimagined/**",
-]
-outputs = [
-    "userscripts/builders/myreadingmanga-reimagined/dist/**",
-]
 runner = "node"
-platform = "web"
+platform = "userscript-builder"
+inputs = ["**"]
+outputs = ["dist/**"]
+
+[targets.myreadingmanga-reimagined.artifacts]
+directories = ["dist"]
+patterns = ["*.user.js", "*.meta.js"]
+recursive = true
+verify = true
+
+[targets.myreadingmanga-reimagined.jobs.build]
+runner = "command"
+command = ["node", "build.mjs"]
+inputs = ["build.mjs", "src/**", "package.json"]
+outputs = ["dist/**"]
+
+[targets.myreadingmanga-reimagined.jobs.reproducibility]
+runner = "command"
+command = ["node", "build.mjs", "--check"]
+inputs = ["build.mjs", "src/**", "dist/**"]
+outputs = []
+[targets.myreadingmanga-reimagined.jobs.reproducibility.metadata]
+read_only = true
+
+[targets.myreadingmanga-reimagined.jobs.test]
+runner = "command"
+command = ["node", "--test", "test/*.test.mjs"]
+inputs = ["src/**", "test/**"]
+outputs = []
+[targets.myreadingmanga-reimagined.jobs.test.metadata]
+read_only = true
+
+[targets.myreadingmanga-reimagined.jobs.syntax]
+runner = "command"
+command = ["node", "--check", "dist/myreadingmanga-reimagined.user.js"]
+inputs = ["dist/myreadingmanga-reimagined.user.js"]
+outputs = []
+[targets.myreadingmanga-reimagined.jobs.syntax.metadata]
+read_only = true
+
+[targets.myreadingmanga-reimagined.jobs.smoke]
+runner = "command"
+command = ["python3", "test/browser-smoke.py"]
+inputs = ["src/**", "test/browser-smoke.py", "dist/**"]
+outputs = []
+[targets.myreadingmanga-reimagined.jobs.smoke.metadata]
+read_only = true
+
+[targets.myreadingmanga-reimagined.workflows]
+build = ["job:build"]
+test = ["job:test"]
+lint = [
+  { id = "repro", ref = "job:reproducibility", depends_on = [] },
+  { id = "syntax", ref = "job:syntax", depends_on = [] },
+  { id = "test", ref = "job:test", depends_on = [] },
+]
+validate = [
+  { id = "build", ref = "job:build", depends_on = [] },
+  { id = "repro", ref = "job:reproducibility", depends_on = ["build"] },
+  { id = "syntax", ref = "job:syntax", depends_on = ["build"] },
+  { id = "test", ref = "job:test", depends_on = ["build"] },
+]
+seal = [
+  { id = "build", ref = "job:build", depends_on = [] },
+  { id = "repro", ref = "job:reproducibility", depends_on = ["build"] },
+  { id = "syntax", ref = "job:syntax", depends_on = ["build"] },
+  { id = "test", ref = "job:test", depends_on = ["build"] },
+]
+smoke = ["job:smoke"]
 
 [targets.sims-cc-download-basket]
 root = "userscripts/builders/sims-cc-download-basket"
-inputs = [
-    "userscripts/builders/sims-cc-download-basket/**",
-]
-outputs = [
-    "userscripts/builders/sims-cc-download-basket/dist/**",
-]
 runner = "node"
-platform = "web"
+platform = "userscript-builder"
+inputs = ["**"]
+outputs = ["dist/**"]
 
-[targets.manga-site-media-downloader]
-root = "extensions/manga-site-media-downloader"
-build_command = "python3 build.py"
-inputs = [
-    "extensions/manga-site-media-downloader/**",
-]
-outputs = [
-    "extensions/manga-site-media-downloader/dist/**",
-    "extensions/manga-site-media-downloader/build/**",
-]
-runner = "command"
-platform = "cli"
-
-[targets.manga-site-media-downloader.artifacts]
-required = false
-verify = false
-directories = [
-    "extensions/manga-site-media-downloader/dist",
-    "extensions/manga-site-media-downloader/build",
-]
+[targets.sims-cc-download-basket.artifacts]
+directories = ["dist"]
+patterns = ["*.user.js", "*.meta.js"]
 recursive = true
-[targets.stardew-nexus-download-queue]
-root = "extensions/stardew-nexus-download-queue"
-build_command = "python3 build.py"
-inputs = [
-    "extensions/stardew-nexus-download-queue/**",
-]
-outputs = [
-    "extensions/stardew-nexus-download-queue/dist/**",
-    "extensions/stardew-nexus-download-queue/build/**",
-]
-runner = "command"
-platform = "cli"
+verify = true
 
-[targets.stardew-nexus-download-queue.artifacts]
-required = false
-verify = false
-directories = [
-    "extensions/stardew-nexus-download-queue/dist",
-    "extensions/stardew-nexus-download-queue/build",
-]
-recursive = true
-[targets.telegram-media-downloader-extension]
-root = "extensions/telegram-media-downloader"
-build_command = "python3 build.py"
-inputs = [
-    "extensions/telegram-media-downloader/**",
-]
-outputs = [
-    "extensions/telegram-media-downloader/dist/**",
-    "extensions/telegram-media-downloader/build/**",
-]
+[targets.sims-cc-download-basket.jobs.build]
 runner = "command"
-platform = "cli"
+command = ["node", "build.mjs"]
+inputs = ["build.mjs", "src/**", "package.json"]
+outputs = ["dist/**"]
 
-[targets.telegram-media-downloader-extension.artifacts]
-required = false
-verify = false
-directories = [
-    "extensions/telegram-media-downloader/dist",
-    "extensions/telegram-media-downloader/build",
-]
-recursive = true
-[targets.smoke-python]
-root = "."
-inputs = [
-    "tools/smoke/**",
-    "userscripts/builders/content-site-modernizer/**",
-]
-outputs = [
-    "userscripts/builders/content-site-modernizer/dist/**",
-]
+[targets.sims-cc-download-basket.jobs.reproducibility]
 runner = "command"
-platform = "cli"
+command = ["node", "build.mjs", "--check"]
+inputs = ["build.mjs", "src/**", "dist/**"]
+outputs = []
+[targets.sims-cc-download-basket.jobs.reproducibility.metadata]
+read_only = true
 
-[targets.smoke-python.workflows]
-build = ["job:scriptexts-smoke-build-content-sites"]
-test = [
-    {id = "build_content_sites", ref = "job:scriptexts-smoke-build-content-sites", depends_on = []},
-    {id = "smoke_config", ref = "job:scriptexts-smoke-content-sites-check", depends_on = ["build_content_sites"]},
-    {id = "visual_config", ref = "job:scriptexts-smoke-content-sites-visual-check", depends_on = ["build_content_sites"]},
+[targets.sims-cc-download-basket.jobs.test]
+runner = "command"
+command = ["node", "--test", "test/*.test.mjs"]
+inputs = ["src/**", "test/**"]
+outputs = []
+[targets.sims-cc-download-basket.jobs.test.metadata]
+read_only = true
+
+[targets.sims-cc-download-basket.jobs.syntax]
+runner = "command"
+command = ["node", "../../../tools/devtool-workspace/check-js-syntax.mjs", "dist/sims-basket-modthesims.user.js", "dist/sims-basket-simblrcc.user.js", "dist/sims-basket-thesimsresource.user.js"]
+inputs = ["dist/*.user.js", "../../../tools/devtool-workspace/check-js-syntax.mjs"]
+outputs = []
+[targets.sims-cc-download-basket.jobs.syntax.metadata]
+read_only = true
+
+[targets.sims-cc-download-basket.workflows]
+build = ["job:build"]
+test = ["job:test"]
+lint = [
+  { id = "repro", ref = "job:reproducibility", depends_on = [] },
+  { id = "syntax", ref = "job:syntax", depends_on = [] },
+  { id = "test", ref = "job:test", depends_on = [] },
 ]
 validate = [
-    {id = "build_content_sites", ref = "job:scriptexts-smoke-build-content-sites", depends_on = []},
-    {id = "smoke_config", ref = "job:scriptexts-smoke-content-sites-check", depends_on = ["build_content_sites"]},
-    {id = "visual_config", ref = "job:scriptexts-smoke-content-sites-visual-check", depends_on = ["build_content_sites"]},
+  { id = "build", ref = "job:build", depends_on = [] },
+  { id = "repro", ref = "job:reproducibility", depends_on = ["build"] },
+  { id = "syntax", ref = "job:syntax", depends_on = ["build"] },
+  { id = "test", ref = "job:test", depends_on = ["build"] },
 ]
+seal = [
+  { id = "build", ref = "job:build", depends_on = [] },
+  { id = "repro", ref = "job:reproducibility", depends_on = ["build"] },
+  { id = "syntax", ref = "job:syntax", depends_on = ["build"] },
+  { id = "test", ref = "job:test", depends_on = ["build"] },
+]
+
 [targets.lpsg-media-gallery-unlocker]
 root = "userscripts/builders/lpsg-media-gallery-unlocker"
-inputs = [
-    "userscripts/builders/lpsg-media-gallery-unlocker/**",
-    "userscripts/builders/media-gallery/build.mjs",
-    "userscripts/builders/media-gallery/sites/lpsg.json",
-    "userscripts/standalone/lpsg-media-gallery-unlocker/**",
-]
-outputs = [
-    "userscripts/standalone/lpsg-media-gallery-unlocker/lpsg-media-gallery-unlocker.user.js",
-]
 runner = "node"
-platform = "web"
+platform = "userscript-builder"
+inputs = [
+  "**",
+  "../media-gallery/build.mjs",
+  "../media-gallery/sites/lpsg.json",
+  "../../standalone/lpsg-media-gallery-unlocker/**",
+]
+outputs = ["../../standalone/lpsg-media-gallery-unlocker/lpsg-media-gallery-unlocker.user.js"]
 
-# LPSG owns its execution units. Wrapper commands below resolve into these
-# target-local jobs through target workflows, preserving EXO/TLJ identity.
+[targets.lpsg-media-gallery-unlocker.artifacts]
+paths = ["../../standalone/lpsg-media-gallery-unlocker/lpsg-media-gallery-unlocker.user.js"]
+verify = true
+required = false
+
 [targets.lpsg-media-gallery-unlocker.jobs.build]
 runner = "command"
 command = ["node", "build.mjs"]
-inputs = [
-    "build.mjs",
-    "modules.json",
-    "src/**",
-    "../media-gallery/build.mjs",
-    "../media-gallery/sites/lpsg.json",
-]
-outputs = [
-    "../../standalone/lpsg-media-gallery-unlocker/lpsg-media-gallery-unlocker.user.js",
-]
-
+inputs = ["build.mjs", "modules.json", "src/**", "../media-gallery/build.mjs", "../media-gallery/sites/lpsg.json"]
+outputs = ["../../standalone/lpsg-media-gallery-unlocker/lpsg-media-gallery-unlocker.user.js"]
 [targets.lpsg-media-gallery-unlocker.jobs.reproducibility]
 runner = "command"
 command = ["node", "build.mjs", "--check"]
-inputs = [
-    "build.mjs",
-    "modules.json",
-    "src/**",
-    "../media-gallery/build.mjs",
-    "../media-gallery/sites/lpsg.json",
-    "../../standalone/lpsg-media-gallery-unlocker/lpsg-media-gallery-unlocker.user.js",
-]
+inputs = ["build.mjs", "modules.json", "src/**", "../media-gallery/build.mjs", "../media-gallery/sites/lpsg.json", "../../standalone/lpsg-media-gallery-unlocker/lpsg-media-gallery-unlocker.user.js"]
 outputs = []
-
 [targets.lpsg-media-gallery-unlocker.jobs.reproducibility.metadata]
 read_only = true
-
 [targets.lpsg-media-gallery-unlocker.jobs.syntax]
 runner = "command"
 command = ["node", "--check", "../../standalone/lpsg-media-gallery-unlocker/lpsg-media-gallery-unlocker.user.js"]
-inputs = [
-    "../../standalone/lpsg-media-gallery-unlocker/lpsg-media-gallery-unlocker.user.js",
-]
+inputs = ["../../standalone/lpsg-media-gallery-unlocker/lpsg-media-gallery-unlocker.user.js"]
 outputs = []
-
 [targets.lpsg-media-gallery-unlocker.jobs.syntax.metadata]
 read_only = true
-
 [targets.lpsg-media-gallery-unlocker.jobs.regression]
 runner = "command"
-command = ["node", "--test", "test/lpsg.test.mjs", "test/release-seal.test.mjs"]
-inputs = [
-    "src/**",
-    "test/**",
-    "modules.json",
-    "../../standalone/lpsg-media-gallery-unlocker/lpsg-media-gallery-unlocker.user.js",
-]
+command = ["node", "--test", "test/*.test.mjs"]
+inputs = ["src/**", "test/**", "modules.json", "../../standalone/lpsg-media-gallery-unlocker/lpsg-media-gallery-unlocker.user.js"]
 outputs = []
-
 [targets.lpsg-media-gallery-unlocker.jobs.regression.metadata]
 read_only = true
-
 [targets.lpsg-media-gallery-unlocker.jobs.seal]
 runner = "command"
 command = ["node", "release-seal.mjs", "--json"]
-inputs = [
-    "build.mjs",
-    "release-seal.mjs",
-    "modules.json",
-    "src/**",
-    "test/**",
-    "../media-gallery/build.mjs",
-    "../media-gallery/sites/lpsg.json",
-    "../../standalone/lpsg-media-gallery-unlocker/lpsg-media-gallery-unlocker.user.js",
-]
+inputs = ["build.mjs", "release-seal.mjs", "modules.json", "src/**", "test/**", "../media-gallery/build.mjs", "../media-gallery/sites/lpsg.json", "../../standalone/lpsg-media-gallery-unlocker/lpsg-media-gallery-unlocker.user.js"]
 outputs = []
-
 [targets.lpsg-media-gallery-unlocker.jobs.seal.metadata]
 read_only = true
-
 [targets.lpsg-media-gallery-unlocker.workflows]
 build = ["job:build"]
-check = [
-    { id = "reproducibility", ref = "job:reproducibility", depends_on = [] },
-    { id = "syntax", ref = "job:syntax", depends_on = [] },
-]
 test = ["job:regression"]
-seal = ["job:seal"]
+lint = [
+  { id = "repro", ref = "job:reproducibility", depends_on = [] },
+  { id = "syntax", ref = "job:syntax", depends_on = [] },
+]
 validate = [
-    { id = "reproducibility", ref = "job:reproducibility", depends_on = [] },
-    { id = "syntax", ref = "job:syntax", depends_on = [] },
-    { id = "regression", ref = "job:regression", depends_on = [] },
+  { id = "build", ref = "job:build", depends_on = [] },
+  { id = "repro", ref = "job:reproducibility", depends_on = ["build"] },
+  { id = "syntax", ref = "job:syntax", depends_on = ["build"] },
+  { id = "regression", ref = "job:regression", depends_on = ["build"] },
+]
+seal = [
+  { id = "build", ref = "job:build", depends_on = [] },
+  { id = "seal", ref = "job:seal", depends_on = ["build"] },
 ]
 
 [targets.poast-timeline-metadata-reset]
 root = "userscripts/builders/poast-timeline-metadata-reset"
-inputs = [
-    "userscripts/builders/poast-timeline-metadata-reset/**",
-]
-outputs = [
-    "userscripts/builders/poast-timeline-metadata-reset/dist/**",
-]
 runner = "node"
-platform = "web"
+platform = "userscript-builder"
+inputs = ["**", "../../standalone/poast-timeline-metadata-reset/**"]
+outputs = ["../../standalone/poast-timeline-metadata-reset/**"]
 
-[targets.search-engines-clean-dark-ui]
-root = "."
-build_command = "node --check userscripts/standalone/search-engines-clean-dark-ui/search-engines-clean-dark-ui.user.js"
-inputs = [
-    "userscripts/standalone/search-engines-clean-dark-ui/**",
-]
+[targets.poast-timeline-metadata-reset.artifacts]
+directories = ["../../standalone/poast-timeline-metadata-reset"]
+patterns = ["*.user.js", "*.meta.js"]
+recursive = true
+verify = true
+
+[targets.poast-timeline-metadata-reset.jobs.build]
 runner = "command"
-platform = "cli"
+command = ["node", "build.mjs"]
+inputs = ["build.mjs", "src/**", "package.json"]
+outputs = ["../../standalone/poast-timeline-metadata-reset/**"]
 
-[targets.telegram-media-downloader-userscript]
-root = "."
-build_command = "node --check userscripts/standalone/telegram-media-downloader/telegram-media-downloader.user.js"
-test_command = "node --test userscripts/standalone/telegram-media-downloader/test/*.test.mjs"
-inputs = [
-    "userscripts/standalone/telegram-media-downloader/**",
-]
+[targets.poast-timeline-metadata-reset.jobs.reproducibility]
 runner = "command"
-platform = "cli"
+command = ["node", "build.mjs", "--check"]
+inputs = ["build.mjs", "src/**", "../../standalone/poast-timeline-metadata-reset/**"]
+outputs = []
+[targets.poast-timeline-metadata-reset.jobs.reproducibility.metadata]
+read_only = true
 
+[targets.poast-timeline-metadata-reset.jobs.test]
+runner = "command"
+command = ["node", "--test", "test/*.test.mjs"]
+inputs = ["src/**", "test/**"]
+outputs = []
+[targets.poast-timeline-metadata-reset.jobs.test.metadata]
+read_only = true
+
+[targets.poast-timeline-metadata-reset.workflows]
+build = ["job:build"]
+test = ["job:test"]
+lint = [
+  { id = "repro", ref = "job:reproducibility", depends_on = [] },
+  { id = "test", ref = "job:test", depends_on = [] },
+]
+validate = [
+  { id = "build", ref = "job:build", depends_on = [] },
+  { id = "repro", ref = "job:reproducibility", depends_on = ["build"] },
+  { id = "test", ref = "job:test", depends_on = ["build"] },
+]
+seal = [
+  { id = "build", ref = "job:build", depends_on = [] },
+  { id = "repro", ref = "job:reproducibility", depends_on = ["build"] },
+  { id = "test", ref = "job:test", depends_on = ["build"] },
+]
 
 [targets.coomer-media-gallery]
-root = "userscripts/builders/media-gallery"
-build_command = "npm run check:coomer"
-test_command = "npm test"
-inputs = [
-    "userscripts/builders/media-gallery/**",
-]
-outputs = [
-    "userscripts/builders/media-gallery/dist/**",
-]
-runner = "node"
-platform = "web"
+root = "userscripts/standalone/coomer-media-gallery"
+runner = "command"
+platform = "userscript-builder"
+inputs = ["**", "../../builders/media-gallery/build.mjs", "../../builders/media-gallery/src/**", "../../builders/media-gallery/sites/coomer.json", "../../builders/media-gallery/test/**"]
+outputs = ["coomer-media-gallery.user.js"]
 
+[targets.coomer-media-gallery.artifacts]
+paths = ["coomer-media-gallery.user.js"]
+verify = true
+required = false
+
+[targets.coomer-media-gallery.jobs.build]
+runner = "command"
+root = "../../builders/media-gallery"
+command = ["node", "build.mjs", "--site=coomer"]
+inputs = ["build.mjs", "src/**", "sites/coomer.json"]
+outputs = ["../../standalone/coomer-media-gallery/coomer-media-gallery.user.js"]
+[targets.coomer-media-gallery.jobs.reproducibility]
+runner = "command"
+root = "../../builders/media-gallery"
+command = ["node", "build.mjs", "--site=coomer", "--check"]
+inputs = ["build.mjs", "src/**", "sites/coomer.json", "../../standalone/coomer-media-gallery/coomer-media-gallery.user.js"]
+outputs = []
+[targets.coomer-media-gallery.jobs.reproducibility.metadata]
+read_only = true
+[targets.coomer-media-gallery.jobs.test]
+runner = "command"
+root = "../../builders/media-gallery"
+command = ["node", "--test", "test/*.test.mjs"]
+inputs = ["build.mjs", "src/**", "sites/**", "test/**"]
+outputs = []
+[targets.coomer-media-gallery.jobs.test.metadata]
+read_only = true
+[targets.coomer-media-gallery.workflows]
+build = ["job:build"]
+test = ["job:test"]
+lint = ["job:reproducibility"]
+validate = [
+  { id = "build", ref = "job:build", depends_on = [] },
+  { id = "repro", ref = "job:reproducibility", depends_on = ["build"] },
+  { id = "test", ref = "job:test", depends_on = ["build"] },
+]
+seal = [
+  { id = "build", ref = "job:build", depends_on = [] },
+  { id = "repro", ref = "job:reproducibility", depends_on = ["build"] },
+  { id = "test", ref = "job:test", depends_on = ["build"] },
+]
 
 # -----------------------------------------------------------------------------
-# Repository wrapper (WRAP / EXO bridge)
+# Standalone userscripts
+# -----------------------------------------------------------------------------
+[targets.search-engines-clean-dark-ui]
+root = "userscripts/standalone/search-engines-clean-dark-ui"
+runner = "command"
+platform = "userscript"
+inputs = ["**"]
+outputs = []
+
+[targets.search-engines-clean-dark-ui.artifacts]
+paths = ["search-engines-clean-dark-ui.user.js"]
+verify = true
+required = false
+
+[targets.search-engines-clean-dark-ui.jobs.syntax]
+runner = "command"
+command = ["node", "--check", "search-engines-clean-dark-ui.user.js"]
+inputs = ["search-engines-clean-dark-ui.user.js"]
+outputs = []
+[targets.search-engines-clean-dark-ui.jobs.syntax.metadata]
+read_only = true
+[targets.search-engines-clean-dark-ui.workflows]
+build = ["job:syntax"]
+test = ["job:syntax"]
+lint = ["job:syntax"]
+validate = ["job:syntax"]
+seal = ["job:syntax"]
+
+[targets.telegram-media-downloader-userscript]
+root = "userscripts/standalone/telegram-media-downloader"
+runner = "command"
+platform = "userscript"
+inputs = ["**"]
+outputs = []
+
+[targets.telegram-media-downloader-userscript.artifacts]
+paths = ["telegram-media-downloader.user.js"]
+verify = true
+required = false
+
+[targets.telegram-media-downloader-userscript.jobs.syntax]
+runner = "command"
+command = ["node", "--check", "telegram-media-downloader.user.js"]
+inputs = ["telegram-media-downloader.user.js"]
+outputs = []
+[targets.telegram-media-downloader-userscript.jobs.syntax.metadata]
+read_only = true
+[targets.telegram-media-downloader-userscript.jobs.test]
+runner = "command"
+command = ["node", "--test", "test/*.test.mjs"]
+inputs = ["telegram-media-downloader.user.js", "test/**"]
+outputs = []
+[targets.telegram-media-downloader-userscript.jobs.test.metadata]
+read_only = true
+[targets.telegram-media-downloader-userscript.workflows]
+build = ["job:syntax"]
+test = ["job:test"]
+lint = ["job:syntax"]
+validate = [
+  { id = "syntax", ref = "job:syntax", depends_on = [] },
+  { id = "test", ref = "job:test", depends_on = [] },
+]
+seal = [
+  { id = "syntax", ref = "job:syntax", depends_on = [] },
+  { id = "test", ref = "job:test", depends_on = [] },
+]
+
+# -----------------------------------------------------------------------------
+# Browser extensions
+# -----------------------------------------------------------------------------
+[targets.manga-site-media-downloader]
+root = "extensions/manga-site-media-downloader"
+runner = "command"
+platform = "browser-extension"
+inputs = ["**"]
+outputs = ["dist/**"]
+[targets.manga-site-media-downloader.artifacts]
+directories = ["dist"]
+patterns = ["*.xpi", "SHA256SUMS"]
+recursive = false
+verify = true
+required = false
+[targets.manga-site-media-downloader.jobs.build]
+runner = "command"
+command = ["python3", "build.py"]
+inputs = ["build.py", "src/**"]
+outputs = ["dist/**"]
+[targets.manga-site-media-downloader.jobs.reproducibility]
+runner = "command"
+command = ["python3", "../../tools/devtool-workspace/check-extension-reproducible.py", "."]
+inputs = ["build.py", "src/**", "../../tools/devtool-workspace/check-extension-reproducible.py"]
+outputs = ["dist/**"]
+[targets.manga-site-media-downloader.workflows]
+build = ["job:build"]
+test = ["job:reproducibility"]
+lint = ["job:reproducibility"]
+validate = ["job:reproducibility"]
+seal = ["job:reproducibility"]
+
+[targets.stardew-nexus-download-queue]
+root = "extensions/stardew-nexus-download-queue"
+runner = "command"
+platform = "browser-extension"
+inputs = ["**"]
+outputs = ["dist/**"]
+[targets.stardew-nexus-download-queue.artifacts]
+directories = ["dist"]
+patterns = ["*.xpi", "SHA256SUMS"]
+recursive = false
+verify = true
+required = false
+[targets.stardew-nexus-download-queue.jobs.build]
+runner = "command"
+command = ["python3", "build.py"]
+inputs = ["build.py", "src/**"]
+outputs = ["dist/**"]
+[targets.stardew-nexus-download-queue.jobs.reproducibility]
+runner = "command"
+command = ["python3", "../../tools/devtool-workspace/check-extension-reproducible.py", "."]
+inputs = ["build.py", "src/**", "../../tools/devtool-workspace/check-extension-reproducible.py"]
+outputs = ["dist/**"]
+[targets.stardew-nexus-download-queue.workflows]
+build = ["job:build"]
+test = ["job:reproducibility"]
+lint = ["job:reproducibility"]
+validate = ["job:reproducibility"]
+seal = ["job:reproducibility"]
+
+[targets.telegram-media-downloader-extension]
+root = "extensions/telegram-media-downloader"
+runner = "command"
+platform = "browser-extension"
+inputs = ["**", "../../tools/tests/telegram-extension-runtime.test.mjs"]
+outputs = ["dist/**"]
+[targets.telegram-media-downloader-extension.artifacts]
+directories = ["dist"]
+patterns = ["*.xpi", "SHA256SUMS"]
+recursive = false
+verify = true
+required = false
+[targets.telegram-media-downloader-extension.jobs.build]
+runner = "command"
+command = ["python3", "build.py"]
+inputs = ["build.py", "src/**"]
+outputs = ["dist/**"]
+[targets.telegram-media-downloader-extension.jobs.reproducibility]
+runner = "command"
+command = ["python3", "../../tools/devtool-workspace/check-extension-reproducible.py", "."]
+inputs = ["build.py", "src/**", "../../tools/devtool-workspace/check-extension-reproducible.py"]
+outputs = ["dist/**"]
+[targets.telegram-media-downloader-extension.jobs.test]
+runner = "command"
+root = "../.."
+command = ["node", "--test", "tools/tests/telegram-extension-runtime.test.mjs"]
+inputs = ["tools/tests/telegram-extension-runtime.test.mjs", "extensions/telegram-media-downloader/**"]
+outputs = []
+[targets.telegram-media-downloader-extension.jobs.test.metadata]
+read_only = true
+[targets.telegram-media-downloader-extension.workflows]
+build = ["job:build"]
+test = ["job:test"]
+lint = ["job:reproducibility"]
+validate = [
+  { id = "repro", ref = "job:reproducibility", depends_on = [] },
+  { id = "test", ref = "job:test", depends_on = [] },
+]
+seal = [
+  { id = "repro", ref = "job:reproducibility", depends_on = [] },
+  { id = "test", ref = "job:test", depends_on = [] },
+]
+
+# -----------------------------------------------------------------------------
+# Optional managed browser smoke environment
+# -----------------------------------------------------------------------------
+[targets.smoke-python]
+root = "."
+runner = "python"
+platform = "browser-smoke"
+inputs = ["tools/smoke/**", "requirements-smoke.txt", "pyproject.toml", "uv.lock", "userscripts/builders/content-site-modernizer/**"]
+outputs = ["smoke-results/**"]
+
+[targets.smoke-python.python]
+manager = "uv"
+environment = ".venv-smoke"
+groups = ["smoke"]
+locked = true
+install_project = false
+
+[targets.smoke-python.jobs.config]
+runner = "command"
+command = ["python3", "tools/smoke/run-content-site-smoke.py", "--builder", "content-site-modernizer", "--check-config"]
+inputs = ["tools/smoke/**", "userscripts/builders/content-site-modernizer/**"]
+outputs = []
+[targets.smoke-python.jobs.config.metadata]
+read_only = true
+[targets.smoke-python.jobs.visual-config]
+runner = "command"
+command = ["python3", "tools/smoke/run-content-site-visual.py", "--builder", "content-site-modernizer", "--check-config"]
+inputs = ["tools/smoke/**", "userscripts/builders/content-site-modernizer/**"]
+outputs = []
+[targets.smoke-python.jobs.visual-config.metadata]
+read_only = true
+[targets.smoke-python.workflows]
+build = ["job:config"]
+test = [
+  { id = "config", ref = "job:config", depends_on = [] },
+  { id = "visual", ref = "job:visual-config", depends_on = [] },
+]
+validate = [
+  { id = "config", ref = "job:config", depends_on = [] },
+  { id = "visual", ref = "job:visual-config", depends_on = [] },
+]
+seal = [
+  { id = "config", ref = "job:config", depends_on = [] },
+  { id = "visual", ref = "job:visual-config", depends_on = [] },
+]
+
+# -----------------------------------------------------------------------------
+# Repository wrapper: workspace first, component shortcuts second
 # -----------------------------------------------------------------------------
 [wrapper]
 schema = 1
 default_command = "validate"
 
+[wrapper.commands.restore]
+description = "Restore repository dependencies through the workspace TLJ"
+workflow = "restore"
+target = "workspace"
+aliases = ["r"]
+
 [wrapper.commands.build]
-description = "Build the LPSG userscript from modular source"
+description = "Build every release component and refresh generated userscript metadata"
 workflow = "build"
-target = "lpsg-media-gallery-unlocker"
+target = "workspace"
 aliases = ["b"]
 
-[wrapper.commands.check]
-description = "Check LPSG reproducibility and generated userscript syntax"
-workflow = "check"
-target = "lpsg-media-gallery-unlocker"
-aliases = ["c"]
-
 [wrapper.commands.test]
-description = "Run the LPSG regression suite"
+description = "Run the repository test graph through EXO/TLJ"
 workflow = "test"
-target = "lpsg-media-gallery-unlocker"
+target = "workspace"
 aliases = ["t"]
 
-[wrapper.commands.seal]
-description = "Run the deterministic LPSG release seal"
-workflow = "seal"
-target = "lpsg-media-gallery-unlocker"
-aliases = ["s"]
+[wrapper.commands.check]
+description = "Run lint/reproducibility checks for every CI target"
+devtool = "lint"
+group = "ci"
+aliases = ["c"]
 
 [wrapper.commands.validate]
-description = "Run the parallel-safe LPSG EXO/TLJ validation workflow"
+description = "Run the complete repository validation DAG (default)"
+workflow = "validate"
+target = "workspace"
+aliases = ["v"]
+
+[wrapper.commands.seal]
+description = "Run component release seals and repository final checks"
+workflow = "seal"
+target = "workspace"
+aliases = ["s"]
+
+[wrapper.commands.package]
+description = "Create repository release packages through the workspace DAG"
+workflow = "package"
+target = "workspace"
+aliases = ["pkg"]
+
+[wrapper.commands.smoke]
+description = "Run the managed content-site smoke configuration gates"
+workflow = "smoke"
+target = "workspace"
+
+[wrapper.commands.userscripts]
+description = "Validate every userscript target as one safe parallel workspace graph"
+workflow = "validate"
+group = "userscripts"
+aliases = ["us"]
+
+[wrapper.commands.extensions]
+description = "Validate every browser extension target"
+workflow = "validate"
+group = "extensions"
+aliases = ["ext"]
+
+[wrapper.commands.lpsg]
+description = "Validate only the LPSG media-gallery target"
 workflow = "validate"
 target = "lpsg-media-gallery-unlocker"
-aliases = ["v"]
+
+[wrapper.commands.content-sites]
+description = "Validate only the content-site-modernizer target"
+workflow = "validate"
+target = "content-site-modernizer"
+aliases = ["csm"]
+
+[wrapper.commands.changed]
+description = "Validate only Git-affected CI targets using dependency-aware ownership"
+devtool = "validate"
+group = "ci"
+aliases = ["chg"]
+
+[wrapper.commands.changed.options.affected]
+type = "boolean"
+default = true
+global_argv = ["--affected"]
+
+[wrapper.commands.changed.options.base]
+type = "string"
+description = "Git base revision for affected selection"
+global_argv = ["--affected-base", "{value}"]
+
+[wrapper.commands.changed.options.head]
+type = "string"
+description = "Git head revision for affected selection"
+global_argv = ["--affected-head", "{value}"]
+
+[wrapper.commands.changed.options.fail_fast]
+type = "boolean"
+description = "Stop independent branches after the first failure"
+aliases = ["f"]
+global_argv = ["--fail-fast"]

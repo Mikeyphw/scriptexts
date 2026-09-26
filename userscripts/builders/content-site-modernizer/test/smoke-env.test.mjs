@@ -25,7 +25,8 @@ test('repo-wide smoke Python environment prefers uv and has venv fallback', asyn
   assert.match(pyproject, /venv = "\.venv-smoke"/);
 
   assert.match(devtoolToml, /\[targets\.smoke-python\]/);
-  assert.match(devtoolToml, /type = "python"/);
+  assert.match(devtoolToml, /runner = "python"/);
+  assert.match(devtoolToml, /platform = "browser-smoke"/);
   assert.match(devtoolToml, /manager = "uv"/);
   assert.match(devtoolToml, /environment = "\.venv-smoke"/);
 

@@ -1,6 +1,10 @@
 // ==UserScript==
 // @name         Coomer Media Gallery
-// @namespace    https://github.com/Mikeyphw/scriptexts/userscripts/media-gallery
+// @namespace    https://github.com/Mikeyphw/scriptexts/userscripts/coomer-media-gallery
+// @homepageURL  https://github.com/Mikeyphw/scriptexts/tree/main/userscripts/standalone/coomer-media-gallery
+// @supportURL   https://github.com/Mikeyphw/scriptexts/issues
+// @updateURL    https://raw.githubusercontent.com/Mikeyphw/scriptexts/main/userscripts/standalone/coomer-media-gallery/coomer-media-gallery.meta.js
+// @downloadURL  https://raw.githubusercontent.com/Mikeyphw/scriptexts/main/userscripts/standalone/coomer-media-gallery/coomer-media-gallery.user.js
 // @version      1.1.1
 // @description  Mobile-first media gallery for Coomer profiles with resilient original-media discovery, incremental results and friendly ZIP jobs.
 // @match        https://*.coomer.com.co/*/user/*

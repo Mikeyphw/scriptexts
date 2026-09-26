@@ -156,7 +156,7 @@
     {
       "path": "userscripts/standalone/lpsg-media-gallery-unlocker",
       "type": "standalone-userscript",
-      "version": "6.7.3-optimized",
+      "version": "6.7.5-optimized",
       "source_model": "direct-single-file",
       "canonical_source": "lpsg-media-gallery-unlocker.user.js",
       "install_artifacts": [
@@ -165,9 +165,21 @@
       ]
     },
     {
+      "path": "userscripts/standalone/coomer-media-gallery",
+      "type": "standalone-userscript",
+      "version": "1.1.1",
+      "source_model": "generated-from-media-gallery-profile",
+      "canonical_source": "coomer-media-gallery.user.js",
+      "builder": "../../builders/media-gallery/build.mjs",
+      "install_artifacts": [
+        "coomer-media-gallery.user.js",
+        "coomer-media-gallery.meta.js"
+      ]
+    },
+    {
       "path": "userscripts/standalone/telegram-media-downloader",
       "type": "standalone-userscript",
-      "version": "1.212",
+      "version": "1.213",
       "source_model": "direct-single-file",
       "canonical_source": "telegram-media-downloader.user.js",
       "install_artifacts": [
@@ -178,7 +190,7 @@
     {
       "path": "userscripts/standalone/search-engines-clean-dark-ui",
       "type": "standalone-userscript",
-      "version": "3.4",
+      "version": "3.5",
       "source_model": "direct-single-file",
       "canonical_source": "search-engines-clean-dark-ui.user.js",
       "install_artifacts": [
@@ -308,39 +320,39 @@
     {
       "path": "extensions/manga-site-media-downloader",
       "type": "firefox-extension",
-      "version": "1.10.3",
+      "version": "1.11.0",
       "source_model": "editable-source-with-reproducible-package",
       "canonical_source": "src/",
       "builder": "build.py",
       "firefox_extension_id": "manga-site-media-downloader@mikeyphw.scriptexts",
       "install_artifacts": [
-        "dist/manga-site-media-downloader-1.10.3.xpi",
+        "dist/manga-site-media-downloader-1.11.0.xpi",
         "dist/SHA256SUMS"
       ]
     },
     {
       "path": "extensions/stardew-nexus-download-queue",
       "type": "firefox-extension",
-      "version": "0.4.4",
+      "version": "0.4.6",
       "source_model": "editable-source-with-reproducible-package",
       "canonical_source": "src/",
       "builder": "build.py",
       "firefox_extension_id": "stardew-nexus-download-queue@mikeyphw.scriptexts",
       "install_artifacts": [
-        "dist/stardew-nexus-download-queue-0.4.4.xpi",
+        "dist/stardew-nexus-download-queue-0.4.6.xpi",
         "dist/SHA256SUMS"
       ]
     },
     {
       "path": "extensions/telegram-media-downloader",
       "type": "firefox-extension",
-      "version": "3.4.9",
+      "version": "3.5.1",
       "source_model": "editable-source-with-reproducible-package",
       "canonical_source": "src/",
       "builder": "build.py",
       "firefox_extension_id": "telegram-media-downloader@mikeyphw.scriptexts",
       "install_artifacts": [
-        "dist/telegram-media-downloader-3.4.9.xpi",
+        "dist/telegram-media-downloader-3.5.1.xpi",
         "dist/SHA256SUMS"
       ]
     }
