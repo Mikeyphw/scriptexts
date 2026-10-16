@@ -124,6 +124,11 @@ smoke = [
 # -----------------------------------------------------------------------------
 # Repository-level contracts and joins
 # -----------------------------------------------------------------------------
+ci-local = [
+  { id = "source", ref = "target:root#ci-preflight", depends_on = [] },
+  { id = "validate", ref = "target:workspace#validate", depends_on = ["source"] },
+]
+
 [targets.root]
 root = "tools/devtool-root"
 runner = "command"
@@ -214,6 +219,10 @@ package = ["job:chromium"]
 # -----------------------------------------------------------------------------
 # Userscript builders
 # -----------------------------------------------------------------------------
+ci-preflight = [
+  { id = "source", ref = "job:ci-source", depends_on = [] },
+]
+
 [targets.content-site-modernizer]
 root = "userscripts/builders/content-site-modernizer"
 runner = "node"
@@ -903,7 +912,7 @@ seal = [
 # Repository wrapper: workspace first, component shortcuts second
 # -----------------------------------------------------------------------------
 [wrapper]
-schema = 1
+schema = 2
 default_command = "validate"
 
 [wrapper.commands.restore]
@@ -1002,3 +1011,22 @@ type = "boolean"
 description = "Stop independent branches after the first failure"
 aliases = ["f"]
 global_argv = ["--fail-fast"]
+
+[targets.root.jobs.ci-source]
+runner = "command"
+root = "../.."
+command = ["python3", "scripts/devtool_actions_contract.py"]
+inputs = [".devtool.toml", "scripts/devtool_actions_contract.py", ".github/workflows/*.yml"]
+outputs = []
+[targets.root.jobs.ci-source.metadata]
+read_only = true
+
+[wrapper.commands.ci-preflight]
+description = "Read-only CI source and workflow preflight"
+workflow = "ci-preflight"
+target = "root"
+
+[wrapper.commands.ci-local]
+description = "Run existing multi-target workspace validation DAG after source check"
+workflow = "ci-local"
+target = "workspace"
