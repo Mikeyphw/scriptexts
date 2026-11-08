@@ -64,7 +64,7 @@
     "smoke:content-sites:a11y:managed": "bash tools/smoke/with-smoke-env.sh -- npm run smoke:content-sites:a11y:focused --",
     "smoke:content-sites:visual:managed": "bash tools/smoke/with-smoke-env.sh -- npm run smoke:content-sites:visual:focused --",
     "smoke:content-sites:live:managed": "bash tools/smoke/with-smoke-env.sh -- npm run smoke:content-sites:live:focused --",
-    "build:mrm-reimagined": "npm run build:mrm-reimagined:write && npm --prefix userscripts/builders/myreadingmanga-reimagined run build:verify",
+    "build:mrm-reimagined": "npm --prefix userscripts/builders/myreadingmanga-reimagined run build:verify",
     "build:mrm-reimagined:write": "npm --prefix userscripts/builders/myreadingmanga-reimagined run build",
     "check:mrm-reimagined": "npm --prefix userscripts/builders/myreadingmanga-reimagined run check",
     "smoke:mrm-reimagined": "npm --prefix userscripts/builders/myreadingmanga-reimagined run smoke",
