@@ -1041,6 +1041,7 @@ function matchesDownloadLink(anchor) {
 
 async function onCaptureClick(event) {
   if (!NXQ.settings?.interceptPageDownloads) return
+  if (event.target.closest("#cbnx01-download-handoff")) return
   const anchor = event.target.closest("a[href]")
   if (!anchor || !matchesDownloadLink(anchor)) return
 
@@ -1109,6 +1110,10 @@ async function boot() {
     return
   }
   await loadSettings()
+  // Only a canonical, user-initiated Cinderbox URL activates this bridge.
+  startCinderboxBrowserBridge().catch(() => {
+    log("cbnx01:bridge-failed")
+  })
   log("boot:settings-loaded", NXQ.settings)
   ensureBaseUi()
   installObservers()

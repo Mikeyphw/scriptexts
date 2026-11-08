@@ -1,0 +1,26 @@
+name: CB-NX01 Stardew Firefox Exact-File Handoff
+on:
+  pull_request:
+    paths:
+      - 'extensions/stardew-nexus-download-queue/src/**'
+      - 'tools/tests/cbnx01-handoff.test.mjs'
+      - '.github/workflows/cbnx01-nexus-handoff.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  extension-contract:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22'
+      - run: node --check extensions/stardew-nexus-download-queue/src/cbnx01-handoff.js
+      - run: node --check extensions/stardew-nexus-download-queue/src/cbnx01-browser-bridge.js
+      - run: node --check extensions/stardew-nexus-download-queue/src/content.js
+      - run: node --check extensions/stardew-nexus-download-queue/src/background.js
+      - run: node --test tools/tests/cbnx01-handoff.test.mjs
+      - run: python3 extensions/stardew-nexus-download-queue/build.py

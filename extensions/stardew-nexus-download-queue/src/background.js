@@ -200,12 +200,11 @@ async function launchManagerUrl(item) {
       await browser.tabs.create({ url: targetUrl, active: false })
     }
     updateItem(item.id, {
-      status: "completed",
-      progress: 100,
-      message: "Sent to mod manager."
+      status: "handoff_attempted",
+      progress: 0,
+      message: "NXM launch attempted. Confirm receipt in the target app."
     })
-    await persistDownloadedModState(item)
-    await notify("Stardew Nexus Queue", `${item.modName || "Mod"} sent to mod manager.`)
+    await notify("Stardew Nexus Queue", `${item.modName || "Mod"}: NXM launch attempted; check the mod manager.`)
   } catch (error) {
     updateItem(item.id, {
       status: "failed",
@@ -387,7 +386,7 @@ browser.runtime.onMessage.addListener(EXT_PROTOCOL_V2.adaptPromiseListener((mess
   }
 
   if (message.type === "CLEAR_FINISHED") {
-    state.queue = state.queue.filter(item => !["completed", "failed", "cancelled"].includes(item.status))
+    state.queue = state.queue.filter(item => !["completed", "handoff_attempted", "failed", "cancelled"].includes(item.status))
     return persist().then(processQueue).then(() => getPublicState())
   }
 
