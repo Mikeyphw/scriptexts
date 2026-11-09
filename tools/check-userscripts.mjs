@@ -6,7 +6,7 @@ import { fileURLToPath } from "node:url";
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const npm = process.platform === "win32" ? "npm.cmd" : "npm";
 const steps = [
-  ["validation regression tests", process.execPath, ["--test", "tools/tests/*.test.mjs"]],
+  ["validation regression tests", process.execPath, ["--test", "--test-concurrency=1", "tools/tests/*.test.mjs"]],
   ["content-site-modernizer", npm, ["--prefix", "userscripts/builders/content-site-modernizer", "run", "check"]],
   ["manga-reader-modernizer", npm, ["--prefix", "userscripts/builders/manga-reader-modernizer", "run", "check"]],
   ["myreadingmanga-reimagined", npm, ["--prefix", "userscripts/builders/myreadingmanga-reimagined", "run", "check"]],
