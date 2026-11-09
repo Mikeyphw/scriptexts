@@ -24,3 +24,9 @@ jobs:
       - run: node --check extensions/stardew-nexus-download-queue/src/background.js
       - run: node --test tools/tests/cbnx01-handoff.test.mjs
       - run: python3 extensions/stardew-nexus-download-queue/build.py
+      - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4
+        with:
+          name: stardew-nexus-queue-unsigned-xpi
+          path: extensions/stardew-nexus-download-queue/dist/*.xpi
+          if-no-files-found: error
+          retention-days: 14

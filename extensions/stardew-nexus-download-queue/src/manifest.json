@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Stardew Nexus Download Queue",
-  "version": "0.4.7",
+  "version": "0.4.8",
   "description": "Queue and launch Stardew Valley Nexus downloads with listing-page buttons and a popup manager.",
   "author": "OpenAI",
   "permissions": [
