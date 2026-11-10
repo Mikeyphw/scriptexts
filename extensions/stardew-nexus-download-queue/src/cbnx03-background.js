@@ -50,7 +50,7 @@
     const empty = { inventoryState: 'UNAVAILABLE', remoteUpdateCheck: 'NOT_PERFORMED', items: [] }
     if (!value || value.schema !== 1 || value.scope !== 'LOCAL_SMAPI_AND_JOURNAL' ||
         !['QUALIFIED', 'UNAVAILABLE'].includes(value.inventory_state) ||
-        value.remote_update_check !== 'NOT_PERFORMED' || !Array.isArray(value.items) ||
+        !['NOT_PERFORMED', 'UNAVAILABLE', 'CLOCK_INVALID', 'SMAPI_CACHE_STALE', 'SMAPI_CACHE_FRESH'].includes(value.remote_update_check) || !Array.isArray(value.items) ||
         value.items.length > 128) return empty
     const validId = id => /^[1-9][0-9]{0,11}$/.test(id)
     const allowedInstalled = new Set(['UNKNOWN', 'NOT_LINKED', 'AMBIGUOUS', 'PRESENT', 'DISABLED_PRESENT'])
@@ -63,6 +63,8 @@
     const proofStates = new Set(['VERIFIED_AT_SCAN', 'NO_RETAINED_ARCHIVE', 'UNAVAILABLE'])
     const possibleRetained = new Set(['VALIDATING', 'REVIEW_REQUIRED', 'BLOCKED',
       'VERIFY_REQUIRED', 'INSTALLING', 'INSTALLED'])
+    const updateStates = new Set(['UNKNOWN', 'NEWER', 'CURRENT', 'INSTALLED_AHEAD', 'UNCOMPARABLE'])
+    const updateScope = 'CACHED_SMAPI_MOD_VERSION'
     const items = []
     const seen = new Set()
     for (const item of value.items) {
@@ -72,7 +74,8 @@
           typeof fileId !== 'string' || (fileId !== '' && !validId(fileId)) ||
           !allowedJournal.has(item.journal_state) ||
           !allowedInstalled.has(item.installed_mod_state) ||
-          item.update_state !== 'UNKNOWN' ||
+          !updateStates.has(item.update_state) ||
+          item.update_proof_scope !== updateScope ||
           item.exact_file_installed !== 'UNKNOWN' ||
           typeof item.archive_checksum_qualified !== 'boolean' ||
           !proofStates.has(item.archive_proof_state) ||
@@ -89,16 +92,25 @@
       if (version !== undefined &&
           (typeof version !== 'string' || !/^[A-Za-z0-9.+_-]{1,80}$/.test(version) ||
           !['PRESENT','DISABLED_PRESENT'].includes(installedState))) return empty
+      const isFresh = value.remote_update_check === 'SMAPI_CACHE_FRESH'
+      const hasUpdate = item.update_state !== 'UNKNOWN'
+      const newer = item.update_state === 'NEWER'
+      const candidate = item.candidate_version
+      if ((hasUpdate && (!isFresh || installedState !== 'PRESENT' || !version)) ||
+          (newer && (typeof candidate !== 'string' ||
+             !/^[A-Za-z0-9.+_-]{1,80}$/.test(candidate))) ||
+          (!newer && candidate !== undefined)) return empty
       items.push({ modId, fileId, journalState: item.journal_state,
         journalTransferReported: item.journal_transfer_reported,
         installedModState: installedState, installedVersion: version || null,
         archiveProofState: item.archive_proof_state,
         archiveProofScope: 'LOCAL_ZIP_VS_APP_RECEIPT',
         archiveChecksumQualified: item.archive_checksum_qualified,
-        exactFileInstalled: 'UNKNOWN', updateState: 'UNKNOWN' })
+        exactFileInstalled: 'UNKNOWN', updateState: item.update_state,
+        updateProofScope: updateScope, candidateVersion: newer ? candidate : null })
     }
     return { inventoryState: value.inventory_state,
-      remoteUpdateCheck: 'NOT_PERFORMED', items }
+      remoteUpdateCheck: value.remote_update_check, items }
   }
   async function status() {
     if (!token) return { state: 'unpaired', jobs: [] }

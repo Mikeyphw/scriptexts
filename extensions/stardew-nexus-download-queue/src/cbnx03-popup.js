@@ -101,7 +101,7 @@
       const evidence = result.authority
       const summary = document.createElement('p')
       summary.textContent = evidence?.inventoryState === 'QUALIFIED'
-        ? 'SMAPI manifest scan completed. Exact installed files and remote updates are not verified.'
+        ? 'SMAPI manifests scanned. Exact installed files are unverified; updates reflect a cached SMAPI observation only.'
         : 'Installed-mod inventory unavailable. No installation or update claims can be made.'
       authority.append(summary)
       for (const item of evidence?.items || []) {
@@ -123,8 +123,16 @@
         const transfer = item.journalTransferReported
           ? ' · transfer completion reported by journal'
           : ''
-        row.textContent = mod + file + ': ' + installed + transfer + archiveProof +
-          ' · update status unknown (no provider check)'
+        const update = item.updateState === 'NEWER'
+          ? ' · newer SMAPI mod version ' + item.candidateVersion + ' (cached observation; exact Nexus file update unverified)'
+          : item.updateState === 'CURRENT'
+            ? ' · current compared with cached SMAPI mod version (not an exact file claim)'
+            : item.updateState === 'INSTALLED_AHEAD'
+              ? ' · installed mod version ahead of cached SMAPI version'
+              : item.updateState === 'UNCOMPARABLE'
+                ? ' · cached SMAPI mod versions are not comparable'
+                : ' · update status unknown or cached observation expired'
+        row.textContent = mod + file + ': ' + installed + transfer + archiveProof + update
         authority.append(row)
       }
     }

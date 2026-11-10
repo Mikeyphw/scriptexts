@@ -13,7 +13,7 @@ const evidence = (changes = {}) => ({ schema: 1, scope: 'LOCAL_SMAPI_AND_JOURNAL
     journal_transfer_reported: true, archive_checksum_qualified: false,
     archive_proof_state: 'NO_RETAINED_ARCHIVE', archive_proof_scope: 'LOCAL_ZIP_VS_APP_RECEIPT',
     installed_mod_state: 'PRESENT', exact_file_installed: 'UNKNOWN',
-    update_state: 'UNKNOWN', installed_version: '1.2.0'
+    update_state: 'UNKNOWN', update_proof_scope: 'CACHED_SMAPI_MOD_VERSION', installed_version: '1.2.0'
   }], ...changes })
 function session(authority, onFetch = () => {}) {
   let listener
@@ -111,6 +111,43 @@ test('inconsistent or forged archive proof and provider scope are rejected fail 
   for (const changes of variants) {
     const payload = evidence({ items: [{ ...evidence().items[0], ...changes }] })
     const send = session(payload)
+    await send('CBNX03_PAIR')
+    assert.equal((await send('CBNX03_STATUS')).authority.items.length, 0)
+  }
+})
+
+// CB-NX04C migration: existing authority suite accepts ONLY bounded cached SMAPI mod
+// comparisons with fresh inventory evidence; no remote requests or exact-file claims.
+test('fresh cached SMAPI newer mod version is surfaced without exact Nexus-file proof', async () => {
+  const newItem = { ...evidence().items[0], update_state: 'NEWER', candidate_version: '1.3.0' }
+  const send = session(evidence({ remote_update_check: 'SMAPI_CACHE_FRESH', items: [newItem] }))
+  await send('CBNX03_PAIR')
+  const state = (await send('CBNX03_STATUS')).authority
+  assert.equal(state.remoteUpdateCheck, 'SMAPI_CACHE_FRESH')
+  assert.equal(state.items[0].updateState, 'NEWER')
+  assert.equal(state.items[0].candidateVersion, '1.3.0')
+  assert.equal(state.items[0].exactFileInstalled, 'UNKNOWN')
+})
+test('stale, unavailable and clock-invalid cache cannot produce an update badge', async () => {
+  for (const remoteUpdateCheck of ['NOT_PERFORMED', 'SMAPI_CACHE_STALE', 'CLOCK_INVALID', 'UNAVAILABLE']) {
+    const send = session(evidence({ remote_update_check: remoteUpdateCheck,
+      items: [{ ...evidence().items[0], update_state: 'NEWER', candidate_version: '1.3.0' }] }))
+    await send('CBNX03_PAIR')
+    assert.equal((await send('CBNX03_STATUS')).authority.items.length, 0)
+  }
+})
+test('forged or missing SMAPI update metadata fails closed, never auto-installs', async () => {
+  const old = evidence().items[0]
+  const mutants = [
+    { ...old, update_state: 'NEWER' },
+    { ...old, update_state: 'NEWER', candidate_version: 'nxm://private' },
+    { ...old, update_state: 'CURRENT', candidate_version: '1.3.0' },
+    { ...old, update_state: 'NEWER', candidate_version: '1.3.0', update_proof_scope: 'NEXUS_FILE_SIGNATURE' },
+    { ...old, update_state: 'NEWER', candidate_version: '1.3.0', installed_mod_state: 'DISABLED_PRESENT' },
+    { ...old, update_state: 'NEWER', candidate_version: '1.3.0', exact_file_installed: 'CONFIRMED' },
+  ]
+  for (const item of mutants) {
+    const send = session(evidence({ remote_update_check: 'SMAPI_CACHE_FRESH', items: [item] }))
     await send('CBNX03_PAIR')
     assert.equal((await send('CBNX03_STATUS')).authority.items.length, 0)
   }
