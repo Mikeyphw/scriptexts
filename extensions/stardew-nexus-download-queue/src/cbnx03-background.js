@@ -44,6 +44,49 @@
     token = joined.token
     return { state: 'paired', readOnly: true }
   }
+  function normalizeAuthority(value) {
+    // Only the installed SMAPI manifest can prove local mod presence. No journal
+    // state alone can prove an exact installed Nexus file, or a remote update.
+    const empty = { inventoryState: 'UNAVAILABLE', remoteUpdateCheck: 'NOT_PERFORMED', items: [] }
+    if (!value || value.schema !== 1 || value.scope !== 'LOCAL_SMAPI_AND_JOURNAL' ||
+        !['QUALIFIED', 'UNAVAILABLE'].includes(value.inventory_state) ||
+        value.remote_update_check !== 'NOT_PERFORMED' || !Array.isArray(value.items) ||
+        value.items.length > 128) return empty
+    const validId = id => /^[1-9][0-9]{0,11}$/.test(id)
+    const allowedInstalled = new Set(['UNKNOWN', 'NOT_LINKED', 'AMBIGUOUS', 'PRESENT', 'DISABLED_PRESENT'])
+    const allowedJournal = new Set(['QUEUED', 'DOWNLOADING', 'PAUSED', 'CANCELLED',
+      'INTERRUPTED', 'FAILED', 'VALIDATING', 'REVIEW_REQUIRED', 'BLOCKED',
+      'VERIFY_REQUIRED', 'INSTALLING', 'INSTALLED', 'COMPLETED', 'DISCARDED',
+      'NO_EXACT_FILE_RECEIPT'])
+    const items = []
+    const seen = new Set()
+    for (const item of value.items) {
+      if (!item || typeof item !== 'object') return empty
+      const modId = item.mod_id, fileId = item.file_id
+      if (typeof modId !== 'string' || !validId(modId) ||
+          typeof fileId !== 'string' || (fileId !== '' && !validId(fileId)) ||
+          !allowedJournal.has(item.journal_state) ||
+          !allowedInstalled.has(item.installed_mod_state) ||
+          item.update_state !== 'UNKNOWN' ||
+          item.exact_file_installed !== 'UNKNOWN' ||
+          item.archive_checksum_qualified !== false ||
+          typeof item.journal_transfer_reported !== 'boolean') return empty
+      const identity = modId + '/' + fileId
+      if (seen.has(identity)) return empty
+      seen.add(identity)
+      const installedState = value.inventory_state === 'QUALIFIED' ? item.installed_mod_state : 'UNKNOWN'
+      const version = item.installed_version
+      if (version !== undefined &&
+          (typeof version !== 'string' || !/^[A-Za-z0-9.+_-]{1,80}$/.test(version) ||
+          !['PRESENT','DISABLED_PRESENT'].includes(installedState))) return empty
+      items.push({ modId, fileId, journalState: item.journal_state,
+        journalTransferReported: item.journal_transfer_reported,
+        installedModState: installedState, installedVersion: version || null,
+        exactFileInstalled: 'UNKNOWN', updateState: 'UNKNOWN' })
+    }
+    return { inventoryState: value.inventory_state,
+      remoteUpdateCheck: 'NOT_PERFORMED', items }
+  }
   async function status() {
     if (!token) return { state: 'unpaired', jobs: [] }
     try {
@@ -54,6 +97,7 @@
       }
       return {
         state: 'connected', readOnly: true, proof: 'journal_only',
+        authority: normalizeAuthority(state.authority),
         handoffEnabled: state.handoff_enabled === true && state.inbox_available !== false,
         inboxAvailable: state.inbox_available !== false,
         handoffs: (Array.isArray(state.handoffs) ? state.handoffs : []).slice(0, 40).map(item => ({

@@ -20,7 +20,7 @@
   pair.textContent = 'Pair'
   const refresh = document.createElement('button')
   refresh.type = 'button'
-  refresh.textContent = 'Refresh status'
+  refresh.textContent = 'Refresh local evidence'
   const revoke = document.createElement('button')
   revoke.type = 'button'
   revoke.textContent = 'Disconnect'
@@ -33,9 +33,11 @@
   handoffInfo.textContent = 'Use a selected file from your browser queue. Cinderbox must approve requests locally; no download starts here.'
   const handoffList = document.createElement('div')
   handoffList.setAttribute('aria-label', 'Browser exact-file requests')
+  const authority = document.createElement('div')
+  authority.setAttribute('aria-label', 'Cinderbox authoritative local mod evidence')
   const jobs = document.createElement('div')
   jobs.setAttribute('aria-label', 'Cinderbox read-only job statuses')
-  panel.append(header, description, code, pair, refresh, revoke, status, jobs,
+  panel.append(header, description, code, pair, refresh, revoke, status, authority, jobs,
     handoffTitle, handoffInfo, handoffList)
   main.append(panel)
 
@@ -94,6 +96,33 @@
       refused: 'Pairing refused.' })[result?.state] || 'Pairing unavailable'
     canHandoff = result?.state === 'connected' && result.handoffEnabled === true
     renderHandoffChoices().catch(() => { handoffList.textContent = 'Browser queue unavailable' })
+    authority.replaceChildren()
+    if (result?.state === 'connected') {
+      const evidence = result.authority
+      const summary = document.createElement('p')
+      summary.textContent = evidence?.inventoryState === 'QUALIFIED'
+        ? 'SMAPI manifest scan completed. Exact installed files and remote updates are not verified.'
+        : 'Installed-mod inventory unavailable. No installation or update claims can be made.'
+      authority.append(summary)
+      for (const item of evidence?.items || []) {
+        const row = document.createElement('p')
+        const mod = 'Mod ' + item.modId
+        const file = item.fileId ? ' · file ' + item.fileId : ''
+        const installed = item.installedModState === 'PRESENT'
+          ? 'SMAPI mod present (exact file unverified)'
+          : item.installedModState === 'DISABLED_PRESENT'
+            ? 'Disabled SMAPI mod present (exact file unverified)'
+            : item.installedModState === 'AMBIGUOUS'
+              ? 'Conflicting SMAPI manifest links'
+              : 'Installation unverified'
+        const transfer = item.journalTransferReported
+          ? ' · transfer completion reported by journal; archive hash unverified'
+          : ''
+        row.textContent = mod + file + ': ' + installed + transfer +
+          ' · update status unknown (no provider check)'
+        authority.append(row)
+      }
+    }
     jobs.replaceChildren()
     if (result?.state === 'connected') {
       for (const handoff of result.handoffs || []) {
