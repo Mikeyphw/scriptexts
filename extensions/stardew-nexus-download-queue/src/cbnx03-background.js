@@ -54,6 +54,14 @@
       }
       return {
         state: 'connected', readOnly: true, proof: 'journal_only',
+        handoffEnabled: state.handoff_enabled === true && state.inbox_available !== false,
+        inboxAvailable: state.inbox_available !== false,
+        handoffs: (Array.isArray(state.handoffs) ? state.handoffs : []).slice(0, 40).map(item => ({
+          requestId: String(item.request_id || '').slice(0, 64),
+          modId: String(item.mod_id || '').slice(0, 12),
+          fileId: String(item.file_id || '').slice(0, 12),
+          status: String(item.status || 'UNKNOWN').slice(0, 24)
+        })),
         jobs: state.jobs.slice(0, 60).map(job => ({
           jobId: String(job.job_id || '').slice(0, 64),
           source: String(job.source || '').slice(0, 32),
@@ -72,6 +80,23 @@
       return { state: 'offline', jobs: [] }
     }
   }
+  async function handoff(modId, fileId) {
+    // Credentials and actual Nexus URLs NEVER cross this interface.
+    if (!/^[1-9][0-9]{0,11}$/.test(modId || '') ||
+        !/^[1-9][0-9]{0,11}$/.test(fileId || '')) return { state: 'invalid_identity' }
+    if (!token) return { state: 'unpaired' }
+    const requestId = nonce()
+    const ack = await call('/v1/handoff', {
+      body: { mod_id: modId, file_id: fileId, request_id: requestId }
+    }, true)
+    if (!['pending_user_action', 'already_pending', 'already_seen'].includes(ack.status) ||
+        !/^[A-Za-z0-9_-]{22,64}$/.test(ack.request_id || '') ||
+        ack.download_started !== false || ack.archive_staged !== false || ack.installed !== false) {
+      return { state: 'incompatible' }
+    }
+    return { state: 'handoff_pending', status: ack.status,
+      modId, fileId, requestId: ack.request_id, downloadStarted: false }
+  }
   async function revoke() {
     try { if (token) await call('/v1/revoke', { body: {} }, true) }
     catch (_) { /* Local Cinderbox might have already stopped. */ }
@@ -80,13 +105,14 @@
   }
 
   browser.runtime.onMessage.addListener((message, sender) => {
-    if (!message || !['CBNX03_PAIR', 'CBNX03_STATUS', 'CBNX03_REVOKE'].includes(message.type)) return undefined
+    if (!message || !['CBNX03_PAIR', 'CBNX03_STATUS', 'CBNX03_REVOKE', 'CBNX03_HANDOFF'].includes(message.type)) return undefined
     // Never accept pairing/control messages from untrusted Nexus page content scripts.
     if (sender?.url !== POPUP || sender?.tab) return Promise.resolve({ state: 'refused' })
     if (inFlight) return Promise.resolve({ state: 'busy' })
     inFlight = true
     const task = message.type === 'CBNX03_PAIR' ? pair(message.code) :
-      message.type === 'CBNX03_REVOKE' ? revoke() : status()
+      message.type === 'CBNX03_REVOKE' ? revoke() :
+        message.type === 'CBNX03_HANDOFF' ? handoff(message.modId, message.fileId) : status()
     return Promise.resolve(task).catch(() => ({ state: 'offline', jobs: [] }))
       .finally(() => { inFlight = false })
   })

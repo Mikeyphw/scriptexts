@@ -27,9 +27,16 @@
   const status = document.createElement('div')
   status.setAttribute('role', 'status')
   status.textContent = 'Not paired'
+  const handoffTitle = document.createElement('h3')
+  handoffTitle.textContent = 'Send an exact file request'
+  const handoffInfo = document.createElement('p')
+  handoffInfo.textContent = 'Use a selected file from your browser queue. Cinderbox must approve requests locally; no download starts here.'
+  const handoffList = document.createElement('div')
+  handoffList.setAttribute('aria-label', 'Browser exact-file requests')
   const jobs = document.createElement('div')
   jobs.setAttribute('aria-label', 'Cinderbox read-only job statuses')
-  panel.append(header, description, code, pair, refresh, revoke, status, jobs)
+  panel.append(header, description, code, pair, refresh, revoke, status, jobs,
+    handoffTitle, handoffInfo, handoffList)
   main.append(panel)
 
   async function send(message) {
@@ -41,14 +48,60 @@
     } catch (_) { return { state: 'offline', jobs: [] } }
     finally { pair.disabled = false; refresh.disabled = false; revoke.disabled = false }
   }
+  let canHandoff = false
+  async function renderHandoffChoices() {
+    handoffList.replaceChildren()
+    if (!canHandoff) {
+      handoffList.textContent = 'Pair and enable exact-file requests in Cinderbox Settings first.'
+      return
+    }
+    // GET_STATE is the existing standalone browser queue; do not change its ownership.
+    const state = await browser.runtime.sendMessage({ type: 'GET_STATE' }).catch(() => null)
+    const items = Array.isArray(state?.queue) ? state.queue : []
+    const seen = new Set()
+    for (const item of items) {
+      const modId = String(item.modId || '')
+      const fileId = String(item.fileId || '')
+      if (!/^[1-9][0-9]{0,11}$/.test(modId) || !/^[1-9][0-9]{0,11}$/.test(fileId)) continue
+      const key = modId + '/' + fileId
+      if (seen.has(key)) continue
+      seen.add(key)
+      const button = document.createElement('button')
+      button.type = 'button'
+      button.textContent = `Request mod ${modId} · file ${fileId}`
+      button.addEventListener('click', async () => {
+        button.disabled = true
+        try {
+          const ack = await send({ type: 'CBNX03_HANDOFF', modId, fileId })
+          status.textContent = ack?.state === 'handoff_pending'
+            ? ack.status === 'already_seen'
+              ? 'This request was already handled in Cinderbox. No new download was started.'
+              : ack.status === 'already_pending'
+                ? 'That exact file is already waiting in Cinderbox Settings.'
+                : 'Cinderbox recorded the exact-file request. Open Settings to review it.'
+            : 'Request unavailable. Use the regular Nexus/NXM download flow.'
+        } finally { button.disabled = false }
+      })
+      handoffList.append(button)
+    }
+    if (!seen.size) handoffList.textContent = 'No exact mod/file IDs in the browser queue.'
+  }
   function render(result) {
     status.textContent = ({ paired: 'Paired (status only)', connected: 'Connected (journal status)',
       offline: 'Cinderbox unavailable. Use regular NXM handoff.',
       unpaired: 'Not paired', invalid_code: 'Enter the nine-digit code from Cinderbox.',
       incompatible: 'Bridge protocol not supported.', busy: 'Try again shortly.',
       refused: 'Pairing refused.' })[result?.state] || 'Pairing unavailable'
+    canHandoff = result?.state === 'connected' && result.handoffEnabled === true
+    renderHandoffChoices().catch(() => { handoffList.textContent = 'Browser queue unavailable' })
     jobs.replaceChildren()
     if (result?.state === 'connected') {
+      for (const handoff of result.handoffs || []) {
+        if (handoff.status !== 'PENDING') continue
+        const row = document.createElement('p')
+        row.textContent = `Request ${handoff.modId}/${handoff.fileId}: waiting for local Cinderbox action`
+        jobs.append(row)
+      }
       for (const job of result.jobs || []) {
         const row = document.createElement('p')
         row.textContent = `Mod ${job.modId} · file ${job.fileId}: ${job.status}`

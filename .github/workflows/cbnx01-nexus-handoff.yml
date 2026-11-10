@@ -5,6 +5,7 @@ on:
       - 'extensions/stardew-nexus-download-queue/src/**'
       - 'tools/tests/cbnx01-handoff.test.mjs'
       - 'tools/tests/cbnx03-pairing.test.mjs'
+      - 'tools/tests/cbnx03b-security-gate.py'
       - '.github/workflows/cbnx01-nexus-handoff.yml'
   workflow_dispatch:
 permissions:
@@ -27,6 +28,7 @@ jobs:
       - run: node --check extensions/stardew-nexus-download-queue/src/cbnx03-background.js
       - run: node --check extensions/stardew-nexus-download-queue/src/cbnx03-popup.js
       - run: node --test tools/tests/cbnx03-pairing.test.mjs
+      - run: python3 tools/tests/cbnx03b-security-gate.py
       - run: python3 extensions/stardew-nexus-download-queue/build.py
       - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4
         with:
