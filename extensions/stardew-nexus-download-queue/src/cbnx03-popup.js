@@ -9,6 +9,29 @@
   header.textContent = 'Cinderbox companion'
   const description = document.createElement('p')
   description.textContent = 'Optional local pairing. Status only; browser downloads and Vortex still work when unpaired.'
+  const destinationTitle = document.createElement('label')
+  destinationTitle.textContent = 'Exact-file destination'
+  const destination = document.createElement('select')
+  destination.setAttribute('aria-label', 'Exact-file destination')
+  for (const [value, label] of [
+    ['browser', 'Open file on Nexus in Firefox'],
+    ['cinderbox', 'Request in Cinderbox'],
+    ['manager', 'Open Nexus for another supported manager']
+  ]) {
+    const option = document.createElement('option')
+    option.value = value
+    option.textContent = label
+    destination.append(option)
+  }
+  const rememberLabel = document.createElement('label')
+  const remember = document.createElement('input')
+  remember.type = 'checkbox'
+  rememberLabel.append(remember, document.createTextNode(' Remember destination on this device'))
+  const destinationInfo = document.createElement('p')
+  destinationInfo.textContent = 'Browser by default. Nothing is auto-routed or installed. ' +
+    'For other managers, choose the supported action on Nexus yourself.'
+  destinationTitle.append(destination)
+  destination.value = 'browser'
   const code = document.createElement('input')
   code.type = 'text'
   code.inputMode = 'numeric'
@@ -37,7 +60,8 @@
   authority.setAttribute('aria-label', 'Cinderbox authoritative local mod evidence')
   const jobs = document.createElement('div')
   jobs.setAttribute('aria-label', 'Cinderbox read-only job statuses')
-  panel.append(header, description, code, pair, refresh, revoke, status, authority, jobs,
+  panel.append(header, description, destinationTitle, rememberLabel, destinationInfo,
+    code, pair, refresh, revoke, status, authority, jobs,
     handoffTitle, handoffInfo, handoffList)
   main.append(panel)
 
@@ -51,9 +75,33 @@
     finally { pair.disabled = false; refresh.disabled = false; revoke.disabled = false }
   }
   let canHandoff = false
+  const validDestinations = new Set(['browser', 'cinderbox', 'manager'])
+  async function saveDestination() {
+    if (!remember.checked) {
+      await browser.storage.local.remove(['cbnx05b_destination', 'cbnx05b_remember'])
+    } else if (validDestinations.has(destination.value)) {
+      await browser.storage.local.set({ cbnx05b_destination: destination.value,
+        cbnx05b_remember: true })
+    }
+  }
+  destination.addEventListener('change', () => {
+    saveDestination().catch(() => { status.textContent = 'Destination preference could not be saved.' })
+    renderHandoffChoices().catch(() => { handoffList.textContent = 'Browser queue unavailable' })
+  })
+  remember.addEventListener('change', () => {
+    saveDestination().catch(() => { status.textContent = 'Destination preference could not be saved.' })
+  })
+  // Local opt-in only. Never persist bearer tokens, selected NXM links, or file IDs.
+  browser.storage.local.get(['cbnx05b_destination', 'cbnx05b_remember']).then(saved => {
+    if (saved?.cbnx05b_remember === true && validDestinations.has(saved.cbnx05b_destination)) {
+      destination.value = saved.cbnx05b_destination
+      remember.checked = true
+    }
+    return renderHandoffChoices()
+  }).catch(() => { destination.value = 'browser' })
   async function renderHandoffChoices() {
     handoffList.replaceChildren()
-    if (!canHandoff) {
+    if (destination.value === 'cinderbox' && !canHandoff) {
       handoffList.textContent = 'Pair and enable exact-file requests in Cinderbox Settings first.'
       return
     }
@@ -70,10 +118,24 @@
       seen.add(key)
       const button = document.createElement('button')
       button.type = 'button'
-      button.textContent = `Request mod ${modId} · file ${fileId}`
+      button.textContent = destination.value === 'cinderbox'
+        ? `Request mod ${modId} · file ${fileId} in Cinderbox`
+        : `Open mod ${modId} · file ${fileId} on Nexus`
       button.addEventListener('click', async () => {
         button.disabled = true
         try {
+          if (destination.value !== 'cinderbox') {
+            // An exact-file PAGE is not a completed Nexus download. Keep official
+            // authorization/manual and supported manager choices in the browser.
+            const url = new URL(`https://www.nexusmods.com/stardewvalley/mods/${modId}`)
+            url.searchParams.set('tab', 'files')
+            url.searchParams.set('file_id', fileId)
+            await browser.tabs.create({ url: url.toString() })
+            status.textContent = destination.value === 'manager'
+              ? 'Opened the selected file on Nexus. Choose a supported manager there.'
+              : 'Opened the selected file on Nexus. Finish the browser download there.'
+            return
+          }
           const ack = await send({ type: 'CBNX03_HANDOFF', modId, fileId })
           status.textContent = ack?.state === 'handoff_pending'
             ? ack.status === 'already_seen'
@@ -82,11 +144,18 @@
                 ? 'That exact file is already waiting in Cinderbox Settings.'
                 : 'Cinderbox recorded the exact-file request. Open Settings to review it.'
             : 'Request unavailable. Use the regular Nexus/NXM download flow.'
+        } catch (_) {
+          status.textContent = 'Selected-file action unavailable. Use the normal Nexus queue.'
         } finally { button.disabled = false }
       })
       handoffList.append(button)
     }
     if (!seen.size) handoffList.textContent = 'No exact mod/file IDs in the browser queue.'
+    if (destination.value !== 'cinderbox') {
+      handoffInfo.textContent = 'Open the exact selected file on Nexus. No download or manager handoff is claimed.'
+    } else {
+      handoffInfo.textContent = 'Cinderbox must approve requests locally; no download starts here.'
+    }
   }
   function render(result) {
     status.textContent = ({ paired: 'Paired (status only)', connected: 'Connected (journal status)',
