@@ -115,10 +115,15 @@
             : item.installedModState === 'AMBIGUOUS'
               ? 'Conflicting SMAPI manifest links'
               : 'Installation unverified'
+        const archiveProof = item.archiveProofState === 'VERIFIED_AT_SCAN'
+          ? ' · private archive SHA-256 matched its app receipt at scan time (not provider-verified)'
+          : item.archiveProofState === 'NO_RETAINED_ARCHIVE'
+            ? ' · no retained archive available for checksum proof'
+            : ' · private archive evidence unavailable'
         const transfer = item.journalTransferReported
-          ? ' · transfer completion reported by journal; archive hash unverified'
+          ? ' · transfer completion reported by journal'
           : ''
-        row.textContent = mod + file + ': ' + installed + transfer +
+        row.textContent = mod + file + ': ' + installed + transfer + archiveProof +
           ' · update status unknown (no provider check)'
         authority.append(row)
       }

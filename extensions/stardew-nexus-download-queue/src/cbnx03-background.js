@@ -58,6 +58,11 @@
       'INTERRUPTED', 'FAILED', 'VALIDATING', 'REVIEW_REQUIRED', 'BLOCKED',
       'VERIFY_REQUIRED', 'INSTALLING', 'INSTALLED', 'COMPLETED', 'DISCARDED',
       'NO_EXACT_FILE_RECEIPT'])
+    // A verified private archive receipt is NOT a Nexus-signed checksum and
+    // does not prove an installed file or an available remote update.
+    const proofStates = new Set(['VERIFIED_AT_SCAN', 'NO_RETAINED_ARCHIVE', 'UNAVAILABLE'])
+    const possibleRetained = new Set(['VALIDATING', 'REVIEW_REQUIRED', 'BLOCKED',
+      'VERIFY_REQUIRED', 'INSTALLING', 'INSTALLED'])
     const items = []
     const seen = new Set()
     for (const item of value.items) {
@@ -69,7 +74,12 @@
           !allowedInstalled.has(item.installed_mod_state) ||
           item.update_state !== 'UNKNOWN' ||
           item.exact_file_installed !== 'UNKNOWN' ||
-          item.archive_checksum_qualified !== false ||
+          typeof item.archive_checksum_qualified !== 'boolean' ||
+          !proofStates.has(item.archive_proof_state) ||
+          item.archive_proof_scope !== 'LOCAL_ZIP_VS_APP_RECEIPT' ||
+          (item.archive_checksum_qualified !== (item.archive_proof_state === 'VERIFIED_AT_SCAN')) ||
+          (item.archive_checksum_qualified &&
+            (fileId === '' || !possibleRetained.has(item.journal_state))) ||
           typeof item.journal_transfer_reported !== 'boolean') return empty
       const identity = modId + '/' + fileId
       if (seen.has(identity)) return empty
@@ -82,6 +92,9 @@
       items.push({ modId, fileId, journalState: item.journal_state,
         journalTransferReported: item.journal_transfer_reported,
         installedModState: installedState, installedVersion: version || null,
+        archiveProofState: item.archive_proof_state,
+        archiveProofScope: 'LOCAL_ZIP_VS_APP_RECEIPT',
+        archiveChecksumQualified: item.archive_checksum_qualified,
         exactFileInstalled: 'UNKNOWN', updateState: 'UNKNOWN' })
     }
     return { inventoryState: value.inventory_state,

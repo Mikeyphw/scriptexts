@@ -11,6 +11,7 @@ const evidence = (changes = {}) => ({ schema: 1, scope: 'LOCAL_SMAPI_AND_JOURNAL
   inventory_state: 'QUALIFIED', remote_update_check: 'NOT_PERFORMED', items: [{
     mod_id: '50535', file_id: '178239', journal_state: 'INSTALLED',
     journal_transfer_reported: true, archive_checksum_qualified: false,
+    archive_proof_state: 'NO_RETAINED_ARCHIVE', archive_proof_scope: 'LOCAL_ZIP_VS_APP_RECEIPT',
     installed_mod_state: 'PRESENT', exact_file_installed: 'UNKNOWN',
     update_state: 'UNKNOWN', installed_version: '1.2.0'
   }], ...changes })
@@ -39,6 +40,8 @@ test('qualified SMAPI link proves mod presence, but never exact installed file o
   assert.equal(state.authority.items[0].installedModState, 'PRESENT')
   assert.equal(state.authority.items[0].exactFileInstalled, 'UNKNOWN')
   assert.equal(state.authority.items[0].updateState, 'UNKNOWN')
+  assert.equal(state.authority.items[0].archiveProofState, 'NO_RETAINED_ARCHIVE')
+  assert.equal(state.authority.items[0].archiveChecksumQualified, false)
   assert.equal(JSON.stringify(state).includes(token), false)
 })
 test('inaccessible inventory cannot show installed even with forged old evidence', async () => {
@@ -79,4 +82,36 @@ test('old Cinderbox payload remains connected but clearly unqualified', async ()
   assert.equal(state.state, 'connected')
   assert.equal(state.authority.inventoryState, 'UNAVAILABLE')
   assert.equal(state.authority.items.length, 0)
+})
+
+// CB-NX04B: Update the SAME canonical authority suite, not a new legacy gate.
+test('matching app-private receipt is surfaced as local proof, never Nexus proof or installed-file status', async () => {
+  const item = { ...evidence().items[0], journal_state: 'REVIEW_REQUIRED',
+    archive_checksum_qualified: true, archive_proof_state: 'VERIFIED_AT_SCAN' }
+  const send = session(evidence({ items: [item] }))
+  await send('CBNX03_PAIR')
+  const state = (await send('CBNX03_STATUS')).authority
+  assert.equal(state.items.length, 1)
+  assert.equal(state.items[0].archiveProofState, 'VERIFIED_AT_SCAN')
+  assert.equal(state.items[0].archiveProofScope, 'LOCAL_ZIP_VS_APP_RECEIPT')
+  assert.equal(state.items[0].archiveChecksumQualified, true)
+  assert.equal(state.items[0].exactFileInstalled, 'UNKNOWN')
+  assert.equal(state.items[0].updateState, 'UNKNOWN')
+})
+test('inconsistent or forged archive proof and provider scope are rejected fail closed', async () => {
+  const variants = [
+    { archive_checksum_qualified: true, archive_proof_state: 'NO_RETAINED_ARCHIVE' },
+    { archive_checksum_qualified: false, archive_proof_state: 'VERIFIED_AT_SCAN' },
+    { archive_checksum_qualified: true, archive_proof_state: 'VERIFIED_AT_SCAN',
+      archive_proof_scope: 'NEXUS_PROVIDER_SIGNATURE' },
+    { archive_proof_state: 'SOME_UNTRUSTED_STATE' },
+    { archive_checksum_qualified: true, archive_proof_state: 'VERIFIED_AT_SCAN',
+      journal_state: 'QUEUED' },
+  ]
+  for (const changes of variants) {
+    const payload = evidence({ items: [{ ...evidence().items[0], ...changes }] })
+    const send = session(payload)
+    await send('CBNX03_PAIR')
+    assert.equal((await send('CBNX03_STATUS')).authority.items.length, 0)
+  }
 })
