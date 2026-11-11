@@ -333,13 +333,13 @@
     {
       "path": "extensions/stardew-nexus-download-queue",
       "type": "firefox-extension",
-      "version": "0.4.8",
+      "version": "0.4.9",
       "source_model": "editable-source-with-reproducible-package",
       "canonical_source": "src/",
       "builder": "build.py",
       "firefox_extension_id": "stardew-nexus-download-queue@mikeyphw.scriptexts",
       "install_artifacts": [
-        "dist/stardew-nexus-download-queue-0.4.8.xpi",
+        "dist/stardew-nexus-download-queue-0.4.9.xpi",
         "dist/SHA256SUMS"
       ]
     },

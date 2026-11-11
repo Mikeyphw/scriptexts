@@ -2,6 +2,8 @@ name: CB-NX01 Stardew Firefox Exact-File Handoff
 on:
   pull_request:
     paths:
+      - 'repo-manifest.json'
+      - 'tools/tests/cbnx01-ci-hardening.test.mjs'
       - 'extensions/stardew-nexus-download-queue/src/**'
       - 'tools/tests/cbnx01-handoff.test.mjs'
       - 'tools/tests/cbnx03-pairing.test.mjs'
@@ -27,6 +29,7 @@ jobs:
       - run: node --check extensions/stardew-nexus-download-queue/src/cbnx01-browser-bridge.js
       - run: node --check extensions/stardew-nexus-download-queue/src/content.js
       - run: node --check extensions/stardew-nexus-download-queue/src/background.js
+      - run: node --test tools/tests/cbnx01-ci-hardening.test.mjs
       - run: node --test tools/tests/cbnx01-handoff.test.mjs
       - run: node --check extensions/stardew-nexus-download-queue/src/cbnx03-background.js
       - run: node --check extensions/stardew-nexus-download-queue/src/cbnx03-popup.js
