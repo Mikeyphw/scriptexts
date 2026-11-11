@@ -1,0 +1,74 @@
+name: CB-NX06 LAB02C Isolated Firefox/Iceraven XPI
+on:
+  pull_request:
+    paths:
+      - 'extensions/stardew-nexus-download-queue/build_cbnx06_lab.py'
+      - 'extensions/stardew-nexus-download-queue/src/**'
+      - 'tools/tests/cbnx06_lab02c_tests.py'
+      - '.github/workflows/cbnx06-lab02c-iceraven.yml'
+      - 'docs/CBNX06_LAB02C_ICERAVEN.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source-and-unsigned-xpi:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    env:
+      CBNX_LAB_BROWSER_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22'
+      - name: Exact PR source and synthetic lab isolation negatives
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$CBNX_LAB_BROWSER_SHA"
+          python3 -B tools/tests/cbnx06_lab02c_tests.py
+          python3 -B tools/tests/cbnx03b-security-gate.py
+          python3 -B tools/tests/cbnx04-security-gate.py
+          node --test tools/tests/cbnx03-pairing.test.mjs
+          node --test tools/tests/cbnx05c-page-evidence.test.mjs
+      - name: Reproducible isolated unsigned XPI and no-production-port assertions
+        run: |
+          set -euo pipefail
+          python3 -B extensions/stardew-nexus-download-queue/build_cbnx06_lab.py \
+            --source-sha "$CBNX_LAB_BROWSER_SHA"
+          dist=extensions/stardew-nexus-download-queue/dist-lab
+          (cd "$dist" && sha256sum -c SHA256SUMS)
+          python3 - "$dist" "$CBNX_LAB_BROWSER_SHA" <<'PY'
+          import json,sys,zipfile,pathlib
+          root=pathlib.Path(sys.argv[1]);sha=sys.argv[2]
+          rec=json.loads((root/'LAB02C_ARTIFACT_ATTESTATION.json').read_text())
+          assert rec['browser_source_sha']==sha
+          assert rec['extension_id']=='stardew-nexus-download-queue-cbnx06lab@mikeyphw.scriptexts'
+          assert rec['android_lab_application_id']=='com.sdvsync.cbnx06lab'
+          assert rec['android_lab_port']==38472 and rec['signed'] is False
+          assert rec['physical_qualified'] is False
+          with zipfile.ZipFile(next(root.glob('*.xpi'))) as z:
+              js=[n for n in z.namelist() if n.endswith(('.js','.html','.json'))]
+              assert len(js)>=6
+              for n in js:
+                  assert b'127.0.0.1:38471' not in z.read(n), n
+              bg=z.read('cbnx03-background.js')
+              assert bg.count(b"const BASE = 'http://127.0.0.1:38472'")==1
+              assert b'browser.tabs.create' not in z.read('background.js')
+          print('CBNX06_LAB02C_HOSTED_SOURCE_IDENTITY_AND_NO_PRODUCTION_NXM_PASS')
+          PY
+          for file in cbnx03-background.js cbnx03-popup.js background.js cbnx01-browser-bridge.js content.js; do
+            unzip -p "$dist"/*.xpi "$file" | node --check --input-type=commonjs
+          done
+      - name: Publish unsigned, source-attested LAB XPI only
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4
+        with:
+          name: cbnx06-lab02c-iceraven-unsigned-xpi
+          path: |
+            extensions/stardew-nexus-download-queue/dist-lab/*.xpi
+            extensions/stardew-nexus-download-queue/dist-lab/SHA256SUMS
+            extensions/stardew-nexus-download-queue/dist-lab/LAB02C_ARTIFACT_ATTESTATION.json
+          if-no-files-found: error
+          retention-days: 14
