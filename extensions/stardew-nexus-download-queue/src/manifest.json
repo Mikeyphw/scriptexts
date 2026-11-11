@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Stardew Nexus Download Queue",
-  "version": "0.4.8",
+  "version": "0.4.9",
   "description": "Queue and launch Stardew Valley Nexus downloads with listing-page buttons and a popup manager.",
   "author": "OpenAI",
   "permissions": [
@@ -29,6 +29,7 @@
   "background": {
     "scripts": [
       "scripts/protocol-v2.js",
+      "cbnx05c-evidence-policy.js",
       "cbnx03-background.js",
       "background.js"
     ],
@@ -45,7 +46,8 @@
       "js": [
         "cbnx01-handoff.js",
         "cbnx01-browser-bridge.js",
-        "content.js"
+        "content.js",
+        "cbnx05c-content.js"
       ],
       "run_at": "document_idle"
     }

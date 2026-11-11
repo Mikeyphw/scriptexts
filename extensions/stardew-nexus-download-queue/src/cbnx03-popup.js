@@ -32,6 +32,14 @@
     'For other managers, choose the supported action on Nexus yourself.'
   destinationTitle.append(destination)
   destination.value = 'browser'
+  const evidenceLabel = document.createElement('label')
+  const evidenceOptIn = document.createElement('input')
+  evidenceOptIn.type = 'checkbox'
+  evidenceOptIn.setAttribute('aria-label', 'Show local companion status on Nexus pages')
+  evidenceLabel.append(evidenceOptIn, document.createTextNode(' Show companion badges on Nexus pages'))
+  const evidencePrivacy = document.createElement('p')
+  evidencePrivacy.textContent = 'Off by default. Enabling may expose displayed local mod status to Nexus page scripts. ' +
+    'No file IDs, app paths, cookies, bearer tokens or exact installed-file claims are shared.'
   const code = document.createElement('input')
   code.type = 'text'
   code.inputMode = 'numeric'
@@ -61,6 +69,7 @@
   const jobs = document.createElement('div')
   jobs.setAttribute('aria-label', 'Cinderbox read-only job statuses')
   panel.append(header, description, destinationTitle, rememberLabel, destinationInfo,
+    evidenceLabel, evidencePrivacy,
     code, pair, refresh, revoke, status, authority, jobs,
     handoffTitle, handoffInfo, handoffList)
   main.append(panel)
@@ -75,6 +84,22 @@
     finally { pair.disabled = false; refresh.disabled = false; revoke.disabled = false }
   }
   let canHandoff = false
+  browser.storage.local.get('cbnx05c_page_badges').then(data => {
+    evidenceOptIn.checked = data?.cbnx05c_page_badges === true
+  }).catch(() => { evidenceOptIn.checked = false })
+  evidenceOptIn.addEventListener('change', async () => {
+    const wanted = evidenceOptIn.checked
+    evidenceOptIn.disabled = true
+    try {
+      await browser.storage.local.set({ cbnx05c_page_badges: wanted })
+      status.textContent = wanted
+        ? 'Companion badges enabled. Local status may appear on Nexus pages.'
+        : 'Companion page badges disabled.'
+    } catch (_) {
+      evidenceOptIn.checked = !wanted // Never pretend an opt-out was stored.
+      status.textContent = 'Could not save badge preference. Check privacy settings.'
+    } finally { evidenceOptIn.disabled = false }
+  })
   const validDestinations = new Set(['browser', 'cinderbox', 'manager'])
   async function saveDestination() {
     if (!remember.checked) {

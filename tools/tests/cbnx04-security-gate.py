@@ -12,8 +12,11 @@ for key in ('function normalizeAuthority(value)', "scope !== 'LOCAL_SMAPI_AND_JO
             'authority: normalizeAuthority(state.authority)', 'credentials: \'omit\'',
             "if (sender?.url !== POPUP || sender?.tab)"):
     assert key in bg, 'CBNX04_FIREFOX_AUTHORITY_MISSING:'+key
-for forbidden in ('browser.storage', 'localStorage', 'downloads.download(', 'startDownload(', 'installFromZip('):
+for forbidden in ('localStorage', 'downloads.download(', 'startDownload(', 'installFromZip('):
     assert forbidden not in bg, 'CBNX04_BROWSER_PRIVILEGE_REGRESSION:'+forbidden
+assert bg.count("browser.storage.local.get('cbnx05c_page_badges')") == 2
+assert 'browser.storage.local.set(' not in bg
+assert 'browser.storage.sync' not in bg
 for key in ('Refresh local evidence', "installedModState === 'PRESENT'",
             'exact file unverified', 'cached observation expired', 'No installation or update claims'):
     assert key in popup, 'CBNX04_POPUP_PROOF_MISSING:'+key
@@ -42,4 +45,14 @@ for marker in ('SMAPI_CACHE_FRESH', "item.update_proof_scope !== updateScope",
                "!newer && candidate !== undefined"):
     assert marker in bg, 'CBNX04C_SMAPI_CACHE_POLICY_MISSING:'+marker
 assert 'cached SMAPI mod version' in popup and 'exact Nexus file update unverified' in popup
+# CB-NX05C: source-of-truth wording migration must be additive to CB-NX04.
+# Legacy Nexus page/file-date heuristics cannot justify an install-update badge.
+legacy_content = (p/'content.js').read_text(encoding='utf8')
+assert 'Nexus page/file changed · review' in legacy_content
+assert 'Browser file downloaded' in legacy_content
+assert 'applyUpdateGlow(tile, status === "update_available" && shouldGlowUpdateCard())' in legacy_content
+assert 'Highlight changed Nexus pages (unverified; not installed-mod updates)' in (p/'popup.html').read_text(encoding='utf8')
+assert 'return "Update available"' not in legacy_content
+assert 'return "Downloaded"' not in legacy_content
 print('CBNX04C_FIREFOX_SMAPI_UPDATE_SOURCE_AND_STALE_CONTRACT_PASS')
+print('CBNX05C_LEGACY_BROWSER_BADGE_CLAIM_MIGRATION_PASS')

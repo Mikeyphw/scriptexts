@@ -3,6 +3,10 @@
   'use strict'
   const BASE = 'http://127.0.0.1:38471'
   const POPUP = browser.runtime.getURL('popup.html')
+  const PAGE_TTL_MS = 60_000
+  let pageCache = null // In-process, never persisted; never includes bearer credentials.
+  let pageCheckedAt = 0
+  let pageFetch = null
   let token = null // Memory only; not written to storage, log, message or content script.
   let inFlight = false
 
@@ -42,6 +46,8 @@
     if (joined.protocol !== 1 || joined.read_only !== true ||
         !/^[A-Za-z0-9_-]{36,64}$/.test(joined.token || '')) return { state: 'incompatible' }
     token = joined.token
+    pageCache = null
+    pageCheckedAt = 0
     return { state: 'paired', readOnly: true }
   }
   function normalizeAuthority(value) {
@@ -169,11 +175,61 @@
   async function revoke() {
     try { if (token) await call('/v1/revoke', { body: {} }, true) }
     catch (_) { /* Local Cinderbox might have already stopped. */ }
-    finally { token = null }
+    finally { token = null; pageCache = null; pageCheckedAt = 0 }
     return { state: 'unpaired', jobs: [] }
   }
 
+  // Content scripts are permitted ONLY a mod-scoped, status-only projection.
+  // No host page can pair, revoke, request an exact file, or obtain a bearer token.
+  function allowedPageSender(sender, ids) {
+    if (!sender?.tab || !Number.isInteger(sender.tab.id) || sender.tab.id < 0 ||
+        (sender.frameId !== undefined && sender.frameId !== 0)) return false
+    try {
+      const url = new URL(sender.url)
+      if (url.protocol !== 'https:' ||
+          !['www.nexusmods.com', 'next.nexusmods.com'].includes(url.hostname) ||
+          !/^\/(?:games\/)?stardewvalley(?:\/|$)/.test(url.pathname)) return false
+      const detail = /^\/(?:games\/)?stardewvalley\/mods\/([1-9][0-9]{0,11})(?:\/|$)/.exec(url.pathname)
+      return !detail || (ids.length === 1 && ids[0] === detail[1])
+    } catch (_) { return false }
+  }
+  async function pageStatus(message, sender) {
+    const ids = CBNX05CPolicy.normalizeIds(message?.modIds)
+    if (!ids) return { state: 'invalid_identity', rows: [] }
+    if (!allowedPageSender(sender, ids)) return { state: 'refused', rows: [] }
+    // Opt-in checks at the PRIVILEGED background boundary, not just at the UI.
+    const pref = await browser.storage.local.get('cbnx05c_page_badges').catch(() => null)
+    if (pref?.cbnx05c_page_badges !== true) return { state: 'disabled', rows: [] }
+    if (!token) { pageCache = null; pageCheckedAt = 0; return { state: 'unpaired', rows: [] } }
+    // Capture the bearer identity before any await: revoke/re-pair must invalidate this read.
+    const issuedToken = token
+    if (!pageCache || Date.now() - pageCheckedAt >= PAGE_TTL_MS ||
+        (message.force === true && Date.now() - pageCheckedAt >= 30_000)) {
+      if (!pageFetch) {
+        pageFetch = status().then(value => {
+          pageCache = value
+          pageCheckedAt = Date.now()
+        }).catch(() => {
+          pageCache = { state: 'offline' }
+          pageCheckedAt = Date.now()
+        }).finally(() => { pageFetch = null })
+      }
+      await pageFetch
+    }
+    // Revocation or an opt-out racing the read must win before any page reply.
+    if (token !== issuedToken) return { state: 'unpaired', rows: [] }
+    const currentConsent = await browser.storage.local.get('cbnx05c_page_badges').catch(() => null)
+    if (currentConsent?.cbnx05c_page_badges !== true) return { state: 'disabled', rows: [] }
+    if (pageCache?.state !== 'connected') return { state: pageCache?.state || 'offline', rows: [] }
+    const rows = CBNX05CPolicy.summarize(pageCache, ids)
+    if (!rows) return { state: 'incompatible', rows: [] }
+    return { state: 'connected', checkedAtMs: pageCheckedAt, rows }
+  }
+
   browser.runtime.onMessage.addListener((message, sender) => {
+    if (message?.type === 'CBNX05C_PAGE_STATUS') {
+      return pageStatus(message, sender).catch(() => ({ state: 'offline', rows: [] }))
+    }
     if (!message || !['CBNX03_PAIR', 'CBNX03_STATUS', 'CBNX03_REVOKE', 'CBNX03_HANDOFF'].includes(message.type)) return undefined
     // Never accept pairing/control messages from untrusted Nexus page content scripts.
     if (sender?.url !== POPUP || sender?.tab) return Promise.resolve({ state: 'refused' })
