@@ -1,6 +1,6 @@
 # Stardew Nexus Download Queue
 
-Firefox extension version **0.4.4** for queuing and launching Stardew Valley Nexus Mods downloads.
+Firefox extension version **0.4.8** for queuing and launching Stardew Valley Nexus Mods downloads.
 
 ## Source model
 
@@ -21,3 +21,7 @@ The command creates an unsigned XPI under `dist/` plus `dist/SHA256SUMS`. Load `
 ## Target
 
 `https://www.nexusmods.com/stardewvalley/*`
+
+## CB-NX01 Android file handoff
+
+When a requested file is available through a rendered Nexus Mod Manager link, the extension preserves the exact file identity before attempting an NXM handoff. If a dynamic Nexus page does not expose that link, the notice offers **Continue exact file on Nexus**, an explicit HTTPS link scoped to the requested file with `nmm=1`. Nexus may still require sign-in or confirmation, or may not provide a manager download for the file. This fallback is **not evidence of a successful download**. The Retry button restarts 15 bounded checks; it does not silently select a different file.

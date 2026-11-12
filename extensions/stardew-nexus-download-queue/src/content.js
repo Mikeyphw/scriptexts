@@ -297,13 +297,13 @@ function formatChipDate(value) {
 }
 
 function getStatusLabel(status) {
-  if (status === "update_available") return "Update available"
-  if (status === "downloaded") return "Downloaded"
+  if (status === "update_available") return "Nexus page/file changed · review"
+  if (status === "downloaded") return "Browser file downloaded"
   return "No data"
 }
 
 function getStatusClass(status) {
-  if (status === "update_available") return "nxq-chip--update"
+  if (status === "update_available") return "nxq-chip--no-data"
   if (status === "downloaded") return "nxq-chip--downloaded"
   return "nxq-chip--no-data"
 }
@@ -404,11 +404,11 @@ function updateChipPopover(tile, chip, popover, state, status) {
 
   const rows = [
     ["Status", getStatusLabel(status)],
-    ["Downloaded file ID", state?.downloadedFileId || "—"],
-    ["Downloaded at", formatChipDate(state?.downloadedAt)],
+    ["Browser downloaded file ID", state?.downloadedFileId || "—"],
+    ["Browser completed at", formatChipDate(state?.downloadedAt)],
     ["Last checked", formatChipDate(state?.lastCheckedAt)],
     ["Last updated", formatChipDate(state?.lastKnownUpdatedAt)],
-    ["Remote file ID", state?.lastKnownRemoteFileId || "—"]
+    ["Observed Nexus file ID (not an update verdict)", state?.lastKnownRemoteFileId || "—"]
   ]
 
   popover.replaceChildren()

@@ -112,3 +112,48 @@ test('browser bridge refuses mismatched final NXM and never enqueues', async () 
   assert.equal(h.sent.length, 0)
   assert.equal(h.elements.find(x => x.tag === 'button').hidden, false)
 })
+
+test('official HTTPS fallback stays bound to exact mod and file IDs, without NXM fabrication', () => {
+  const expected = bridge.exactNexusFileActionUrl('50535', '178239')
+  const url = new URL(expected)
+  assert.equal(url.protocol, 'https:')
+  assert.equal(url.hostname, 'www.nexusmods.com')
+  assert.equal(url.pathname, '/stardewvalley/mods/50535')
+  assert.equal(url.searchParams.get('file_id'), '178239')
+  assert.equal(url.searchParams.get('nmm'), '1')
+  assert.equal(bridge.exactNexusFileActionUrl('50535', '190561').includes('file_id=178239'), false)
+  for (const invalid of ['0', '-1', '1/2', '1?x=2', '1234567890123']) {
+    assert.equal(bridge.exactNexusFileActionUrl(invalid, '178239'), null)
+    assert.equal(bridge.exactNexusFileActionUrl('50535', invalid), null)
+  }
+})
+
+test('missing dynamic manager link exposes a safe exact-file fallback and a complete retry window', async () => {
+  const h = makeBrowserHarness(null, [])
+  await h.sandbox.startCinderboxBrowserBridge()
+  const links = h.elements.filter(x => x.tag === 'a')
+  assert.equal(links.length, 2)
+  const fallback = links[1]
+  assert.equal(fallback.hidden, false)
+  assert.equal(new URL(fallback.href).searchParams.get('file_id'), '456')
+  assert.equal(new URL(fallback.href).searchParams.get('nmm'), '1')
+  assert.equal(h.sent.length, 0)
+  for (let count = 0; count < 15; count++) {
+    const timer = h.timers.shift()
+    assert.equal(typeof timer, 'function')
+    await timer()
+  }
+  assert.equal(h.timers.length, 0)
+  assert.equal(h.elements.find(x => x.tag === 'button').hidden, false)
+  const retry = h.elements.find(x => x.tag === 'button')
+  retry.on_click()
+  assert.equal(h.timers.length, 1)
+  for (let count = 0; count < 15; count++) {
+    const timer = h.timers.shift()
+    assert.equal(typeof timer, 'function')
+    await timer()
+  }
+  assert.equal(h.timers.length, 0)
+  assert.equal(retry.hidden, false)
+  assert.equal(h.sent.length, 0)
+})

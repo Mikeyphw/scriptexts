@@ -70,6 +70,16 @@
     return byHref.size === 1 ? [...byHref.values()][0] : null
   }
 
+  /** Official Nexus HTTPS file action only. Does not fabricate an NXM token. */
+  function exactNexusFileActionUrl(modId, fileId) {
+    if (!idPattern.test(String(modId || '')) || !idPattern.test(String(fileId || ''))) return null
+    const url = new URL(`https://www.nexusmods.com/stardewvalley/mods/${modId}`)
+    url.searchParams.set('tab', 'files')
+    url.searchParams.set('file_id', fileId)
+    url.searchParams.set('nmm', '1')
+    return url.href
+  }
+
   function matchesNxmUrl(href, modId, fileId) {
     try {
       const url = new URL(href)
@@ -83,5 +93,5 @@
     }
   }
 
-  globalThis.CBNX01 = Object.freeze({parseRequest, extractFileId, selectExactManagerAnchor, matchesNxmUrl})
+  globalThis.CBNX01 = Object.freeze({parseRequest, extractFileId, selectExactManagerAnchor, exactNexusFileActionUrl, matchesNxmUrl})
 })()

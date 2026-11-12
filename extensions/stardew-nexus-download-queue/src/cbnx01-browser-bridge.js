@@ -20,7 +20,14 @@ async function startCinderboxBrowserBridge() {
   openLink.textContent = 'Open in Cinderbox'
   openLink.style.cssText = 'display:inline-block;margin:10px;color:#b9f6cf;text-decoration:underline'
   openLink.hidden = true
-  notice.append(title, message, button, openLink)
+  // The fallback is an exact Nexus HTTPS manager-action URL, not a guessed NXM URI.
+  // A fresh user gesture is needed. Nexus retains control of auth, requirements,
+  // file availability and confirmation, and Android retains its external-app prompt.
+  const nexusFallback = document.createElement('a')
+  nexusFallback.textContent = 'Continue exact file on Nexus'
+  nexusFallback.href = CBNX01.exactNexusFileActionUrl(request.modId, request.fileId)
+  nexusFallback.style.cssText = 'display:inline-block;margin:10px;color:#b9f6cf;text-decoration:underline'
+  notice.append(title, message, button, openLink, nexusFallback)
   ;(document.querySelector('main') || document.body).prepend(notice)
 
   let resolving = false
@@ -35,7 +42,7 @@ async function startCinderboxBrowserBridge() {
       message.textContent = 'Waiting for this exact file and its Mod Manager action. If needed, sign in and open Files.'
       if (attempts >= 15) {
         button.hidden = false
-        message.textContent = 'Exact file action not found. Sign in/open Files, then retry. No other file will be selected.'
+        message.textContent = 'Exact manager link not exposed by this page. Continue the exact file on Nexus using the link below, complete the normal Nexus prompts, or retry. No other file is selected.'
       }
       return
     }
@@ -81,18 +88,28 @@ async function startCinderboxBrowserBridge() {
     }
   }
 
-  button.addEventListener('click', () => {
-    attempts = 0
-    button.hidden = true
-    resolveExactFile().catch(() => { button.hidden = false })
-  })
-
-  // Retrying is bounded; no site login, wait screen, or confirmation is skipped.
+  // Retrying re-arms the complete 15-check window, not just one probe.
+  // No site login, wait screen or confirmation is bypassed.
   const probe = async () => {
-    if (finished || resolving) return
+    if (finished) return
+    if (resolving) {
+      setTimeout(probe, 900)
+      return
+    }
     attempts++
-    await resolveExactFile()
+    try {
+      await resolveExactFile()
+    } catch (_) {
+      button.hidden = false
+      // Never reveal provider exceptions: they may contain private URLs.
+    }
     if (!finished && attempts < 15) setTimeout(probe, 900)
   }
+  button.addEventListener('click', () => {
+    if (finished) return
+    attempts = 0
+    button.hidden = true
+    setTimeout(probe, 100)
+  })
   setTimeout(probe, 600)
 }

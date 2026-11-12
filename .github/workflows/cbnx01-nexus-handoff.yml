@@ -2,8 +2,15 @@ name: CB-NX01 Stardew Firefox Exact-File Handoff
 on:
   pull_request:
     paths:
+      - 'repo-manifest.json'
+      - 'tools/tests/cbnx01-ci-hardening.test.mjs'
       - 'extensions/stardew-nexus-download-queue/src/**'
       - 'tools/tests/cbnx01-handoff.test.mjs'
+      - 'tools/tests/cbnx03-pairing.test.mjs'
+      - 'tools/tests/cbnx03b-security-gate.py'
+      - 'tools/tests/cbnx04-authority.test.mjs'
+      - 'tools/tests/cbnx04-security-gate.py'
+      - 'tools/tests/cbnx05c-*'
       - '.github/workflows/cbnx01-nexus-handoff.yml'
   workflow_dispatch:
 permissions:
@@ -22,5 +29,22 @@ jobs:
       - run: node --check extensions/stardew-nexus-download-queue/src/cbnx01-browser-bridge.js
       - run: node --check extensions/stardew-nexus-download-queue/src/content.js
       - run: node --check extensions/stardew-nexus-download-queue/src/background.js
+      - run: node --test tools/tests/cbnx01-ci-hardening.test.mjs
       - run: node --test tools/tests/cbnx01-handoff.test.mjs
+      - run: node --check extensions/stardew-nexus-download-queue/src/cbnx03-background.js
+      - run: node --check extensions/stardew-nexus-download-queue/src/cbnx03-popup.js
+      - run: node --test tools/tests/cbnx03-pairing.test.mjs
+      - run: python3 tools/tests/cbnx03b-security-gate.py
+      - run: python3 tools/tests/cbnx04-security-gate.py
+      - run: node --test tools/tests/cbnx04-authority.test.mjs
+      - run: node --check extensions/stardew-nexus-download-queue/src/cbnx05c-evidence-policy.js
+      - run: node --check extensions/stardew-nexus-download-queue/src/cbnx05c-content.js
+      - run: node --test tools/tests/cbnx05c-page-evidence.test.mjs
+      - run: python3 tools/tests/cbnx05c-security-negative-tests.py
       - run: python3 extensions/stardew-nexus-download-queue/build.py
+      - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4
+        with:
+          name: stardew-nexus-queue-unsigned-xpi
+          path: extensions/stardew-nexus-download-queue/dist/*.xpi
+          if-no-files-found: error
+          retention-days: 14

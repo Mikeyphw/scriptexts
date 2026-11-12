@@ -2,7 +2,7 @@ const DEFAULT_SETTINGS = {
   showListingButtons: true,
   listingButtonMode: "both",
   listingButtonStyle: "icon",
-  interceptPageDownloads: true,
+  interceptPageDownloads: false,
   autoProcessQueue: true,
   notifyOnComplete: true,
   preferManagerForDefaultButton: false,
@@ -61,8 +61,13 @@ function log(...args) {
 }
 
 async function loadState() {
-  const stored = await browser.storage.local.get(["settings", "queue", "nextQueueId", "downloadToQueue"])
+  const stored = await browser.storage.local.get(["settings", "queue", "nextQueueId", "downloadToQueue", "cbnx05c_interception_migrated"])
   state.settings = { ...DEFAULT_SETTINGS, ...(stored.settings || {}) }
+  // Earlier versions silently defaulted to interception ON. A one-time
+  // security migration requires fresh explicit consent rather than preserving
+  // an indistinguishable inherited default. Do not re-enable automatically.
+  const needsInterceptionReset = stored.cbnx05c_interception_migrated !== true
+  if (needsInterceptionReset) state.settings.interceptPageDownloads = false
   state.queue = Array.isArray(stored.queue) ? stored.queue : []
   state.nextQueueId = Number.isInteger(stored.nextQueueId) ? stored.nextQueueId : 1
   state.downloadToQueue = stored.downloadToQueue && typeof stored.downloadToQueue === "object" ? stored.downloadToQueue : {}
@@ -75,6 +80,7 @@ async function loadState() {
     }
   }
   await persist()
+  if (needsInterceptionReset) await browser.storage.local.set({ cbnx05c_interception_migrated: true })
   await processQueue()
 }
 
