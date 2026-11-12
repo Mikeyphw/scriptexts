@@ -153,6 +153,61 @@ class Lab02CSecurityTests(unittest.TestCase):
         self.refuse('popup.html', '<h1>Stardew Nexus Queue</h1>', '<h1>Changed</h1>',
                     'ANCHOR_DRIFT:POPUP_LAB_BANNER')
 
+    @staticmethod
+    def lab_ux_fixture():
+        files = fixture()
+        files['popup.css'] = b'body {\n  overflow: hidden;\n}\n.app {\n  overflow: hidden;\n}\n'
+        files['cbnx03-popup.js'] = (
+            "header.textContent = 'Cinderbox companion'\n"
+            "code.placeholder = '9-digit Cinderbox code'\n"
+            "  code.autocomplete = 'off'\n"
+            "  status.textContent = 'Not paired'\n"
+            "  panel.append(header, description, destinationTitle, rememberLabel, destinationInfo,\n"
+            "    code, pair, refresh, revoke, status, authority, jobs,\n"
+            "  main.append(panel)\n"
+            "    canHandoff = result?.state === 'connected' && result.handoffEnabled === true\n"
+            "  pair.addEventListener('click', async () => {\n"
+            "    const value = code.value.trim()\n"
+            "    code.value = '' // Keep the manually entered code out of page history and DOM.\n"
+            "    render(await send({ type: 'CBNX03_PAIR', code: value }))\n"
+            "  })\n"
+            "offline: 'Cinderbox unavailable. Use regular NXM handoff.',\n"
+        ).encode()
+        return files
+
+    def test_lab_only_scroll_and_pairing_first_controls(self):
+        src = self.lab_ux_fixture()
+        out = builder.render_variant(src)
+        css = out['popup.css'].decode()
+        popup = out['cbnx03-popup.js'].decode()
+        self.assertIn('overflow-y: auto;', css)
+        self.assertIn('touch-action: pan-y;', css)
+        self.assertIn('.app > .header, .app > .panel { flex: 0 0 auto; }', css)
+        self.assertIn("if (top) top.after(panel)", popup)
+        self.assertIn("pairingActions.append(pair, refresh, revoke)", popup)
+        self.assertIn("status.setAttribute('aria-live', 'polite')", popup)
+        self.assertIn('9-digit Cinderbox LAB pairing code', popup)
+        self.assertIn("if (outcome?.state === 'paired') render(await send({ type: 'CBNX03_STATUS' }))",popup)
+        self.assertNotIn('main.append(panel)', popup)
+        self.assertNotIn('regular NXM handoff', popup)
+        # The canonical source dictionaries passed to the builder are immutable.
+        self.assertEqual(src['popup.css'], self.lab_ux_fixture()['popup.css'])
+        self.assertEqual(src['cbnx03-popup.js'], self.lab_ux_fixture()['cbnx03-popup.js'])
+        self.assertNotIn('overflow-y: auto;', src['popup.css'].decode())
+
+    def test_lab_scroll_rejects_hidden_viewport_layout_drift(self):
+        src = self.lab_ux_fixture()
+        src['popup.css'] = src['popup.css'].replace(b'overflow: hidden;',b'overflow: visible;')
+        src['popup.css'] = src['popup.css'].replace(b'overflow: hidden;',b'overflow: visible;')
+        with self.assertRaisesRegex(builder.Refused,'LAB_POPUP_SCROLL_SOURCE_DRIFT'):
+            builder.render_variant(src)
+
+    def test_lab_pairing_rejects_missing_input_anchor(self):
+        src = self.lab_ux_fixture()
+        src['cbnx03-popup.js'] = src['cbnx03-popup.js'].replace(b'9-digit Cinderbox code', b'other text')
+        with self.assertRaisesRegex(builder.Refused,'LAB_PAIRING_POPUP_SOURCE_DRIFT'):
+            builder.render_variant(src)
+
     def test_reproducible_unsigned_xpi_and_receipt(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)

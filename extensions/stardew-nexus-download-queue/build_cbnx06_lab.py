@@ -107,6 +107,90 @@ def render_variant(files: dict[str, bytes]) -> dict[str, bytes]:
     popup = files['cbnx03-popup.js'].decode('utf-8')
     popup = replace_once(popup, "header.textContent = 'Cinderbox companion'",
                          "header.textContent = 'Cinderbox LAB companion (38472)'", 'POPUP_COMPANION_IDENTITY')
+    # LAB-only mobile UX: generated in memory; canonical extension stays unchanged.
+    # The historical source-only fixtures intentionally omit popup.css.
+    if 'popup.css' in files:
+        css = files['popup.css'].decode('utf-8')
+        require('overflow: hidden;' in css and '.app {' in css and 'body {' in css,
+                'LAB_POPUP_SCROLL_SOURCE_DRIFT')
+        require("code.placeholder = '9-digit Cinderbox code'" in popup and
+                '  main.append(panel)' in popup and
+                '  panel.append(header, description, destinationTitle, rememberLabel, destinationInfo,' in popup,
+                'LAB_PAIRING_POPUP_SOURCE_DRIFT')
+        # In Iceraven, the app flexbox had overflow:hidden at BOTH scroll roots.
+        # Make the inner app a touch-scroll region and prevent cards shrinking.
+        css += """
+
+/* CBNX06 LAB-only: Iceraven popup full-page scroll and usable pairing controls. */
+.app {
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior-y: contain;
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+.app > .header, .app > .panel { flex: 0 0 auto; }
+.cbnx-lab-pairing-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.cbnx-lab-pairing-actions > button { flex: 1 1 105px; }
+.cbnx-lab-pairing-code { width: 100%; max-width: 100%; font-size: 16px; }
+.cbnx-lab-status { padding: 8px 10px; border-radius: 10px; background: var(--nxq-panel-2); }
+.cbnx-lab-consent { color: var(--nxq-muted); font-size: 13px; }
+"""
+        files['popup.css'] = css.encode('utf-8')
+        popup = replace_once(popup,
+            "  code.autocomplete = 'off'",
+            "  code.autocomplete = 'off'\n"
+            "  code.setAttribute('aria-label', '9-digit Cinderbox LAB pairing code')\n"
+            "  code.className = 'cbnx-lab-pairing-code'",
+            'LAB_PAIRING_INPUT')
+        popup = replace_once(popup,
+            "  status.textContent = 'Not paired'",
+            "  status.textContent = 'Not paired'\n"
+            "  status.className = 'cbnx-lab-status'\n"
+            "  status.setAttribute('aria-live', 'polite')",
+            'LAB_PAIRING_STATUS')
+        popup = replace_once(popup,
+            "  panel.append(header, description, destinationTitle, rememberLabel, destinationInfo,",
+            "  const pairingTitle = document.createElement('h3')\n"
+            "  pairingTitle.textContent = 'Step 1 · Pair with Cinderbox LAB'\n"
+            "  const pairingHint = document.createElement('p')\n"
+            "  pairingHint.textContent = 'In Cinderbox LAB Settings, tap Start pairing window. Enter its 9-digit code here. No downloads or installs happen during pairing.'\n"
+            "  const pairingActions = document.createElement('div')\n"
+            "  pairingActions.className = 'cbnx-lab-pairing-actions'\n"
+            "  pairingActions.append(pair, refresh, revoke)\n"
+            "  const consent = document.createElement('p')\n"
+            "  consent.className = 'cbnx-lab-consent'\n"
+            "  consent.textContent = 'Step 2 · After pairing, allow exact-file requests in Cinderbox LAB Settings.'\n"
+            "  panel.append(header, description, pairingTitle, pairingHint, code, pairingActions, status, consent, destinationTitle, rememberLabel, destinationInfo,",
+            'LAB_PAIRING_FIRST_GROUP')
+        popup = replace_once(popup,
+            "    code, pair, refresh, revoke, status, authority, jobs,",
+            "    authority, jobs,",
+            'LAB_PAIRING_NO_DUPLICATES')
+        popup = replace_once(popup,
+            '  main.append(panel)',
+            "  const top = main.querySelector('.header')\n"
+            "  if (top) top.after(panel)\n"
+            "  else main.prepend(panel)",
+            'LAB_PAIRING_TOP_PLACEMENT')
+        popup = replace_once(popup,
+            "    canHandoff = result?.state === 'connected' && result.handoffEnabled === true",
+            "    canHandoff = result?.state === 'connected' && result.handoffEnabled === true\n"
+            "    consent.textContent = canHandoff\n"
+            "      ? 'Ready · Exact-file requests enabled in LAB. Select a file from the browser queue below.'\n"
+            "      : result?.state === 'connected' || result?.state === 'paired'\n"
+            "        ? 'Connected · Enable Allow exact-file requests from Firefox in Cinderbox LAB Settings, then tap Refresh local evidence.'\n"
+            "        : 'Start pairing in the LAB app, then enter its current 9-digit code above.'",
+            'LAB_PAIRING_CONSENT_STATUS')
+        popup = replace_once(popup,
+            "  pair.addEventListener('click', async () => {\n    const value = code.value.trim()\n    code.value = '' // Keep the manually entered code out of page history and DOM.\n    render(await send({ type: 'CBNX03_PAIR', code: value }))\n  })",
+            "  pair.addEventListener('click', async () => {\n    const value = code.value.trim()\n    code.value = '' // Keep the manually entered code out of page history and DOM.\n    const outcome = await send({ type: 'CBNX03_PAIR', code: value })\n    render(outcome)\n    if (outcome?.state === 'paired') render(await send({ type: 'CBNX03_STATUS' }))\n  })\n  code.addEventListener('keydown', event => {\n    if (event.key === 'Enter') { event.preventDefault(); pair.click() }\n  })",
+            'LAB_PAIRING_AUTO_REFRESH')
+        popup = replace_once(popup,
+            "offline: 'Cinderbox unavailable. Use regular NXM handoff.',",
+            "offline: 'Cinderbox LAB unavailable. Browser downloads remain available; LAB never launches NXM.',",
+            'LAB_OFFLINE_NO_PRODUCTION_ROUTING')
     files['cbnx03-popup.js'] = popup.encode()
 
     html = files['popup.html'].decode('utf-8')
