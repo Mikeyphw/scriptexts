@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "repository": "Mikeyphw/scriptexts",
+  "base_branch": "main",
+  "event": "pull_request",
+  "release_qualification": "separate",
+  "required_workflows": [
+    {
+      "name": "Validate",
+      "workflow_id": 317669398
+    },
+    {
+      "name": "Devtool S7 P03 scriptexts Consumer Adoption",
+      "workflow_id": 418864667
+    }
+  ]
+}
