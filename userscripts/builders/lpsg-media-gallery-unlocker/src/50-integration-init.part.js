@@ -330,5 +330,6 @@
         }, 1500);
     }
 
+    mobileSetDataSaver(Boolean(mobileStorageRead("pg_mf_data_saver", navigator.connection?.saveData || false)));
     init();
 })();

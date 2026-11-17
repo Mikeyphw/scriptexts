@@ -1207,6 +1207,7 @@
     }
 
     async function hydrateVideoDurations(reason = "manual") {
+        if ((mobileStorageRead("pg_mf_data_saver", false) || document.visibilityState === "hidden") && !["manual", "button", "more-sheet", "shortcut"].includes(reason)) return;
         if (state.videoDurationHydrationRunning) {
             state.videoDurationHydrationQueued = true;
             return;
@@ -2027,7 +2028,7 @@
         return entry.pageNumber >= tailStart || entry.pageNumber === threadInfo.currentPage || isCurrentDocumentUrl(entry.url, threadInfo);
     }
 
-    async function scanAllThreadPages() {
+    async function scanAllThreadPages(mode = "all") {
         if (state.scanRunning) {
             return;
         }
@@ -2045,7 +2046,8 @@
         setActionButtonsDisabled(true);
         setCancelButtonVisible(true);
         const signal = state.scanAbortController.signal;
-        const queue = discoverThreadPageUrls(document, threadInfo);
+        const discoveredPages = discoverThreadPageUrls(document, threadInfo);
+        const queue = mode === "recent" ? discoveredPages.slice(-5) : discoveredPages;
         const lastPage = Math.max(1, ...queue.map(getPageNumberFromUrl));
         let completed = 0;
         let failed = 0;
@@ -2067,11 +2069,13 @@
 
         try {
             setProgress(`Preparing incremental scan · ${queue.length} page(s)`, 0, Math.max(queue.length, 1));
-            const workQueue = await Promise.all(queue.map(async url => {
+            let workQueue = await Promise.all(queue.map(async url => {
                 const pageNumber = getPageNumberFromUrl(url);
                 return { url, pageNumber, cacheRecord: await loadPageScanCache(pageNumber) };
             }));
             assertNotAborted(signal);
+            if (mode === "uncached") workQueue = workQueue.filter(entry => !entry.cacheRecord || shouldRevalidateCachedPage(entry, lastPage, threadInfo));
+            setProgress(`Scanning ${workQueue.length} page(s) (${mode})`, 0, Math.max(workQueue.length, 1));
 
             await runConcurrent(workQueue, config.scanConcurrency, async entry => {
                 assertNotAborted(signal);
@@ -2141,8 +2145,8 @@
                     addDebugLog("warn", "Thread page scan failed after retries.", { pageNumber: entry.pageNumber, url: entry.url, cachedFallback: usedCachedFallback, error: stringifyDebugValue(error) });
                 } finally {
                     completed += 1;
-                    const message = `Scanning pages: ${completed}/${queue.length} · ${reused} cached · ${changed} changed · ${failed} failed · ${state.mediaById.size + pendingMedia.length} candidates`;
-                    setProgress(message, completed, queue.length);
+                    const message = `Scanning pages: ${completed}/${workQueue.length} · ${reused} cached · ${changed} changed · ${failed} failed · ${state.mediaById.size + pendingMedia.length} candidates`;
+                    setProgress(message, completed, workQueue.length);
                 }
             });
 
@@ -2157,7 +2161,7 @@
                 done: true,
                 timeout: 4500,
             });
-            addDebugLog(failed > 0 ? "warn" : "ok", "Incremental thread scan complete.", { pages: queue.length, reused, changed, failed, media: state.mediaById.size, failures: Array.from(state.scanPageFailures.values()) });
+            addDebugLog(failed > 0 ? "warn" : "ok", "Incremental thread scan complete.", { pages: workQueue.length, reused, changed, failed, media: state.mediaById.size, failures: Array.from(state.scanPageFailures.values()) });
             scheduleThreadMetadataCacheSave();
         } catch (error) {
             flushPendingMedia();

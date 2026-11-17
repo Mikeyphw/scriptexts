@@ -34,6 +34,7 @@
             state.pageFilter,
             state.selectedOnly ? state.selectionRevision : 0,
             state.selectedOnly,
+            mobileUX.favoritesOnly, mobileUX.recentOnly,
             state.groupByPage,
             query,
             sort,
@@ -56,6 +57,8 @@
         if (state.selectedOnly) {
             media = media.filter(item => state.selectedMediaIds.has(item.id));
         }
+        if (mobileUX.favoritesOnly) media = media.filter(item => mobileUX.favorites.has(item.id));
+        if (mobileUX.recentOnly) media = media.filter(item => mobileUX.recent.has(item.id));
 
         if (query) {
             media = media.filter(item => {
@@ -143,6 +146,7 @@
         const gap = isMobileLayout() ? 10 : config.galleryGridGap;
 
         root.style.setProperty("--pg-card-min-width", `${width}px`);
+        root.style.setProperty("--pg-mf-card-width", `${width}px`);
         root.style.setProperty("--pg-grid-gap", `${gap}px`);
 
         document.querySelectorAll("#pg-card-size, #pg-more-card-size").forEach(selector => {
@@ -348,6 +352,7 @@
     }
 
     function startPreviewVideoForCard(card) {
+        if (mobileStorageRead("pg_mf_data_saver", false)) return;
         if (!card || card.dataset.type !== "video" || isIOS || window.matchMedia("(pointer: coarse)").matches) {
             return;
         }
@@ -435,7 +440,7 @@
                 return;
             }
 
-            if (isMobileLayout() && (state.selectionMode || state.selectedMediaIds.size > 0)) {
+            if (isMobileLayout() && state.selectionMode) {
                 const selected = !state.selectedMediaIds.has(item.id);
                 checkbox.checked = selected;
                 card.classList.toggle("pg-selected", selected);
@@ -558,6 +563,8 @@
         }
 
         cancelPendingRender();
+        state.mobileRenderObserver?.disconnect();
+        state.mobileRenderObserver = null;
         stopActivePreviewVideo();
         attachGalleryGridHandlers(grid);
         applyGalleryGridSize();
@@ -606,6 +613,9 @@
         const filteredIndexById = new Map(state.filteredMedia.map((item, index) => [item.id, index]));
         const token = ++state.renderToken;
         let cursor = 0;
+        const lowMemory = Number(navigator.deviceMemory) > 0 && Number(navigator.deviceMemory) <= 2;
+        const pageSize = isMobileLayout() ? (lowMemory ? 120 : 240) : displayOrder.length;
+        let visibleLimit = Math.min(pageSize, displayOrder.length);
 
         const appendChunk = () => {
             if (token !== state.renderToken || !document.body.contains(grid)) {
@@ -613,7 +623,7 @@
             }
 
             const fragment = document.createDocumentFragment();
-            const end = Math.min(displayOrder.length, cursor + config.renderChunkSize);
+            const end = Math.min(visibleLimit, cursor + config.renderChunkSize);
 
             while (cursor < end) {
                 const item = displayOrder[cursor];
@@ -632,8 +642,29 @@
 
             grid.appendChild(fragment);
 
-            if (cursor < displayOrder.length) {
+            if (cursor < visibleLimit) {
                 requestAnimationFrame(appendChunk);
+            } else if (visibleLimit < displayOrder.length) {
+                const button = document.createElement("button");
+                button.className = "pg-mf-load-more";
+                button.type = "button";
+                button.textContent = `Load more (${visibleLimit}/${displayOrder.length} shown)`;
+                const next = () => {
+                    if (token !== state.renderToken) return;
+                    state.mobileRenderObserver?.disconnect();
+                    state.mobileRenderObserver = null;
+                    button.remove();
+                    visibleLimit = Math.min(displayOrder.length, visibleLimit + pageSize);
+                    requestAnimationFrame(appendChunk);
+                };
+                button.addEventListener("click", next);
+                grid.appendChild(button);
+                if (typeof IntersectionObserver === "function") {
+                    state.mobileRenderObserver = new IntersectionObserver(entries => {
+                        if (entries.some(entry => entry.isIntersecting)) next();
+                    }, { root: document.querySelector(".pg-gallery-scroll"), rootMargin: "200px" });
+                    state.mobileRenderObserver.observe(button);
+                }
             }
         };
 
@@ -706,6 +737,8 @@
         }
 
         cancelPendingRender();
+        state.mobileRenderObserver?.disconnect();
+        state.mobileRenderObserver = null;
         stopActivePreviewVideo();
         void flushThreadMetadataCacheSave();
 
@@ -738,6 +771,7 @@
     }
 
     function closeLightbox() {
+        mobileResetZoom();
         const lightbox = document.getElementById("pg-lightbox");
         const stage = document.getElementById("pg-lb-stage");
 
@@ -758,7 +792,10 @@
     }
 
     function updateLightboxContent() {
+        mobileResetZoom();
         const item = state.filteredMedia[state.currentIndex];
+        mobileMarkViewed(item);
+        refreshMobileLightboxActions();
         const stage = document.getElementById("pg-lb-stage");
         const lightbox = document.getElementById("pg-lightbox");
         const counter = document.querySelector(".pg-lb-counter");
@@ -801,7 +838,8 @@
             mediaElement.className = "pg-lb-media";
             mediaElement.controls = true;
             mediaElement.playsInline = true;
-            mediaElement.autoplay = true;
+            mediaElement.autoplay = !mobileStorageRead("pg_mf_data_saver", false);
+            mediaElement.preload = mobileStorageRead("pg_mf_data_saver", false) ? "metadata" : "auto";
             mediaElement.volume = config.volume;
 
             if (item.poster) {

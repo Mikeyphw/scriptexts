@@ -554,6 +554,7 @@
         state.zipAbortController = new AbortController();
         state.lastFailedZipEntries = [];
         state.lastZipItems = items;
+        mobileDownloadCheckpoint(items);
         state.lastZipProgressUpdate = 0;
         state.blockedZipSourceHosts = new Map();
         state.zipSourceScores = new Map();
@@ -614,6 +615,7 @@
             const zipBlob = await writer.close();
             const action = triggerZipPartDownload(zipBlob, partNumber, isOnlyPart, runId, jobId, archiveBaseName, currentPartPage, currentPagePartIndex);
             downloadActions.push(action);
+            mobileSaveDeliveredPart(partManifestEntries, action.download, zipBlob.size, action.href);
             addDebugLog("ok", "ZIP part finalized.", {
                 runId,
                 jobId,
@@ -659,6 +661,7 @@
                         };
         } catch (error) {
                         failed += 1;
+                        mobileRecordItemResult(entry.item, "failed");
                         failedEntries.push({
                             item: entry.item,
                             index: entry.index,
@@ -738,6 +741,7 @@
                     partBytes += file.blob.size;
                     partFiles += 1;
                     partManifestEntries.push({ item: file.item, fileName: file.fileName, url: file.url, size: file.blob.size });
+                    mobileRecordItemResult(file.item, "archived", file.blob.size);
                     archivedBytes += file.blob.size;
                     archivedFiles += 1;
 
@@ -782,6 +786,7 @@
 
             await closePart(grouping === "page" || partNumber === 1);
             saveZipJobSummary({ status: "complete", completed, total: items.length, failed, parts: partNumber, archivedBytes });
+            mobileFinishDownload(failed ? "completed-with-errors" : "completed");
             const elapsedMs = Math.round(performance.now() - startedAt);
             clearProgress(`ZIP complete. ${archivedFiles} file(s) added, ${failed} failed.`);
             showToast("zip", `ZIP complete: ${archivedFiles}/${items.length} added · ${failed} failed · ${partNumber} part(s).`, {
@@ -821,6 +826,7 @@
                 state.zipDetailsOpen = true;
             }
             saveZipJobSummary({ status: cancelled ? "cancelled" : "failed", completed, total: items.length, failed, parts: partNumber, archivedBytes });
+            mobileFinishDownload(cancelled ? "cancelled" : "failed");
             clearProgress(cancelled ? "ZIP cancelled." : `ZIP failed. ${archivedFiles} file(s) added, ${failed} failed.`);
             showToast("zip", cancelled ? "ZIP cancelled." : "ZIP could not finish. Use Details for problems and diagnostics.", {
                 level: cancelled ? "warn" : "error",

@@ -5,7 +5,7 @@
 // @supportURL   https://github.com/Mikeyphw/scriptexts/issues
 // @updateURL    https://raw.githubusercontent.com/Mikeyphw/scriptexts/main/userscripts/standalone/lpsg-media-gallery-unlocker/lpsg-media-gallery-unlocker.meta.js
 // @downloadURL  https://raw.githubusercontent.com/Mikeyphw/scriptexts/main/userscripts/standalone/lpsg-media-gallery-unlocker/lpsg-media-gallery-unlocker.user.js
-// @version      6.7.5-optimized
+// @version      6.8.0-mobile
 // @description  Optimized LPSG media gallery with complete post-scoped discovery, streaming ZIPs, page-title archive names, mobile-safe defaults, smart source fallback, and lightweight optional resume caching.
 // @author       CurlyWurly
 // @match        https://www.lpsg.com/*
@@ -156,6 +156,7 @@
         renderDebounceTimer: null,
         renderToken: 0,
         lazyObserverTimer: null,
+        mobileRenderObserver: null,
         metadataSaveTimer: null,
         gallerySearchTimer: null,
         activePreviewVideo: null,
@@ -2279,6 +2280,106 @@
         }
         #pg-container.pg-mobile-profile .pg-sticky-status { display: none !important; }
         #pg-container.pg-coarse-pointer .pg-item:hover { transform: none; box-shadow: none; }
+
+        /* Mobile-first UI: isolated in #pg-container; desktop behavior remains intact. */
+        #pg-container.pg-mobile-profile .pg-mf-nav {
+            display: grid; grid-template-columns: repeat(5, minmax(0, 1fr));
+            gap: 2px; flex: 0 0 auto; background: #151515;
+            border-top: 1px solid rgba(255,255,255,.17);
+            padding: 3px 4px calc(4px + env(safe-area-inset-bottom, 0px));
+            z-index: 45; order: 99;
+        }
+        #pg-container:not(.pg-mobile-profile) .pg-mf-nav { display: none; }
+        #pg-container.pg-mobile-profile .pg-mf-nav button {
+            min-height: 50px; min-width: 0; border: 0; border-radius: 10px;
+            background: transparent; color: #fff; font-size: 23px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            gap: 2px; touch-action: manipulation;
+        }
+        #pg-container.pg-mobile-profile .pg-mf-nav button span { font-size: 10px; line-height: 1.2; }
+        #pg-container.pg-mobile-profile .pg-mf-nav button:active,
+        #pg-container.pg-mobile-profile .pg-mf-nav button[aria-pressed="true"] { background: rgba(255,215,0,.19); color: #ffdb66; }
+        #pg-container.pg-mobile-profile .pg-mf-nav button:focus-visible,
+        #pg-container.pg-mobile-profile .pg-mf-sheet button:focus-visible,
+        #pg-container.pg-mobile-profile .pg-mf-sheet input:focus-visible { outline: 2px solid #ffdb66; outline-offset: -2px; }
+        #pg-container.pg-mobile-profile .pg-sticky-download-bar {
+            padding: 5px 10px; min-height: 43px; gap: 6px;
+            grid-template-columns: minmax(0, 1fr) auto auto;
+            order: 90;
+        }
+        #pg-container.pg-mobile-profile #pg-sticky-more,
+        #pg-container.pg-mobile-profile #pg-sticky-none,
+        #pg-container.pg-mobile-profile #pg-sticky-failed { display: none !important; }
+        #pg-container.pg-mobile-profile .pg-mf-sheet {
+            position: absolute; z-index: 110; inset: auto 0 0 0;
+            padding: 18px 15px calc(22px + env(safe-area-inset-bottom, 0px));
+            max-height: min(89dvh, 95%); overflow: auto; overscroll-behavior: contain;
+            background: #161616; border-radius: 20px 20px 0 0;
+            border-top: 1px solid rgba(255,255,255,.23);
+            box-shadow: 0 -20px 70px rgba(0,0,0,.5); color: white;
+            display: flex; flex-direction: column; gap: 14px;
+        }
+        #pg-container .pg-mf-sheet[hidden] { display: none !important; }
+        #pg-container:not(.pg-mobile-profile) .pg-mf-sheet { display: none !important; }
+        #pg-container .pg-mf-sheet-head { display: flex; align-items: center; justify-content: space-between; }
+        #pg-container .pg-mf-sheet-head strong { font-size: 19px; }
+        #pg-container .pg-mf-sheet-head button { width: 48px; min-height: 48px; font-size: 26px; }
+        #pg-container .pg-mf-sheet label { display: flex; flex-direction: column; gap: 6px; color: #ddd; font-size: 14px; }
+        #pg-container .pg-mf-sheet label:has(input[type="checkbox"]) { flex-direction: row; align-items: center; }
+        #pg-container .pg-mf-sheet input[type="search"],
+        #pg-container .pg-mf-sheet select {
+            width: 100%; height: 48px; box-sizing: border-box; padding: 9px 12px;
+            border-radius: 10px; background: #252525; color: white;
+            border: 1px solid #666; font-size: 16px;
+        }
+        #pg-container .pg-mf-sheet button { min-height: 44px; border: 1px solid #555; border-radius: 10px; background: #2a2a2a; color: white; padding: 8px 12px; }
+        #pg-container .pg-mf-chips { display: flex; flex-wrap: wrap; gap: 7px; }
+        #pg-container .pg-mf-chips button[aria-pressed="true"] { border-color: #ffdb66; color: #ffdb66; }
+        #pg-container .pg-mf-sheet-foot { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+        #pg-container .pg-mf-sheet-foot span { flex: 1 1 100%; }
+        #pg-container .pg-mf-sheet p { margin: 0; font-size: 13px; line-height: 1.45; color: #bbb; }
+        #pg-container #pg-mf-parts { max-height: 130px; overflow: auto; font-size: 12px; }
+        #pg-container #pg-mf-parts > div { padding: 6px 0; border-bottom: 1px solid #333; }
+        #pg-container.pg-mobile-profile .pg-grid {
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--pg-mf-card-width, 132px)), 1fr));
+            align-content: start; gap: var(--pg-grid-gap);
+        }
+        #pg-container.pg-mobile-profile .pg-item { contain: layout paint style; }
+        #pg-container.pg-mobile-profile .pg-gallery-scroll { overscroll-behavior: contain; min-height: 0; }
+        #pg-container.pg-mobile-profile .pg-lb-controls { gap: 3px; flex-wrap: wrap; }
+        #pg-container.pg-mobile-profile .pg-lb-controls button,
+        #pg-container.pg-mobile-profile .pg-lb-controls a { min-height: 44px; min-width: 44px; }
+        #pg-container.pg-mobile-profile #pg-mf-favorite-action,
+        #pg-container.pg-mobile-profile #pg-mf-share-action,
+        #pg-container.pg-mobile-profile #pg-mf-share-file-action { font-size: 12px; width: auto; padding-inline: 8px; }
+        #pg-container.pg-mobile-profile:has(#pg-lightbox.active) .pg-mf-nav { display: none; }
+        #pg-container.pg-mobile-profile.pg-mf-data-saver .pg-video-poster { animation: none; }
+        @media (orientation: landscape) and (max-height: 480px) {
+            #pg-container.pg-mobile-profile .pg-header { padding: 4px 10px; }
+            #pg-container.pg-mobile-profile .pg-mobile-subtitle { display: none; }
+            #pg-container.pg-mobile-profile .pg-mf-nav button { min-height: 40px; font-size: 19px; }
+            #pg-container.pg-mobile-profile .pg-mf-sheet { max-height: 93dvh; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            #pg-container .pg-mf-nav *, #pg-container .pg-mf-sheet *,
+            #pg-container .pg-item { animation-duration: 0s !important; transition-duration: 0s !important; scroll-behavior: auto !important; }
+        }
+        #pg-container.pg-mobile-profile .pg-mf-load-more {
+            grid-column: 1 / -1; min-height: 48px; border-radius: 10px;
+            border: 1px solid #555; background: #292929; color: #fff;
+            margin: 12px 0 18px; font-size: 14px;
+        }
+        /* Disable transition lag during finger-tracked pan/pinch while keeping desktop zoom intact. */
+        #pg-container.pg-mobile-profile #pg-lb-stage img.pg-lb-media.pg-zoomed {
+            transition: none;
+            will-change: transform;
+        }
+        #pg-container.pg-mobile-profile #pg-mf-parts a {
+            display: inline-flex; align-items: center; min-height: 44px;
+            margin-inline-start: 10px; padding: 4px 8px;
+            border: 1px solid #666; border-radius: 8px;
+            color: #ffdb66; text-decoration: none;
+        }
 
     `;
 

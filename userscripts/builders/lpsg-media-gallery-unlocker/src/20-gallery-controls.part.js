@@ -583,6 +583,7 @@
         state.container = container;
         state.lightbox = container.querySelector("#pg-lightbox");
         restoreZipJobSummary();
+        installMobileUX();
 
         container.querySelectorAll(".pg-filter-btn").forEach(button => {
             const filterType = button.dataset.filter || "all";
@@ -918,6 +919,7 @@
         }
 
         updateFloatingButtonLabel();
+        mobileUpdateDock();
         updateProgressDrawerControls();
         updateDesktopOverview();
     }
@@ -1012,6 +1014,7 @@
     }
 
     function focusGallerySearch() {
+        if (isMobileLayout()) { mobileOpenSearch(); return; }
         const input = document.getElementById("pg-gallery-search");
         if (input) {
             input.focus();
@@ -1230,6 +1233,7 @@
     }
 
     function resetLightboxZoom() {
+        mobileResetZoom();
         state.lightboxZoomed = false;
         document.querySelectorAll(".pg-lb-media.pg-zoomed").forEach(node => {
             node.classList.remove("pg-zoomed");
@@ -1255,6 +1259,12 @@
             return;
         }
 
+        if (isMobileLayout()) {
+            mobileZoom.scale = mobileZoom.scale > 1.05 ? 1 : 2;
+            mobileZoom.x = 0; mobileZoom.y = 0;
+            mobileRenderZoom();
+            return;
+        }
         state.lightboxZoomed = !state.lightboxZoomed;
         image.classList.toggle("pg-zoomed", state.lightboxZoomed);
 
@@ -1311,7 +1321,7 @@
             const dy = event.changedTouches[0].clientY - startY;
             gestureMoved = gestureMoved || Math.abs(dx) > 12 || Math.abs(dy) > 12;
 
-            if (pinchStarted && event.touches.length > 1) {
+            if (!isMobileLayout() && pinchStarted && event.touches.length > 1) {
                 const distance = getTouchDistance(event.touches);
 
                 if (startDistance > 0 && Math.abs(distance - startDistance) > 38) {
@@ -1328,6 +1338,7 @@
                 return;
             }
 
+            if (state.lightboxZoomed) return;
             const dx = event.changedTouches[0].clientX - startX;
             const dy = event.changedTouches[0].clientY - startY;
             const absX = Math.abs(dx);
